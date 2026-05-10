@@ -52,14 +52,22 @@
 
         .item .thumb {
             display: flex; align-items: center; justify-content: center;
-            height: 100px;
+            height: 110px;
             background:
-                radial-gradient(circle at center, rgba(202,160,64,0.18), transparent 70%),
-                rgba(8,5,2,0.7);
-            border: 1px solid rgba(202,160,64,0.2);
+                radial-gradient(circle at center, rgba(202,160,64,0.22), transparent 70%),
+                linear-gradient(180deg, #1a1208 0%, #050301 100%);
+            border: 1px solid rgba(202,160,64,0.25);
             border-radius: 3px;
+            box-shadow: inset 0 0 18px rgba(0,0,0,0.7);
         }
-        .item .thumb img { width: 64px; height: 64px; filter: drop-shadow(0 0 10px rgba(230,195,74,0.5)); }
+        .item .thumb img {
+            max-width: 80px; max-height: 80px;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            filter: drop-shadow(0 0 12px rgba(230,195,74,0.55));
+            transition: transform .3s ease;
+        }
+        .item:hover .thumb img { transform: scale(1.08); }
 
         .item .name { font-family: 'Cinzel Decorative',serif; color: var(--gold); font-size: 15px; letter-spacing: 1px; line-height: 1.2; }
         .item .opts { font-size: 12px; color: #c8b890; line-height: 1.45; min-height: 36px; }
@@ -152,7 +160,7 @@
         <section class="listings">
             <article class="item exc">
                 <span class="ribbon">Excellent</span>
-                <div class="thumb"><img src="assets/icons/sword.svg" alt=""></div>
+                <div class="thumb"><img src="assets/images/items/0190.gif" alt="Dragon Slayer"></div>
                 <div class="name">Dragon Slayer +13 +16</div>
                 <div class="opts">
                     <span class="opt">+Excellent Damage</span>
@@ -167,7 +175,7 @@
 
             <article class="item soc">
                 <span class="ribbon">Socket</span>
-                <div class="thumb"><img src="assets/icons/staff.svg" alt=""></div>
+                <div class="thumb"><img src="assets/images/items/5200.gif" alt="Sacred Staff"></div>
                 <div class="name">Sacred Staff +12 +Luck</div>
                 <div class="opts">
                     <span class="opt">3 sockets · Fire-Mana</span>
@@ -182,7 +190,7 @@
 
             <article class="item anc">
                 <span class="ribbon">Ancient</span>
-                <div class="thumb"><img src="assets/icons/shield.svg" alt=""></div>
+                <div class="thumb"><img src="assets/images/items/8110.gif" alt="Hyon Plate"></div>
                 <div class="name">Hyon Plate Set +11</div>
                 <div class="opts">
                     <span class="opt">Ancient set bonus active</span>
@@ -197,7 +205,7 @@
 
             <article class="item exc">
                 <span class="ribbon">Excellent</span>
-                <div class="thumb"><img src="assets/icons/bow.svg" alt=""></div>
+                <div class="thumb"><img src="assets/images/items/4150.gif" alt="Crystal Bow"></div>
                 <div class="name">Crystal Bow +13 +28</div>
                 <div class="opts">
                     <span class="opt">+Excellent damage rate 10%</span>
@@ -212,7 +220,7 @@
 
             <article class="item">
                 <span class="ribbon">Wings</span>
-                <div class="thumb"><img src="assets/icons/gem.svg" alt=""></div>
+                <div class="thumb"><img src="assets/images/items/12110.gif" alt="Wings of Storm"></div>
                 <div class="name">Wings of Storm +13</div>
                 <div class="opts">
                     <span class="opt">+25% Damage absorb</span>
@@ -227,7 +235,7 @@
 
             <article class="item">
                 <span class="ribbon">Jewel</span>
-                <div class="thumb"><img src="assets/icons/gem.svg" alt=""></div>
+                <div class="thumb"><img src="assets/images/items/14130.gif" alt="Jewel of Bless"></div>
                 <div class="name">Jewel of Bless ×30</div>
                 <div class="opts">
                     <span class="opt">Bulk discount applied</span>
@@ -242,7 +250,7 @@
 
             <article class="item">
                 <span class="ribbon">Pet</span>
-                <div class="thumb"><img src="assets/icons/skull.svg" alt=""></div>
+                <div class="thumb"><img src="assets/images/items/13188.gif" alt="Dark Horse"></div>
                 <div class="name">Dark Horse Lv. 30</div>
                 <div class="opts">
                     <span class="opt">Dark Lord exclusive</span>
@@ -257,7 +265,7 @@
 
             <article class="item">
                 <span class="ribbon">Consumable</span>
-                <div class="thumb"><img src="assets/icons/potion.svg" alt=""></div>
+                <div class="thumb"><img src="assets/images/items/14140.gif" alt="HP Potion"></div>
                 <div class="name">Greater HP Potion ×500</div>
                 <div class="opts">
                     <span class="opt">Restores 1500 HP</span>
@@ -268,6 +276,66 @@
                     <span class="seller">Akira</span>
                 </div>
                 <a class="buy" href="#buy8">Buy now</a>
+            </article>
+
+            <article class="item exc">
+                <span class="ribbon">Excellent</span>
+                <div class="thumb"><img src="assets/images/items/6210.gif" alt="Dragon Shield"></div>
+                <div class="name">Dragon Shield +12 +Luck</div>
+                <div class="opts">
+                    <span class="opt">+Excellent defense rate</span>
+                    <span class="opt">+Reflect damage 7%</span>
+                </div>
+                <div class="row">
+                    <span class="price">1 950 <small>WCOIN</small></span>
+                    <span class="seller">Aegis</span>
+                </div>
+                <a class="buy" href="#buy9">Buy now</a>
+            </article>
+
+            <article class="item anc">
+                <span class="ribbon">Ancient</span>
+                <div class="thumb"><img src="assets/images/items/7330.gif" alt="Ancient Helm"></div>
+                <div class="name">Sylphid Ray Helm +11</div>
+                <div class="opts">
+                    <span class="opt">Ancient set piece</span>
+                    <span class="opt">+10 Energy · +Mana</span>
+                </div>
+                <div class="row">
+                    <span class="price">1 250 <small>WCOIN</small></span>
+                    <span class="seller">Selene</span>
+                </div>
+                <a class="buy" href="#buy10">Buy now</a>
+            </article>
+
+            <article class="item">
+                <span class="ribbon">Jewel</span>
+                <div class="thumb"><img src="assets/images/items/14230.gif" alt="Jewel of Soul"></div>
+                <div class="name">Jewel of Soul ×30</div>
+                <div class="opts">
+                    <span class="opt">Stackable bundle</span>
+                    <span class="opt">+Item upgrade</span>
+                </div>
+                <div class="row">
+                    <span class="price">9 800 000 <small>ZEN</small></span>
+                    <span class="seller">Pyra</span>
+                </div>
+                <a class="buy" href="#buy11">Buy now</a>
+            </article>
+
+            <article class="item soc">
+                <span class="ribbon">Socket</span>
+                <div class="thumb"><img src="assets/images/items/0260.gif" alt="Bloodangel Sword"></div>
+                <div class="name">Bloodangel Blade +13</div>
+                <div class="opts">
+                    <span class="opt">5 sockets · Strength-Power</span>
+                    <span class="opt">+Critical 8%</span>
+                </div>
+                <div class="row">
+                    <span class="price">3 200 <small>WCOIN</small></span>
+                    <span class="seller">Reaver</span>
+                </div>
+                <a class="buy" href="#buy12">Buy now</a>
             </article>
         </section>
 
