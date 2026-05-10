@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Season 3 crest">
+  <defs>
+    <radialGradient id="fire" cx="50%" cy="30%" r="70%">
+      <stop offset="0" stop-color="#fff5b8"/>
+      <stop offset=".36" stop-color="#e6c34a"/>
+      <stop offset=".68" stop-color="#9a4b18"/>
+      <stop offset="1" stop-color="#120702"/>
+    </radialGradient>
+    <linearGradient id="steel" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#ded1a0"/>
+      <stop offset=".45" stop-color="#59421b"/>
+      <stop offset="1" stop-color="#090604"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="4" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="256" height="256" fill="none"/>
+  <path d="M128 16 221 54v74c0 57-38 93-93 112-55-19-93-55-93-112V54z" fill="#090604" stroke="#e6c34a" stroke-width="5"/>
+  <path d="M128 31 204 62v64c0 44-29 74-76 91-47-17-76-47-76-91V62z" fill="url(#fire)" opacity=".88"/>
+  <path d="M83 62c27 33 63 33 90 0-7 31-21 53-45 78-24-25-38-47-45-78z" fill="#100905" stroke="#fff0a8" stroke-width="3" opacity=".9"/>
+  <path d="M62 151c31-6 49-23 66-55 17 32 35 49 66 55-25 4-46 16-66 45-20-29-41-41-66-45z" fill="url(#steel)" stroke="#e6c34a" stroke-width="3" filter="url(#glow)"/>
+  <text x="128" y="158" text-anchor="middle" font-family="Georgia,serif" font-size="46" font-weight="700" fill="#fff5b8" stroke="#3a1d05" stroke-width="2">S3</text>
+  <path d="M91 198h74" stroke="#fff0a8" stroke-width="3" stroke-linecap="round"/>
+</svg>

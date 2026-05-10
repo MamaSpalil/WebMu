@@ -31,6 +31,7 @@
                 "market"       => "nav.market",
                 "vote"         => "nav.vote",
                 "donate"       => "nav.donate",
+                "about"        => "nav.about",
             ];
             foreach ($nav as $k => $lk):
                 $cls = "nav-btn" . (($page_id === $k) ? " active" : ""); ?>

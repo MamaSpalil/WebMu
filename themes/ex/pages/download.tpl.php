@@ -2,8 +2,8 @@
 <main class="page">
     <header class="page-header">
         <img class="icon-glyph" src="assets/icons/download.svg" alt="">
-        <h1 class="page-title">Download</h1>
-        <p class="page-subtitle">Step into the continent — get the client</p>
+        <h1 class="page-title"><?= h(lang("nav.download")) ?></h1>
+        <p class="page-subtitle">Season 3 Episode 1 — get the client</p>
         <div class="divider" aria-hidden="true"></div>
     </header>
 
@@ -12,25 +12,26 @@
         <div class="dl-row">
             <img src="assets/icons/chest.svg" alt="">
             <div class="meta">
-                <h3>MU Full Client (Season 6 Ep.3)</h3>
-                <p>Complete installation. Use this if you do not have the game installed.</p>
-                <div class="tags"><span class="badge new">latest</span><span class="badge">3.4 GB</span></div>
+                <h3><?= h($downloads["client"]["name"]) ?></h3>
+                <p>Complete installation for the configured Season 3 Episode 1 server.</p>
+                <div class="tags"><span class="badge new">latest</span><span class="badge"><?= h($downloads["client"]["size"]) ?></span></div>
             </div>
-            <a class="btn" href="#mirror1">
+            <a class="btn" href="<?= h($downloads["client"]["url"]) ?>">
                 <img src="assets/icons/download.svg" alt="" style="width:18px;height:18px"> Mirror
             </a>
         </div>
         <div class="dl-row">
             <img src="assets/icons/scroll.svg" alt="">
             <div class="meta">
-                <h3>Auto-Patcher</h3>
-                <p>Light incremental update if you already have the client installed.</p>
-                <div class="tags"><span class="badge">42 MB</span><span class="badge">required</span></div>
+                <h3><?= h($downloads["patch"]["name"]) ?></h3>
+                <p>Incremental update if you already have the client installed.</p>
+                <div class="tags"><span class="badge"><?= h($downloads["patch"]["size"]) ?></span><span class="badge">required</span></div>
             </div>
-            <a class="btn" href="#patch">
+            <a class="btn" href="<?= h($downloads["patch"]["url"]) ?>">
                 <img src="assets/icons/download.svg" alt="" style="width:18px;height:18px"> Patch
             </a>
         </div>
+        <p class="note mt-20">Change client, patch and launcher links in <code>opt.php</code>; no template edits are required.</p>
     </section>
 
     <section class="panel panel-corner">

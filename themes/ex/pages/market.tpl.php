@@ -18,13 +18,13 @@
                     <img class="ico" src="assets/icons/coins.svg" alt="">
                     <div class="name"><?= h($l["seller"]) ?></div>
                     <div class="text-mute"><span class="cls-tag cls-<?= h($l["class"][1]) ?>"><?= h($l["class"][0]) ?></span></div>
+                    <div class="text-mute">Lv <?= (int)$l["level"] ?> · Resets <?= (int)$l["resets"] ?></div>
                 </article>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
         <p class="note mt-20">
-            Personal-shop contents are decoded by an emulator-specific parser.
-            Configure the parser for your server to see item details here.
+            Set <code>market_open_col</code> in <code>opt.php</code> if your emulator stores an open-shop flag.
         </p>
     </section>
 </main>

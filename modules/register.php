@@ -65,28 +65,35 @@ $cr_a   = $config["cr_acc"]      ?? "memb___id";
 $wc_t   = $config["wcoin_table"] ?? "GameShopPoint";
 $wc_c   = $config["wcoin_column"]?? "WCoinP";
 $wc_a   = $config["wcoin_acc"]   ?? "AccountID";
-$starter_credits = 100;
-$starter_wcoin   = 100;
+$cr_tq = db_ident($cr_t, "MEMB_INFO");
+$cr_cq = db_ident($cr_c, "credits");
+$cr_aq = db_ident($cr_a, "memb___id");
+$wc_tq = db_ident($wc_t, "GameShopPoint");
+$wc_cq = db_ident($wc_c, "WCoinP");
+$wc_aq = db_ident($wc_a, "AccountID");
+$starter_credits = (int)($config["starter_credits"] ?? 100);
+$starter_wcoin   = (int)($config["starter_wcoin"] ?? 100);
+$referral_credits = (int)($config["referral_credits"] ?? 50);
 
 if ($cr_t === "MEMB_INFO") {
-    db_exec("UPDATE [$cr_t] SET [$cr_c] = ISNULL([$cr_c],0) + ? WHERE [$cr_a] = ?",
+    db_exec("UPDATE $cr_tq SET $cr_cq = ISNULL($cr_cq,0) + ? WHERE $cr_aq = ?",
             [$starter_credits, $login]);
 }
 // MERGE for GameShopPoint (insert if missing, otherwise add).
 db_exec(
-    "MERGE INTO [$wc_t] AS T
+    "MERGE INTO $wc_tq AS T
      USING (SELECT ? AS acc, ? AS amt) AS S
-       ON T.[$wc_a] = S.acc
-     WHEN MATCHED THEN UPDATE SET T.[$wc_c] = ISNULL(T.[$wc_c],0) + S.amt
-     WHEN NOT MATCHED THEN INSERT ([$wc_a], [$wc_c]) VALUES (S.acc, S.amt);",
+       ON T.$wc_aq = S.acc
+     WHEN MATCHED THEN UPDATE SET T.$wc_cq = ISNULL(T.$wc_cq,0) + S.amt
+     WHEN NOT MATCHED THEN INSERT ($wc_aq, $wc_cq) VALUES (S.acc, S.amt);",
     [$login, $starter_wcoin]
 );
 
 // Optional referral bonus
 if ($referrer !== "" && valid_login($referrer) && $referrer !== $login) {
     if (db_one("SELECT 1 AS x FROM MEMB_INFO WHERE memb___id = ?", [$referrer])) {
-        db_exec("UPDATE MEMB_INFO SET credits = ISNULL(credits,0) + 50 WHERE memb___id = ?",
-                [$referrer]);
+        db_exec("UPDATE $cr_tq SET $cr_cq = ISNULL($cr_cq,0) + ? WHERE $cr_aq = ?",
+                [$referral_credits, $referrer]);
     }
 }
 

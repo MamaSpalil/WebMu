@@ -57,7 +57,7 @@ $baners  = $widget_data["baners"]    ?? [];
         <a class="card" href="index.php?m=ranking" style="text-decoration:none">
             <img class="card-icon" src="assets/icons/ranking.svg" alt="">
             <div class="card-title"><?= h(lang("nav.ranking")) ?></div>
-            <p>Top heroes, guilds and Castle Siege owners.</p>
+            <p>Top Season 3 heroes, guilds and Castle Siege owners.</p>
         </a>
     </div>
 </section>

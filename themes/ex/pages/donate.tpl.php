@@ -1,13 +1,4 @@
 <?php if (!defined("insite")) die("no access"); ?>
-<style>
-    .pack { display:flex; flex-direction:column; gap:8px; padding:18px; background:rgba(14,9,3,0.7);
-        border:1px solid var(--border-gold); border-radius:3px; text-align:center; }
-    .pack .ico { width:48px; height:48px; margin:0 auto; filter:drop-shadow(0 0 10px rgba(230,195,74,.5)); }
-    .pack .name { font-family:'Cinzel Decorative',serif; color:var(--gold); font-size:18px; letter-spacing:2px; }
-    .pack .price { font-family:'Cinzel Decorative',serif; color:#fff5b8; font-size:22px; }
-    .pack .price small { color:#b89968; font-size:11px; letter-spacing:2px; margin-left:4px; }
-    .pack form { margin-top:8px; }
-</style>
 
 <main class="page">
     <header class="page-header">

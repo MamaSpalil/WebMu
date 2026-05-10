@@ -34,8 +34,11 @@ if (is_file($f)) {
 $tbl = $config["gr_table"]         ?? "MEMB_INFO";
 $col = $config["gr_points_column"] ?? "cash";
 $acc = $config["gr_points_acc"]    ?? "memb___id";
+$tblq = db_ident($tbl, "MEMB_INFO");
+$colq = db_ident($col, "cash");
+$accq = db_ident($acc, "memb___id");
 $ok = db_exec(
-    "UPDATE [$tbl] SET [$col] = ISNULL([$col],0) + ? WHERE [$acc] = ?",
+    "UPDATE $tblq SET $colq = ISNULL($colq,0) + ? WHERE $accq = ?",
     [(int)$site["reward"], $me["id"]]
 );
 if (!$ok) {

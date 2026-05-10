@@ -4,7 +4,12 @@
 if (!defined("insite")) die("no access");
 
 $items = [];
-$rows  = db_all("SELECT id, name, image, price_credits, price_wcoin, category FROM WebDonateItems ORDER BY category, id");
+$items_table = $config["donate_items_table"] ?? "WebDonateItems";
+$rows = [];
+if (db_table_exists($items_table)) {
+    $items_tableq = db_ident($items_table, "WebDonateItems");
+    $rows = db_all("SELECT id, name, image, price_credits, price_wcoin, category FROM $items_tableq ORDER BY category, id");
+}
 if ($rows) {
     foreach ($rows as $r) {
         $items[] = [
@@ -28,12 +33,18 @@ if (!$items) {
 $me = current_user();
 $balances = ["credits" => 0, "wcoin" => 0];
 if ($me) {
-    $cr = db_one("SELECT credits FROM MEMB_INFO WHERE memb___id = ?", [$me["id"]]);
-    if ($cr) $balances["credits"] = (int)$cr["credits"];
+    $cr_t = db_ident($config["cr_table"] ?? "MEMB_INFO", "MEMB_INFO");
+    $cr_c = db_ident($config["cr_column"] ?? "credits", "credits");
+    $cr_a = db_ident($config["cr_acc"] ?? "memb___id", "memb___id");
+    $cr = db_one("SELECT $cr_c AS v FROM $cr_t WHERE $cr_a = ?", [$me["id"]]);
+    if ($cr) $balances["credits"] = (int)$cr["v"];
     $wc_t = $config["wcoin_table"]  ?? "GameShopPoint";
     $wc_c = $config["wcoin_column"] ?? "WCoinP";
     $wc_a = $config["wcoin_acc"]    ?? "AccountID";
-    $wc = db_one("SELECT [$wc_c] AS v FROM [$wc_t] WHERE [$wc_a] = ?", [$me["id"]]);
+    $wc_tq = db_ident($wc_t, "GameShopPoint");
+    $wc_cq = db_ident($wc_c, "WCoinP");
+    $wc_aq = db_ident($wc_a, "AccountID");
+    $wc = db_one("SELECT $wc_cq AS v FROM $wc_tq WHERE $wc_aq = ?", [$me["id"]]);
     if ($wc) $balances["wcoin"] = (int)$wc["v"];
 }
 

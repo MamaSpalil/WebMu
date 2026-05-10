@@ -109,6 +109,35 @@ function db_escape_like($s)
     ]);
 }
 
+/** Validate and quote a configured SQL Server identifier. */
+function db_ident($name, $fallback = null)
+{
+    $name = trim((string)$name);
+    if (preg_match('~^[A-Za-z_][A-Za-z0-9_]*$~', $name)) {
+        return "[" . $name . "]";
+    }
+    if ($fallback !== null) {
+        db_log("Invalid SQL identifier `" . $name . "`, using fallback `" . $fallback . "`.");
+        return db_ident($fallback);
+    }
+    db_log("Invalid SQL identifier `" . $name . "`.");
+    return null;
+}
+
+/** Best-effort table existence check used for optional WebMu tables. */
+function db_table_exists($table)
+{
+    $table = trim((string)$table);
+    if (!preg_match('~^[A-Za-z_][A-Za-z0-9_]*$~', $table)) {
+        return false;
+    }
+    $row = db_one(
+        "SELECT 1 AS x FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = ?",
+        [$table]
+    );
+    return (bool)$row;
+}
+
 /** Append to the error log; only echoed when debug=1. */
 function db_log($msg)
 {
