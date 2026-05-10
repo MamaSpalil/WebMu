@@ -9,417 +9,62 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+    <link rel="stylesheet" href="assets/css/site.css">
     <style>
-        :root {
-            --gold-light: #fff0a8;
-            --gold: #e6c34a;
-            --gold-dark: #a87a18;
-            --gold-deep: #5a3d05;
-            --bg-deep: #050301;
-            --bg-panel: rgba(14, 9, 3, 0.78);
-            --bg-panel-2: rgba(28, 18, 6, 0.85);
-            --border-gold: rgba(202, 160, 64, 0.55);
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        html, body {
-            min-height: 100vh;
-            background: var(--bg-deep);
-            color: var(--gold-light);
-            font-family: 'Cinzel', 'Times New Roman', serif;
-            overflow-x: hidden;
-        }
-
-        body {
-            background:
-                url('assets/images/background.svg') center top / cover no-repeat fixed,
-                radial-gradient(ellipse at top, #2a1a08 0%, #0a0602 70%, #000 100%);
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background:
-                radial-gradient(ellipse at center, rgba(0,0,0,0) 40%, rgba(0,0,0,0.7) 100%),
-                repeating-linear-gradient(0deg, rgba(0,0,0,0) 0, rgba(0,0,0,0) 2px, rgba(0,0,0,0.05) 3px);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* ========== HEADER / NAV ========== */
-        .site-header {
-            position: relative;
-            z-index: 10;
-            background: linear-gradient(180deg, rgba(20,12,4,0.95) 0%, rgba(10,6,2,0.85) 100%);
-            border-bottom: 2px solid var(--gold-dark);
-            box-shadow: 0 4px 20px rgba(202, 160, 64, 0.2),
-                        inset 0 -1px 0 rgba(255, 240, 168, 0.15);
-        }
-
-        .nav-container {
-            max-width: 1280px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 30px;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            text-decoration: none;
-        }
-
-        .brand img {
-            height: 56px;
-            filter: drop-shadow(0 2px 6px rgba(202,160,64,0.6));
-        }
-
-        .brand-text {
-            font-family: 'Cinzel Decorative', serif;
-            font-weight: 900;
-            font-size: 22px;
-            background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 50%, var(--gold-dark) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: 3px;
-            text-shadow: 0 0 12px rgba(202,160,64,0.3);
-        }
-
-        .main-nav {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-        }
-
-        .nav-btn {
-            position: relative;
-            display: inline-block;
-            padding: 12px 26px;
-            font-family: 'Cinzel', serif;
-            font-weight: 700;
-            font-size: 14px;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            text-decoration: none;
-            color: var(--gold-light);
-            background: linear-gradient(180deg, #2a1d08 0%, #14100a 100%);
-            border: 1px solid var(--border-gold);
-            border-radius: 2px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            box-shadow:
-                inset 0 1px 0 rgba(255, 240, 168, 0.15),
-                inset 0 -1px 0 rgba(0,0,0,0.4),
-                0 2px 6px rgba(0,0,0,0.5);
-        }
-
-        .nav-btn::before {
-            content: '';
-            position: absolute;
-            inset: 2px;
-            border: 1px solid rgba(202, 160, 64, 0.15);
-            pointer-events: none;
-        }
-
-        .nav-btn:hover {
-            color: #fff;
-            background: linear-gradient(180deg, #4a3210 0%, #2a1d08 100%);
-            border-color: var(--gold);
-            box-shadow:
-                inset 0 1px 0 rgba(255, 240, 168, 0.3),
-                0 0 18px rgba(202, 160, 64, 0.55),
-                0 2px 6px rgba(0,0,0,0.6);
-            transform: translateY(-1px);
-        }
-
-        /* ========== HERO ========== */
+        /* ==== HOME-only styles ==== */
         .hero {
-            position: relative;
-            z-index: 5;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 60px 30px 40px;
-            text-align: center;
+            position: relative; z-index: 5;
+            max-width: 1280px; margin: 0 auto;
+            padding: 60px 30px 40px; text-align: center;
         }
-
         .ornament {
-            display: block;
-            max-width: 540px;
+            display: block; max-width: 540px;
             margin: 0 auto 18px;
             filter: drop-shadow(0 2px 8px rgba(202,160,64,0.45));
         }
-
         .hero-title {
             font-family: 'Cinzel Decorative', serif;
             font-weight: 900;
             font-size: clamp(40px, 7vw, 84px);
             line-height: 1.05;
-            background: linear-gradient(180deg,
-                #fff5b8 0%,
-                var(--gold) 35%,
-                var(--gold-dark) 65%,
-                var(--gold-deep) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            background: linear-gradient(180deg,#fff5b8 0%,var(--gold) 35%,var(--gold-dark) 65%,var(--gold-deep) 100%);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
             letter-spacing: 6px;
-            text-shadow:
-                0 0 24px rgba(202, 160, 64, 0.45),
-                0 4px 0 rgba(0,0,0,0.6);
+            text-shadow: 0 0 24px rgba(202,160,64,0.45), 0 4px 0 rgba(0,0,0,0.6);
             margin-bottom: 8px;
         }
-
         .hero-subtitle {
-            font-family: 'Cinzel', serif;
             font-weight: 500;
-            font-size: clamp(14px, 1.6vw, 18px);
-            letter-spacing: 8px;
-            text-transform: uppercase;
-            color: var(--gold);
-            opacity: 0.9;
-            margin-bottom: 36px;
+            font-size: clamp(14px,1.6vw,18px);
+            letter-spacing: 8px; text-transform: uppercase;
+            color: var(--gold); opacity: .9; margin-bottom: 36px;
         }
+        .actions { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin: 40px 0 60px; }
 
-        /* ========== ACTION BUTTONS ========== */
-        .actions {
-            display: flex;
-            justify-content: center;
-            gap: 40px;
-            flex-wrap: wrap;
-            margin: 40px 0 60px;
+        .video-section { position: relative; z-index: 5; max-width: 980px; margin: 0 auto 60px; padding: 0 20px; }
+        .video-frame { position: relative; background: var(--bg-panel-2); padding: 18px;
+            border: 2px solid var(--gold-dark); border-radius: 6px;
+            box-shadow: inset 0 0 30px rgba(0,0,0,.7), 0 0 0 1px rgba(255,240,168,.08), 0 10px 40px rgba(0,0,0,.8), 0 0 30px rgba(202,160,64,.15);
         }
+        .video-frame::before, .video-frame::after { content:''; position:absolute; width:28px; height:28px; border:2px solid var(--gold); opacity:.85; }
+        .video-frame::before { top:-6px; left:-6px; border-right:none; border-bottom:none; }
+        .video-frame::after  { bottom:-6px; right:-6px; border-left:none; border-top:none; }
+        .video-wrap { position: relative; width:100%; aspect-ratio:16/9; background:#000;
+            border:1px solid var(--border-gold); overflow:hidden; }
+        .video-wrap iframe { position:absolute; inset:0; width:100%; height:100%; border:0; }
+        .video-caption { text-align:center; font-size:13px; letter-spacing:4px; text-transform:uppercase; color: var(--gold); opacity:.8; margin-top:14px; }
 
-        .btn-major {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 260px;
-            padding: 28px 60px;
-            font-family: 'Cinzel Decorative', serif;
-            font-weight: 900;
-            font-size: 36px;
-            letter-spacing: 10px;
-            text-transform: uppercase;
-            text-decoration: none;
-            color: #fff5b8;
-            background:
-                linear-gradient(180deg,
-                    #6a4a12 0%,
-                    #3a280a 45%,
-                    #1a1206 100%);
-            border: 2px solid var(--gold);
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-shadow:
-                0 0 12px rgba(202,160,64,0.7),
-                0 2px 0 rgba(0,0,0,0.8);
-            box-shadow:
-                inset 0 2px 0 rgba(255, 240, 168, 0.35),
-                inset 0 -3px 0 rgba(0,0,0,0.6),
-                inset 0 0 30px rgba(202,160,64,0.2),
-                0 6px 18px rgba(0,0,0,0.7),
-                0 0 24px rgba(202, 160, 64, 0.25);
-        }
+        .heroes { position:relative; z-index:4; max-width:1280px; margin:0 auto 60px; padding:0 30px;
+            display:flex; justify-content:center; align-items:flex-end; gap:60px; opacity:.9; }
+        .heroes img { width: clamp(140px,16vw,240px);
+            filter: drop-shadow(0 8px 20px rgba(0,0,0,.85)) drop-shadow(0 0 18px rgba(202,160,64,.35));
+            transition: transform .4s ease, filter .4s ease; }
+        .heroes img:hover { transform: translateY(-8px);
+            filter: drop-shadow(0 12px 28px rgba(0,0,0,.9)) drop-shadow(0 0 28px rgba(230,195,74,.6)); }
 
-        .btn-major::before {
-            content: '';
-            position: absolute;
-            inset: 4px;
-            border: 1px solid rgba(255, 240, 168, 0.3);
-            border-radius: 2px;
-            pointer-events: none;
-        }
-
-        .btn-major::after {
-            content: '';
-            position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
-            background: linear-gradient(135deg, transparent 30%, rgba(255,240,168,0.15) 50%, transparent 70%);
-            border-radius: 6px;
-            opacity: 0;
-            transition: opacity 0.3s;
-            pointer-events: none;
-        }
-
-        .btn-major:hover {
-            transform: translateY(-3px) scale(1.02);
-            border-color: #fff5b8;
-            color: #fff;
-            background:
-                linear-gradient(180deg,
-                    #8a6018 0%,
-                    #4a320e 45%,
-                    #261806 100%);
-            box-shadow:
-                inset 0 2px 0 rgba(255, 240, 168, 0.5),
-                inset 0 -3px 0 rgba(0,0,0,0.6),
-                inset 0 0 40px rgba(202,160,64,0.4),
-                0 10px 28px rgba(0,0,0,0.8),
-                0 0 40px rgba(230, 195, 74, 0.6);
-        }
-
-        .btn-major:hover::after { opacity: 1; }
-
-        .btn-major:active { transform: translateY(-1px) scale(1.0); }
-
-        .btn-major .icon {
-            margin-right: 14px;
-            font-size: 0.7em;
-            opacity: 0.85;
-        }
-
-        /* ========== VIDEO PANEL ========== */
-        .video-section {
-            position: relative;
-            z-index: 5;
-            max-width: 980px;
-            margin: 0 auto 80px;
-            padding: 0 20px;
-        }
-
-        .panel-title {
-            text-align: center;
-            font-family: 'Cinzel Decorative', serif;
-            font-weight: 900;
-            font-size: clamp(22px, 3.2vw, 34px);
-            letter-spacing: 6px;
-            text-transform: uppercase;
-            background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 60%, var(--gold-dark) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 22px;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.6);
-        }
-
-        .video-frame {
-            position: relative;
-            background: var(--bg-panel-2);
-            padding: 18px;
-            border: 2px solid var(--gold-dark);
-            border-radius: 6px;
-            box-shadow:
-                inset 0 0 30px rgba(0,0,0,0.7),
-                0 0 0 1px rgba(255, 240, 168, 0.08),
-                0 10px 40px rgba(0,0,0,0.8),
-                0 0 30px rgba(202, 160, 64, 0.15);
-        }
-
-        .video-frame::before,
-        .video-frame::after {
-            content: '';
-            position: absolute;
-            width: 28px;
-            height: 28px;
-            border: 2px solid var(--gold);
-            opacity: 0.85;
-        }
-
-        .video-frame::before {
-            top: -6px; left: -6px;
-            border-right: none; border-bottom: none;
-        }
-
-        .video-frame::after {
-            bottom: -6px; right: -6px;
-            border-left: none; border-top: none;
-        }
-
-        .video-wrap {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000;
-            border: 1px solid var(--border-gold);
-            overflow: hidden;
-        }
-
-        .video-wrap iframe {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-
-        .video-caption {
-            text-align: center;
-            font-family: 'Cinzel', serif;
-            font-size: 13px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--gold);
-            opacity: 0.8;
-            margin-top: 14px;
-        }
-
-        /* ========== HEROES STRIP ========== */
-        .heroes {
-            position: relative;
-            z-index: 4;
-            max-width: 1280px;
-            margin: 0 auto 60px;
-            padding: 0 30px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            gap: 60px;
-            opacity: 0.9;
-        }
-
-        .heroes img {
-            width: clamp(140px, 16vw, 240px);
-            filter:
-                drop-shadow(0 8px 20px rgba(0,0,0,0.85))
-                drop-shadow(0 0 18px rgba(202,160,64,0.35));
-            transition: transform 0.4s ease, filter 0.4s ease;
-        }
-
-        .heroes img:hover {
-            transform: translateY(-8px);
-            filter:
-                drop-shadow(0 12px 28px rgba(0,0,0,0.9))
-                drop-shadow(0 0 28px rgba(230,195,74,0.6));
-        }
-
-        /* ========== FOOTER ========== */
-        .site-footer {
-            position: relative;
-            z-index: 5;
-            margin-top: 40px;
-            padding: 24px 20px;
-            text-align: center;
-            background: linear-gradient(180deg, transparent 0%, rgba(10,6,2,0.9) 60%);
-            border-top: 1px solid var(--border-gold);
-            font-family: 'Cinzel', serif;
-            font-size: 12px;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: var(--gold-dark);
-        }
-
-        .site-footer span { color: var(--gold); }
-
-        /* ========== RESPONSIVE ========== */
-        @media (max-width: 720px) {
-            .nav-container { justify-content: center; padding: 12px 16px; }
-            .brand-text { font-size: 18px; letter-spacing: 2px; }
-            .nav-btn { padding: 10px 16px; font-size: 12px; letter-spacing: 2px; }
-            .actions { gap: 22px; margin: 30px 0 40px; }
-            .btn-major { min-width: 220px; padding: 22px 36px; font-size: 28px; letter-spacing: 6px; }
-            .heroes { gap: 20px; }
-        }
+        /* Featured panels grid on the home page */
+        .featured { max-width: 1280px; margin: 0 auto 60px; padding: 0 30px; position: relative; z-index: 5; }
+        .featured .grid-3 { gap: 22px; }
     </style>
 </head>
 <body>
@@ -427,14 +72,17 @@
     <!-- ============== HEADER / NAVIGATION ============== -->
     <header class="site-header">
         <div class="nav-container">
-            <a class="brand" href="#">
+            <a class="brand" href="index.html">
                 <img src="assets/images/logo.svg" alt="A2K MuOnline">
                 <span class="brand-text">A2K&nbsp;MuOnline</span>
             </a>
             <nav class="main-nav" aria-label="Primary">
-                <a class="nav-btn" href="#download">Download</a>
-                <a class="nav-btn" href="#ranking">Ranking</a>
-                <a class="nav-btn" href="#registration">Registration</a>
+                <a class="nav-btn" href="download.html">Download</a>
+                <a class="nav-btn" href="ranking.html">Ranking</a>
+                <a class="nav-btn" href="registration.html">Registration</a>
+                <a class="nav-btn" href="market.html">Market</a>
+                <a class="nav-btn" href="vote.html">Vote for</a>
+                <a class="nav-btn" href="donate.html">Donate Shop</a>
                 <a class="nav-btn" href="#about">About</a>
             </nav>
         </div>
@@ -447,7 +95,7 @@
         <p class="hero-subtitle">— Legend of the Continent —</p>
 
         <div class="actions">
-            <a class="btn-major" href="#join">
+            <a class="btn-major" href="registration.html">
                 <span class="icon" aria-hidden="true">⚔</span>JOIN
             </a>
             <a class="btn-major" href="#forum">
@@ -473,7 +121,43 @@
         </div>
     </section>
 
-    <!-- ============== HEROES ============== -->
+    <!-- ============== FEATURED PORTAL CARDS ============== -->
+    <section class="featured" aria-label="Server portals">
+        <div class="grid-3">
+            <a class="card" href="download.html" style="text-decoration:none">
+                <img class="card-icon" src="assets/icons/download.svg" alt="">
+                <div class="card-title">Download</div>
+                <p>Get the official A2K MuOnline client. Multiple mirrors, light auto-patcher, full ISO.</p>
+            </a>
+            <a class="card" href="registration.html" style="text-decoration:none">
+                <img class="card-icon" src="assets/icons/registration.svg" alt="">
+                <div class="card-title">Registration</div>
+                <p>Forge your account in minutes and step into the eternal continent of MU.</p>
+            </a>
+            <a class="card" href="ranking.html" style="text-decoration:none">
+                <img class="card-icon" src="assets/icons/ranking.svg" alt="">
+                <div class="card-title">Ranking</div>
+                <p>Top heroes, guilds and Castle Siege owners — see who rules the realm this week.</p>
+            </a>
+            <a class="card" href="market.html" style="text-decoration:none">
+                <img class="card-icon" src="assets/icons/market.svg" alt="">
+                <div class="card-title">Market</div>
+                <p>Browse the player marketplace — items, sets, jewels and excellent gear for sale.</p>
+            </a>
+            <a class="card" href="vote.html" style="text-decoration:none">
+                <img class="card-icon" src="assets/icons/vote.svg" alt="">
+                <div class="card-title">Vote for</div>
+                <p>Support the server on top-lists and earn daily Wcoin rewards for every vote.</p>
+            </a>
+            <a class="card" href="donate.html" style="text-decoration:none">
+                <img class="card-icon" src="assets/icons/donate.svg" alt="">
+                <div class="card-title">Donate Shop</div>
+                <p>Premium packs, VIP, exclusive pets and cosmetics — fund the server, get rewarded.</p>
+            </a>
+        </div>
+    </section>
+
+    <!-- ============== HEROES STRIP ============== -->
     <section class="heroes" aria-hidden="true">
         <img src="assets/images/knight.svg" alt="Dark Knight">
         <img src="assets/images/wizard.svg" alt="Dark Wizard">
@@ -482,6 +166,9 @@
     <!-- ============== FOOTER ============== -->
     <footer class="site-footer">
         © A2K <span>MuOnline</span> — Forge your legend in the eternal continent
+        <div class="credits">
+            Icons: <a href="https://game-icons.net/" rel="noopener">game-icons.net</a> — CC BY 3.0 (Lorc, Delapouite).
+        </div>
     </footer>
 
 </body>
