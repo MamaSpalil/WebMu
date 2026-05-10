@@ -22,6 +22,8 @@ return [
     "form.submit"      => "Подтвердить",
     "form.csrf_invalid"=> "Сессия устарела, попробуйте ещё раз.",
     "form.required"    => "Заполните все обязательные поля.",
+    "db.config_example"=> "Используется opt.example.php. Скопируйте его в opt.php и укажите реальные настройки удалённой базы данных.",
+    "db.connection_error" => "Нет подключения к удалённой базе данных. Проверьте настройки db_host, db_user, db_upwd, db_name и odbc_driver в файле opt.php.",
 
     // registration
     "reg.title"        => "Создать аккаунт",

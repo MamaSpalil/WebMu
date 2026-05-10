@@ -22,6 +22,7 @@ function render_page($page, array $vars = [])
     $vars["config"]    = $config;
     $vars["user"]      = current_user();
     $vars["flashes"]   = flash_pop();
+    $vars["db_error"]  = function_exists("db_connection_error") ? db_connection_error() : "";
     $vars["page_id"]   = $page;
     $vars["page_title"] = $vars["title"] ?? ($config["server_name"] ?? "WebMu");
 

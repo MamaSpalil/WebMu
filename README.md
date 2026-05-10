@@ -7,14 +7,18 @@ shop, market and a personal account dashboard.
 
 ## Quick start
 
-1. Copy the config template and fill in real DB credentials:
+1. Copy the config template and fill in real remote DB credentials:
    ```sh
    cp opt.example.php opt.php
    ```
    The real `opt.php` is git-ignored — secrets never reach the repo.
 2. Make sure PHP has the `odbc` extension and a working
    `Driver={SQL Server}` ODBC driver to your MuOnline database.
-3. Point a webroot at this directory and open `index.php`.
+3. Keep every connection setting (`db_host`, `db_user`, `db_upwd`,
+   `db_name`, `odbc_driver`) in `opt.php`; `opt.example.php` is only a
+   template. If the connection fails, the site shows a warning and logs
+   the ODBC error to `logs/db.log`.
+4. Point a webroot at this directory and open `index.php`.
 
 ## Layout
 

@@ -24,7 +24,7 @@ function db()
     $tried = true;
 
     if (!function_exists("odbc_connect")) {
-        db_log("ODBC extension is not installed — database features disabled.");
+        db_set_error("ODBC extension is not installed — database features disabled.");
         return null;
     }
     $driver = $config["odbc_driver"] ?? "SQL Server";
@@ -36,11 +36,28 @@ function db()
     $dsn = "Driver={" . $driver . "};Server=" . $host . ";Database=" . $name . ";";
     $c = @odbc_connect($dsn, $user, $pwd);
     if (!$c) {
-        db_log("ODBC connect failed: " . odbc_errormsg());
+        db_set_error("ODBC connect failed: " . odbc_errormsg());
         return null;
     }
     $conn = $c;
+    db_set_error("");
     return $conn;
+}
+
+/** Store the last connection error for templates and logs. */
+function db_set_error($msg)
+{
+    $GLOBALS["__db_connection_error"] = (string)$msg;
+    if ($msg !== "") {
+        db_log($msg);
+    }
+}
+
+/** Return the current connection error, trying to connect once if needed. */
+function db_connection_error()
+{
+    db();
+    return $GLOBALS["__db_connection_error"] ?? "";
 }
 
 /**

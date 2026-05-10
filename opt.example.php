@@ -16,7 +16,8 @@
 if (!defined("insite")) die("no access");
 
 // ---- Database (MS SQL Server, MuOnline schema) ----
-$config["db_host"]      = "127.0.0.1";        // SQL Server host (1433)
+// Copy this template to opt.php and set these values to your remote SQL Server.
+$config["db_host"]      = "127.0.0.1";        // remote SQL Server host or host,port
 $config["db_user"]      = "web_app";          // dedicated SQL login (NOT sa)
 $config["db_upwd"]      = "CHANGE_ME";        // password for the SQL login
 $config["ctype"]        = "ODBC";             // currently only ODBC is supported
