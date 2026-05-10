@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market — A2K MuOnline</title>
+    <meta name="description" content="A2K MuOnline player marketplace — items, jewels and excellent gear.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+    <link rel="stylesheet" href="assets/css/site.css">
+    <style>
+        .market-toolbar {
+            display: flex; gap: 12px; flex-wrap: wrap; align-items: end;
+            padding: 16px; background: rgba(14,9,3,0.7);
+            border: 1px solid var(--border-gold); border-radius: 4px; margin-bottom: 22px;
+        }
+        .market-toolbar .field { min-width: 160px; flex: 1; }
+
+        .listings { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+
+        .item {
+            position: relative;
+            background: linear-gradient(180deg, rgba(40,26,8,0.85) 0%, rgba(14,9,3,0.92) 100%);
+            border: 1px solid var(--border-gold);
+            border-radius: 4px;
+            padding: 14px;
+            display: flex; flex-direction: column; gap: 8px;
+            transition: transform .25s, border-color .25s, box-shadow .25s;
+            box-shadow: inset 0 1px 0 rgba(255,240,168,.08), 0 4px 14px rgba(0,0,0,.55);
+        }
+        .item:hover {
+            transform: translateY(-3px);
+            border-color: var(--gold);
+            box-shadow: inset 0 1px 0 rgba(255,240,168,.18), 0 8px 24px rgba(0,0,0,.7), 0 0 22px rgba(230,195,74,.25);
+        }
+        .item.exc  { border-color: #b88a2c; box-shadow: 0 0 14px rgba(230,195,74,.25); }
+        .item.anc  { border-color: #6a8cd8; box-shadow: 0 0 14px rgba(106,140,216,.25); }
+        .item.soc  { border-color: #b86ad8; box-shadow: 0 0 14px rgba(184,106,216,.25); }
+
+        .item .ribbon {
+            position: absolute; top: -1px; right: -1px;
+            padding: 3px 10px;
+            font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+            background: var(--gold-dark); color: #fff5b8;
+            border-radius: 0 3px 0 3px;
+        }
+        .item.exc .ribbon { background: #b88a2c; }
+        .item.anc .ribbon { background: #4a6aa8; }
+        .item.soc .ribbon { background: #8a4ab8; }
+
+        .item .thumb {
+            display: flex; align-items: center; justify-content: center;
+            height: 100px;
+            background:
+                radial-gradient(circle at center, rgba(202,160,64,0.18), transparent 70%),
+                rgba(8,5,2,0.7);
+            border: 1px solid rgba(202,160,64,0.2);
+            border-radius: 3px;
+        }
+        .item .thumb img { width: 64px; height: 64px; filter: drop-shadow(0 0 10px rgba(230,195,74,0.5)); }
+
+        .item .name { font-family: 'Cinzel Decorative',serif; color: var(--gold); font-size: 15px; letter-spacing: 1px; line-height: 1.2; }
+        .item .opts { font-size: 12px; color: #c8b890; line-height: 1.45; min-height: 36px; }
+        .item .opts .opt { display: block; }
+        .item .opts .opt::before { content: '◆ '; color: var(--gold); font-size: 9px; vertical-align: middle; }
+        .item .row { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+        .item .price { color: #fff5b8; font-family: 'Cinzel Decorative',serif; font-size: 16px; }
+        .item .price small { color: #b89968; font-size: 11px; letter-spacing: 1.5px; }
+        .item .seller { font-size: 11px; color: #8a7a40; letter-spacing: 1px; text-transform: uppercase; }
+        .item .buy {
+            display: block; text-align: center; margin-top: 8px;
+            padding: 8px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+            color: var(--gold-light); text-decoration: none;
+            background: linear-gradient(180deg, #3a280a 0%, #14100a 100%);
+            border: 1px solid var(--border-gold); border-radius: 2px; transition: all .2s;
+        }
+        .item .buy:hover { background: linear-gradient(180deg, #5a3a12 0%, #1a1206 100%); border-color: var(--gold); color: #fff; box-shadow: 0 0 14px rgba(230,195,74,.4); }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a class="brand" href="index.html">
+                <img src="assets/images/logo.svg" alt="A2K MuOnline">
+                <span class="brand-text">A2K&nbsp;MuOnline</span>
+            </a>
+            <nav class="main-nav" aria-label="Primary">
+                <a class="nav-btn" href="download.html">Download</a>
+                <a class="nav-btn" href="ranking.html">Ranking</a>
+                <a class="nav-btn" href="registration.html">Registration</a>
+                <a class="nav-btn active" href="market.html">Market</a>
+                <a class="nav-btn" href="vote.html">Vote for</a>
+                <a class="nav-btn" href="donate.html">Donate Shop</a>
+                <a class="nav-btn" href="index.html#about">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page">
+        <header class="page-header">
+            <img class="icon-glyph" src="assets/icons/market.svg" alt="">
+            <h1 class="page-title">Market</h1>
+            <p class="page-subtitle">Trade with heroes from across the continent</p>
+            <div class="divider" aria-hidden="true"></div>
+        </header>
+
+        <!-- Tabs (categories) -->
+        <div class="tabs" role="tablist">
+            <a class="tab active" href="#all">All</a>
+            <a class="tab" href="#weapons">Weapons</a>
+            <a class="tab" href="#armor">Armor</a>
+            <a class="tab" href="#jewels">Jewels</a>
+            <a class="tab" href="#wings">Wings</a>
+            <a class="tab" href="#pets">Pets</a>
+            <a class="tab" href="#consumables">Consumables</a>
+        </div>
+
+        <!-- Filter bar -->
+        <div class="market-toolbar">
+            <div class="field">
+                <label for="search">Search</label>
+                <input id="search" type="search" placeholder="e.g. Dragon Knight set">
+            </div>
+            <div class="field">
+                <label for="cls">Class</label>
+                <select id="cls">
+                    <option>Any class</option>
+                    <option>Dark Knight</option><option>Dark Wizard</option>
+                    <option>Elf</option><option>Magic Gladiator</option>
+                    <option>Dark Lord</option><option>Summoner</option><option>Rage Fighter</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="cur">Currency</label>
+                <select id="cur">
+                    <option>Any</option><option>Zen</option><option>Wcoin</option><option>Bless / Soul</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="sort">Sort by</label>
+                <select id="sort">
+                    <option>Newest</option><option>Price ↑</option><option>Price ↓</option><option>Level ↓</option>
+                </select>
+            </div>
+            <button class="btn" type="button">Apply</button>
+        </div>
+
+        <!-- Listings -->
+        <section class="listings">
+            <article class="item exc">
+                <span class="ribbon">Excellent</span>
+                <div class="thumb"><img src="assets/icons/sword.svg" alt=""></div>
+                <div class="name">Dragon Slayer +13 +16</div>
+                <div class="opts">
+                    <span class="opt">+Excellent Damage</span>
+                    <span class="opt">Life after Monster +8%</span>
+                </div>
+                <div class="row">
+                    <span class="price">2 400 <small>WCOIN</small></span>
+                    <span class="seller">LordGarion</span>
+                </div>
+                <a class="buy" href="#buy1">Buy now</a>
+            </article>
+
+            <article class="item soc">
+                <span class="ribbon">Socket</span>
+                <div class="thumb"><img src="assets/icons/staff.svg" alt=""></div>
+                <div class="name">Sacred Staff +12 +Luck</div>
+                <div class="opts">
+                    <span class="opt">3 sockets · Fire-Mana</span>
+                    <span class="opt">+10% wizardry damage</span>
+                </div>
+                <div class="row">
+                    <span class="price">1 800 <small>WCOIN</small></span>
+                    <span class="seller">VoidMage</span>
+                </div>
+                <a class="buy" href="#buy2">Buy now</a>
+            </article>
+
+            <article class="item anc">
+                <span class="ribbon">Ancient</span>
+                <div class="thumb"><img src="assets/icons/shield.svg" alt=""></div>
+                <div class="name">Hyon Plate Set +11</div>
+                <div class="opts">
+                    <span class="opt">Ancient set bonus active</span>
+                    <span class="opt">+15 Strength · +12 Vitality</span>
+                </div>
+                <div class="row">
+                    <span class="price">3 600 <small>WCOIN</small></span>
+                    <span class="seller">Iron</span>
+                </div>
+                <a class="buy" href="#buy3">Buy now</a>
+            </article>
+
+            <article class="item exc">
+                <span class="ribbon">Excellent</span>
+                <div class="thumb"><img src="assets/icons/bow.svg" alt=""></div>
+                <div class="name">Crystal Bow +13 +28</div>
+                <div class="opts">
+                    <span class="opt">+Excellent damage rate 10%</span>
+                    <span class="opt">+Reflect 5%</span>
+                </div>
+                <div class="row">
+                    <span class="price">2 100 <small>WCOIN</small></span>
+                    <span class="seller">BowQueen</span>
+                </div>
+                <a class="buy" href="#buy4">Buy now</a>
+            </article>
+
+            <article class="item">
+                <span class="ribbon">Wings</span>
+                <div class="thumb"><img src="assets/icons/gem.svg" alt=""></div>
+                <div class="name">Wings of Storm +13</div>
+                <div class="opts">
+                    <span class="opt">+25% Damage absorb</span>
+                    <span class="opt">Lvl 3 wings</span>
+                </div>
+                <div class="row">
+                    <span class="price">5 200 <small>WCOIN</small></span>
+                    <span class="seller">Triton</span>
+                </div>
+                <a class="buy" href="#buy5">Buy now</a>
+            </article>
+
+            <article class="item">
+                <span class="ribbon">Jewel</span>
+                <div class="thumb"><img src="assets/icons/gem.svg" alt=""></div>
+                <div class="name">Jewel of Bless ×30</div>
+                <div class="opts">
+                    <span class="opt">Bulk discount applied</span>
+                    <span class="opt">Stackable</span>
+                </div>
+                <div class="row">
+                    <span class="price">12 000 000 <small>ZEN</small></span>
+                    <span class="seller">Pyra</span>
+                </div>
+                <a class="buy" href="#buy6">Buy now</a>
+            </article>
+
+            <article class="item">
+                <span class="ribbon">Pet</span>
+                <div class="thumb"><img src="assets/icons/skull.svg" alt=""></div>
+                <div class="name">Dark Horse Lv. 30</div>
+                <div class="opts">
+                    <span class="opt">Dark Lord exclusive</span>
+                    <span class="opt">Fully fed &amp; trained</span>
+                </div>
+                <div class="row">
+                    <span class="price">1 400 <small>WCOIN</small></span>
+                    <span class="seller">Hex</span>
+                </div>
+                <a class="buy" href="#buy7">Buy now</a>
+            </article>
+
+            <article class="item">
+                <span class="ribbon">Consumable</span>
+                <div class="thumb"><img src="assets/icons/potion.svg" alt=""></div>
+                <div class="name">Greater HP Potion ×500</div>
+                <div class="opts">
+                    <span class="opt">Restores 1500 HP</span>
+                    <span class="opt">Full stack</span>
+                </div>
+                <div class="row">
+                    <span class="price">800 000 <small>ZEN</small></span>
+                    <span class="seller">Akira</span>
+                </div>
+                <a class="buy" href="#buy8">Buy now</a>
+            </article>
+        </section>
+
+        <p class="note mt-30">
+            <strong>Selling tip:</strong> Use the in-game <em>/setshop</em> command from any town,
+            or list cross-realm items here for a flat 2% Zen tax. All trades are escrowed by the system —
+            no scams.
+        </p>
+    </main>
+
+    <footer class="site-footer">
+        © A2K <span>MuOnline</span> — Forge your legend in the eternal continent
+        <div class="credits">
+            Icons: <a href="https://game-icons.net/" rel="noopener">game-icons.net</a> — CC BY 3.0 (Lorc, Delapouite).
+        </div>
+    </footer>
+
+</body>
+</html>

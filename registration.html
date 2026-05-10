@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration — A2K MuOnline</title>
+    <meta name="description" content="Create your A2K MuOnline account and join the eternal continent.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+    <link rel="stylesheet" href="assets/css/site.css">
+    <style>
+        .reg-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 28px; align-items: start; }
+        @media (max-width: 900px) { .reg-grid { grid-template-columns: 1fr; } }
+
+        .perks { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 14px; }
+        .perks li { display: flex; gap: 14px; align-items: flex-start; padding: 12px;
+            background: rgba(14,9,3,0.7); border: 1px solid var(--border-gold); border-radius: 3px; }
+        .perks li img { width: 38px; height: 38px; flex-shrink: 0; filter: drop-shadow(0 0 8px rgba(230,195,74,.4)); }
+        .perks li strong { color: var(--gold); display: block; font-family: 'Cinzel Decorative',serif; letter-spacing: 1.5px; margin-bottom: 2px; }
+        .perks li span { color: #c8b890; font-size: 13.5px; line-height: 1.5; }
+
+        .submit-row { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; gap: 18px; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a class="brand" href="index.html">
+                <img src="assets/images/logo.svg" alt="A2K MuOnline">
+                <span class="brand-text">A2K&nbsp;MuOnline</span>
+            </a>
+            <nav class="main-nav" aria-label="Primary">
+                <a class="nav-btn" href="download.html">Download</a>
+                <a class="nav-btn" href="ranking.html">Ranking</a>
+                <a class="nav-btn active" href="registration.html">Registration</a>
+                <a class="nav-btn" href="market.html">Market</a>
+                <a class="nav-btn" href="vote.html">Vote for</a>
+                <a class="nav-btn" href="donate.html">Donate Shop</a>
+                <a class="nav-btn" href="index.html#about">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page">
+        <header class="page-header">
+            <img class="icon-glyph" src="assets/icons/registration.svg" alt="">
+            <h1 class="page-title">Create Account</h1>
+            <p class="page-subtitle">Sign the scroll — claim your destiny</p>
+            <div class="divider" aria-hidden="true"></div>
+        </header>
+
+        <div class="reg-grid">
+            <!-- ============ FORM ============ -->
+            <section class="panel panel-corner">
+                <h2 class="panel-title left">Account Details</h2>
+
+                <form action="#" method="post" autocomplete="off" novalidate>
+                    <div class="form-grid">
+                        <div class="field full">
+                            <label for="login">Account name</label>
+                            <input id="login" name="login" type="text" required minlength="4" maxlength="10"
+                                   pattern="[A-Za-z0-9]+" placeholder="warrior42">
+                            <span class="help">4–10 chars, letters &amp; digits only.</span>
+                        </div>
+
+                        <div class="field">
+                            <label for="email">E-mail</label>
+                            <input id="email" name="email" type="email" required placeholder="hero@continent.mu">
+                        </div>
+
+                        <div class="field">
+                            <label for="email2">Confirm e-mail</label>
+                            <input id="email2" name="email2" type="email" required placeholder="hero@continent.mu">
+                        </div>
+
+                        <div class="field">
+                            <label for="password">Password</label>
+                            <input id="password" name="password" type="password" required minlength="8" maxlength="32" placeholder="••••••••">
+                            <span class="help">Min. 8 chars — mix letters, digits &amp; symbols.</span>
+                        </div>
+
+                        <div class="field">
+                            <label for="password2">Confirm password</label>
+                            <input id="password2" name="password2" type="password" required minlength="8" maxlength="32" placeholder="••••••••">
+                        </div>
+
+                        <div class="field">
+                            <label for="pin">Vault PIN (4 digits)</label>
+                            <input id="pin" name="pin" type="password" required minlength="4" maxlength="4"
+                                   inputmode="numeric" pattern="[0-9]{4}" placeholder="••••">
+                            <span class="help">Used to open the in-game vault.</span>
+                        </div>
+
+                        <div class="field">
+                            <label for="country">Country</label>
+                            <select id="country" name="country" required>
+                                <option value="">— select —</option>
+                                <option>Ukraine</option>
+                                <option>Russia</option>
+                                <option>Poland</option>
+                                <option>Germany</option>
+                                <option>USA</option>
+                                <option>Brazil</option>
+                                <option>Philippines</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+
+                        <div class="field full">
+                            <label for="referrer">Referrer (optional)</label>
+                            <input id="referrer" name="referrer" type="text" maxlength="10" placeholder="friend's account name">
+                        </div>
+
+                        <div class="field full">
+                            <label class="checkbox">
+                                <input type="checkbox" name="rules" required>
+                                I have read and accept the <a href="#rules">Server Rules</a> &amp; <a href="#tos">Terms of Service</a>.
+                            </label>
+                            <label class="checkbox">
+                                <input type="checkbox" name="news">
+                                Send me e-mail updates about events and patches.
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="submit-row">
+                        <span class="text-mute">Already have an account? <a href="#login">Log in</a>.</span>
+                        <button type="submit" class="btn">
+                            <img src="assets/icons/sword.svg" alt="" style="width:18px;height:18px"> Forge Account
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- ============ STARTER PACK / RULES ============ -->
+            <aside>
+                <section class="panel panel-corner">
+                    <h2 class="panel-title left">Starter Pack</h2>
+                    <ul class="perks">
+                        <li>
+                            <img src="assets/icons/sword.svg" alt="">
+                            <div><strong>Lvl 1 Boost</strong>
+                            <span>Free +Luck weapon and 7-day buff scroll.</span></div>
+                        </li>
+                        <li>
+                            <img src="assets/icons/potion.svg" alt="">
+                            <div><strong>Survival Kit</strong>
+                            <span>50× SD Potion, 50× HP Potion, 30× Town Scroll.</span></div>
+                        </li>
+                        <li>
+                            <img src="assets/icons/coins.svg" alt="">
+                            <div><strong>Starting Zen</strong>
+                            <span>500 000 Zen + 100 Wcoin to begin your journey.</span></div>
+                        </li>
+                        <li>
+                            <img src="assets/icons/gem.svg" alt="">
+                            <div><strong>Newbie Buff</strong>
+                            <span>+30% EXP for the first 3 days.</span></div>
+                        </li>
+                    </ul>
+                </section>
+
+                <section class="panel panel-corner" id="rules">
+                    <h2 class="panel-title left">Server Rules</h2>
+                    <ul style="padding-left:18px; color:#ddc89a; font-size:13.5px; line-height:1.7;">
+                        <li>One account per person — multi-boxing limited to 3 windows.</li>
+                        <li>No bots, hacks, exploits, or 3rd-party clients.</li>
+                        <li>Do not share account credentials — staff will <em>never</em> ask.</li>
+                        <li>Real-money trading outside the official Donate Shop is prohibited.</li>
+                        <li>Be respectful in chat — racism, threats, doxxing = perma-ban.</li>
+                    </ul>
+                    <p class="note warn mt-20">
+                        Violations are reviewed by the GM team. Penalties range from chat-mute to permanent IP/HWID ban.
+                    </p>
+                </section>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        © A2K <span>MuOnline</span> — Forge your legend in the eternal continent
+        <div class="credits">
+            Icons: <a href="https://game-icons.net/" rel="noopener">game-icons.net</a> — CC BY 3.0 (Lorc, Delapouite).
+        </div>
+    </footer>
+
+</body>
+</html>

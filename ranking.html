@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking — A2K MuOnline</title>
+    <meta name="description" content="A2K MuOnline rankings — top players, guilds and Castle Siege owners.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Cinzel+Decorative:wght@700;900&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="assets/images/logo.svg">
+    <link rel="stylesheet" href="assets/css/site.css">
+    <style>
+        .castle-banner {
+            display: grid; grid-template-columns: 110px 1fr; gap: 22px; align-items: center;
+            padding: 22px;
+            background:
+                linear-gradient(90deg, rgba(74,40,8,0.65) 0%, rgba(14,9,3,0.85) 80%),
+                radial-gradient(circle at right, rgba(202,160,64,0.18), transparent 60%);
+            border: 1px solid var(--gold);
+            border-radius: 4px;
+            margin-bottom: 28px;
+            box-shadow: 0 0 24px rgba(230,195,74,0.2), inset 0 0 30px rgba(0,0,0,0.5);
+        }
+        .castle-banner img { width: 90px; filter: drop-shadow(0 0 12px rgba(230,195,74,0.6)); justify-self: center; }
+        .castle-banner .ttl {
+            font-family: 'Cinzel Decorative',serif; color: var(--gold-light);
+            font-size: 22px; letter-spacing: 3px; margin-bottom: 6px;
+        }
+        .castle-banner .guild { font-size: 26px; color: #fff5b8; text-shadow: 0 0 14px var(--gold); letter-spacing: 4px; }
+        .castle-banner p { color: #c8b890; font-size: 13.5px; margin-top: 4px; }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="nav-container">
+            <a class="brand" href="index.html">
+                <img src="assets/images/logo.svg" alt="A2K MuOnline">
+                <span class="brand-text">A2K&nbsp;MuOnline</span>
+            </a>
+            <nav class="main-nav" aria-label="Primary">
+                <a class="nav-btn" href="download.html">Download</a>
+                <a class="nav-btn active" href="ranking.html">Ranking</a>
+                <a class="nav-btn" href="registration.html">Registration</a>
+                <a class="nav-btn" href="market.html">Market</a>
+                <a class="nav-btn" href="vote.html">Vote for</a>
+                <a class="nav-btn" href="donate.html">Donate Shop</a>
+                <a class="nav-btn" href="index.html#about">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page">
+        <header class="page-header">
+            <img class="icon-glyph" src="assets/icons/ranking.svg" alt="">
+            <h1 class="page-title">Hall of Fame</h1>
+            <p class="page-subtitle">Heroes — Guilds — Castle owners</p>
+            <div class="divider" aria-hidden="true"></div>
+        </header>
+
+        <!-- Castle owner banner -->
+        <section class="castle-banner">
+            <img src="assets/icons/castle.svg" alt="">
+            <div>
+                <div class="ttl">Current Castle Owner</div>
+                <div class="guild">⚜ E T E R N A L S ⚜</div>
+                <p>Won the last siege on <strong>2026-05-03</strong> · 32 members · Master: <em>LordGarion</em></p>
+            </div>
+        </section>
+
+        <!-- Stats strip -->
+        <div class="stats-bar">
+            <div class="stat"><span class="num">14 280</span><span class="lbl">Accounts</span></div>
+            <div class="stat"><span class="num">38 651</span><span class="lbl">Characters</span></div>
+            <div class="stat"><span class="num">1 207</span><span class="lbl">Online now</span></div>
+            <div class="stat"><span class="num">112</span><span class="lbl">Guilds</span></div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs" role="tablist">
+            <a class="tab active" href="#players" role="tab">Top Players</a>
+            <a class="tab" href="#guilds" role="tab">Top Guilds</a>
+            <a class="tab" href="#kills" role="tab">PVP Killers</a>
+            <a class="tab" href="#wealth" role="tab">Wealth</a>
+            <a class="tab" href="#online" role="tab">Online Now</a>
+        </div>
+
+        <!-- Top players -->
+        <section class="panel panel-corner" id="players">
+            <h2 class="panel-title left">Top 10 Heroes — by Resets</h2>
+            <div class="table-wrap">
+                <table class="rank">
+                    <thead>
+                        <tr><th>#</th><th>Character</th><th>Class</th><th>Level</th><th>Resets</th><th>Master Lv</th><th>Guild</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="top-1"><td class="rank-pos">1</td><td>LordGarion</td><td><span class="cls-tag cls-dl">Dark Lord</span></td><td>400</td><td>87</td><td>320</td><td>Eternals</td></tr>
+                        <tr class="top-2"><td class="rank-pos">2</td><td>Selene</td><td><span class="cls-tag cls-elf">Elf</span></td><td>400</td><td>84</td><td>318</td><td>Eternals</td></tr>
+                        <tr class="top-3"><td class="rank-pos">3</td><td>NightFury</td><td><span class="cls-tag cls-dk">Dark Knight</span></td><td>400</td><td>81</td><td>301</td><td>WolfPack</td></tr>
+                        <tr><td class="rank-pos">4</td><td>VoidMage</td><td><span class="cls-tag cls-dw">Dark Wizard</span></td><td>400</td><td>78</td><td>295</td><td>Arcanum</td></tr>
+                        <tr><td class="rank-pos">5</td><td>Triton</td><td><span class="cls-tag cls-sm">Summoner</span></td><td>400</td><td>76</td><td>289</td><td>—</td></tr>
+                        <tr><td class="rank-pos">6</td><td>Hex</td><td><span class="cls-tag cls-mg">Magic Gladiator</span></td><td>400</td><td>74</td><td>284</td><td>Arcanum</td></tr>
+                        <tr><td class="rank-pos">7</td><td>Akira</td><td><span class="cls-tag cls-rf">Rage Fighter</span></td><td>400</td><td>72</td><td>271</td><td>WolfPack</td></tr>
+                        <tr><td class="rank-pos">8</td><td>BowQueen</td><td><span class="cls-tag cls-elf">Elf</span></td><td>400</td><td>70</td><td>266</td><td>Eternals</td></tr>
+                        <tr><td class="rank-pos">9</td><td>Iron</td><td><span class="cls-tag cls-dk">Dark Knight</span></td><td>399</td><td>69</td><td>262</td><td>Forge</td></tr>
+                        <tr><td class="rank-pos">10</td><td>Pyra</td><td><span class="cls-tag cls-dw">Dark Wizard</span></td><td>398</td><td>68</td><td>258</td><td>Arcanum</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-mute mt-20">Ranking refreshes every 10 minutes from the live game database.</p>
+        </section>
+
+        <!-- Top guilds -->
+        <section class="panel panel-corner" id="guilds">
+            <h2 class="panel-title left">Top Guilds</h2>
+            <div class="table-wrap">
+                <table class="rank">
+                    <thead>
+                        <tr><th>#</th><th>Guild</th><th>Master</th><th>Members</th><th>Score</th><th>Castle Sieges Won</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="top-1"><td class="rank-pos">1</td><td>Eternals</td><td>LordGarion</td><td>32</td><td>148 920</td><td>7</td></tr>
+                        <tr class="top-2"><td class="rank-pos">2</td><td>Arcanum</td><td>VoidMage</td><td>28</td><td>121 410</td><td>3</td></tr>
+                        <tr class="top-3"><td class="rank-pos">3</td><td>WolfPack</td><td>NightFury</td><td>30</td><td>118 760</td><td>2</td></tr>
+                        <tr><td class="rank-pos">4</td><td>Forge</td><td>Iron</td><td>24</td><td>92 040</td><td>1</td></tr>
+                        <tr><td class="rank-pos">5</td><td>Crimson</td><td>Akira</td><td>22</td><td>86 130</td><td>0</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- PVP killers -->
+        <section class="panel panel-corner" id="kills">
+            <h2 class="panel-title left">PVP Killers — This Week</h2>
+            <div class="table-wrap">
+                <table class="rank">
+                    <thead>
+                        <tr><th>#</th><th>Character</th><th>Class</th><th>Kills</th><th>Deaths</th><th>K/D</th><th>Bounty (Zen)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="top-1"><td class="rank-pos">1</td><td>Reaver</td><td><span class="cls-tag cls-dk">Dark Knight</span></td><td>1 824</td><td>183</td><td>9.97</td><td>4 200 000</td></tr>
+                        <tr class="top-2"><td class="rank-pos">2</td><td>Selene</td><td><span class="cls-tag cls-elf">Elf</span></td><td>1 612</td><td>206</td><td>7.83</td><td>3 100 000</td></tr>
+                        <tr class="top-3"><td class="rank-pos">3</td><td>Hex</td><td><span class="cls-tag cls-mg">Magic Gladiator</span></td><td>1 487</td><td>240</td><td>6.20</td><td>2 750 000</td></tr>
+                        <tr><td class="rank-pos">4</td><td>Triton</td><td><span class="cls-tag cls-sm">Summoner</span></td><td>1 322</td><td>261</td><td>5.07</td><td>1 980 000</td></tr>
+                        <tr><td class="rank-pos">5</td><td>Akira</td><td><span class="cls-tag cls-rf">Rage Fighter</span></td><td>1 198</td><td>304</td><td>3.94</td><td>1 460 000</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        © A2K <span>MuOnline</span> — Forge your legend in the eternal continent
+        <div class="credits">
+            Icons: <a href="https://game-icons.net/" rel="noopener">game-icons.net</a> — CC BY 3.0 (Lorc, Delapouite).
+        </div>
+    </footer>
+
+</body>
+</html>

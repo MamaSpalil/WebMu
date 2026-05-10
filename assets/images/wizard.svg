@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 600" width="400" height="600">
+  <defs>
+    <linearGradient id="robe" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#4a1a3a"/>
+      <stop offset="50%" stop-color="#2a0a22"/>
+      <stop offset="100%" stop-color="#0a0205"/>
+    </linearGradient>
+    <linearGradient id="goldTrim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe88a"/>
+      <stop offset="100%" stop-color="#a87a18"/>
+    </linearGradient>
+    <radialGradient id="orb" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff5b8"/>
+      <stop offset="40%" stop-color="#e6c060"/>
+      <stop offset="100%" stop-color="#a87a18" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="auraM" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#caa040" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#caa040" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="200" cy="540" rx="170" ry="40" fill="url(#auraM)"/>
+  <!-- robe / cloak -->
+  <path d="M120,220 C90,320 80,440 100,540 L300,540 C320,440 310,320 280,220 L260,200 L140,200 Z"
+        fill="url(#robe)" stroke="url(#goldTrim)" stroke-width="1.5"/>
+  <!-- inner robe folds -->
+  <path d="M180,240 L180,540 M220,240 L220,540 M150,300 L150,540 M250,300 L250,540"
+        stroke="#1a0810" stroke-width="1" fill="none" opacity="0.7"/>
+  <!-- gold trim -->
+  <path d="M140,200 L260,200" stroke="url(#goldTrim)" stroke-width="3"/>
+  <path d="M120,540 L300,540" stroke="url(#goldTrim)" stroke-width="2"/>
+  <!-- hood -->
+  <path d="M150,180 C150,90 250,90 250,180 L260,210 L140,210 Z"
+        fill="#1a0810" stroke="url(#goldTrim)" stroke-width="2"/>
+  <!-- shadowed face -->
+  <ellipse cx="200" cy="170" rx="30" ry="38" fill="#000"/>
+  <!-- glowing eyes -->
+  <circle cx="190" cy="165" r="3" fill="#fff5b8"/>
+  <circle cx="210" cy="165" r="3" fill="#fff5b8"/>
+  <!-- staff -->
+  <g transform="translate(310,300)">
+    <rect x="-3" y="-200" width="6" height="320" fill="#3a2a10" stroke="url(#goldTrim)" stroke-width="0.5"/>
+    <!-- orb cradle -->
+    <path d="M-20,-200 C-20,-220 -10,-235 0,-235 C10,-235 20,-220 20,-200"
+          fill="none" stroke="url(#goldTrim)" stroke-width="2"/>
+    <circle cx="0" cy="-215" r="22" fill="url(#orb)"/>
+    <circle cx="0" cy="-215" r="10" fill="#fff5b8"/>
+  </g>
+</svg>

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <defs>
+    <linearGradient id="orn" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff0a8"/>
+      <stop offset="50%" stop-color="#caa040"/>
+      <stop offset="100%" stop-color="#5a3d05"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke="url(#orn)" stroke-width="2" stroke-linecap="round">
+    <!-- center medallion -->
+    <circle cx="400" cy="100" r="28"/>
+    <circle cx="400" cy="100" r="16"/>
+    <path d="M400,72 L400,128 M372,100 L428,100 M380,80 L420,120 M420,80 L380,120"/>
+    <!-- left flourish -->
+    <path d="M370,100 C320,100 300,70 240,70 C200,70 180,100 140,100 C100,100 80,80 40,90"/>
+    <path d="M370,100 C320,100 300,130 240,130 C200,130 180,100 140,100 C100,100 80,120 40,110"/>
+    <circle cx="240" cy="70" r="5" fill="url(#orn)" stroke="none"/>
+    <circle cx="240" cy="130" r="5" fill="url(#orn)" stroke="none"/>
+    <circle cx="140" cy="100" r="6" fill="url(#orn)" stroke="none"/>
+    <!-- right flourish -->
+    <path d="M430,100 C480,100 500,70 560,70 C600,70 620,100 660,100 C700,100 720,80 760,90"/>
+    <path d="M430,100 C480,100 500,130 560,130 C600,130 620,100 660,100 C700,100 720,120 760,110"/>
+    <circle cx="560" cy="70" r="5" fill="url(#orn)" stroke="none"/>
+    <circle cx="560" cy="130" r="5" fill="url(#orn)" stroke="none"/>
+    <circle cx="660" cy="100" r="6" fill="url(#orn)" stroke="none"/>
+  </g>
+</svg>
