@@ -1,0 +1,60 @@
+<?php
+return [
+    "nav.download"     => "Download",
+    "nav.ranking"      => "Ranking",
+    "nav.registration" => "Registration",
+    "nav.market"       => "Market",
+    "nav.vote"         => "Vote for",
+    "nav.donate"       => "Donate Shop",
+    "nav.about"        => "About",
+    "nav.account"      => "Account",
+    "nav.login"        => "Log in",
+    "nav.logout"       => "Log out",
+
+    "footer.tagline"   => "Forge your legend in the eternal continent",
+    "maintenance.title"=> "Server maintenance in progress",
+    "maintenance.text" => "We'll be back shortly. Please check again later.",
+
+    "form.submit"      => "Submit",
+    "form.csrf_invalid"=> "Your session expired, please try again.",
+    "form.required"    => "Please fill in every required field.",
+
+    "reg.title"        => "Create Account",
+    "reg.success"      => "Account created! Welcome to the continent.",
+    "reg.exists.login" => "An account with that name already exists.",
+    "reg.exists.mail"  => "An account is already registered with that e-mail.",
+    "reg.invalid.login"=> "Account name: 4–10 chars, letters & digits only.",
+    "reg.invalid.pwd"  => "Password: 4–10 chars (game client limit).",
+    "reg.invalid.pwd2" => "Passwords do not match.",
+    "reg.invalid.mail" => "Invalid e-mail.",
+    "reg.invalid.mail2"=> "E-mail addresses do not match.",
+    "reg.invalid.pin"  => "PIN must be 4 digits.",
+    "reg.invalid.rules"=> "You must accept the server rules.",
+    "reg.rate_limit"   => "Too many registrations from your IP. Try later.",
+
+    "login.title"      => "Log in to your account",
+    "login.bad"        => "Wrong login or password.",
+    "login.rate_limit" => "Too many login attempts. Try later.",
+
+    "rank.title"       => "Hall of Fame",
+    "rank.players"     => "Top Players",
+    "rank.guilds"      => "Top Guilds",
+    "rank.kills"       => "PVP Killers",
+    "rank.online"      => "Online Now",
+
+    "vote.title"       => "Vote for the server",
+    "vote.thanks"      => "Thanks for voting! Reward has been credited.",
+    "vote.cooldown"    => "You've already voted recently. Try later.",
+    "vote.no_account"  => "Log in to receive the reward.",
+
+    "donate.title"     => "Donate Shop",
+    "donate.bought"    => "Purchase completed. Item delivered to vault.",
+    "donate.no_funds"  => "Insufficient funds.",
+    "donate.no_item"   => "Item not found.",
+
+    "acc.title"        => "My Account",
+    "acc.balances"     => "Balances",
+    "acc.password"     => "Change password",
+    "acc.password_ok"  => "Password updated.",
+    "acc.password_bad" => "Current password is wrong.",
+];
