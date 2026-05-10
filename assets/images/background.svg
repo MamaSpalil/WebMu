@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <radialGradient id="bgRad" cx="50%" cy="40%" r="75%">
+      <stop offset="0%" stop-color="#3a2810"/>
+      <stop offset="40%" stop-color="#1a1206"/>
+      <stop offset="100%" stop-color="#070401"/>
+    </radialGradient>
+    <linearGradient id="mountain" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a1408" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+    <linearGradient id="mistGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#caa040" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#caa040" stop-opacity="0.18"/>
+    </linearGradient>
+    <radialGradient id="moon" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff3c4"/>
+      <stop offset="60%" stop-color="#e6c060" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#a87a18" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- sky -->
+  <rect width="1920" height="1080" fill="url(#bgRad)"/>
+
+  <!-- stars -->
+  <g fill="#f5e6a8" opacity="0.6">
+    <circle cx="120" cy="80" r="1.2"/>
+    <circle cx="260" cy="160" r="0.8"/>
+    <circle cx="430" cy="60" r="1.5"/>
+    <circle cx="640" cy="120" r="0.9"/>
+    <circle cx="820" cy="40" r="1.1"/>
+    <circle cx="1020" cy="180" r="0.7"/>
+    <circle cx="1240" cy="90" r="1.4"/>
+    <circle cx="1480" cy="60" r="0.9"/>
+    <circle cx="1660" cy="170" r="1.2"/>
+    <circle cx="1820" cy="100" r="0.8"/>
+    <circle cx="180" cy="240" r="0.7"/>
+    <circle cx="700" cy="260" r="1.0"/>
+    <circle cx="1340" cy="240" r="0.9"/>
+  </g>
+
+  <!-- moon -->
+  <circle cx="1450" cy="280" r="220" fill="url(#moon)"/>
+  <circle cx="1450" cy="280" r="90" fill="#fff3c4" opacity="0.9"/>
+
+  <!-- distant mountains -->
+  <path d="M0,720 L160,560 L300,640 L460,500 L640,620 L820,520 L1000,640 L1180,540 L1360,650 L1540,560 L1720,640 L1920,580 L1920,1080 L0,1080 Z"
+        fill="url(#mountain)" opacity="0.85"/>
+
+  <!-- nearer mountains -->
+  <path d="M0,860 L120,740 L260,820 L420,700 L580,820 L760,720 L940,840 L1140,720 L1320,840 L1500,740 L1700,840 L1920,760 L1920,1080 L0,1080 Z"
+        fill="#0d0904"/>
+
+  <!-- ground mist -->
+  <rect x="0" y="780" width="1920" height="300" fill="url(#mistGrad)"/>
+
+  <!-- castle silhouette -->
+  <g fill="#0a0703" opacity="0.95">
+    <rect x="820" y="640" width="280" height="220"/>
+    <rect x="780" y="680" width="60" height="180"/>
+    <rect x="1080" y="680" width="60" height="180"/>
+    <rect x="900" y="560" width="120" height="120"/>
+    <polygon points="780,680 810,620 840,680"/>
+    <polygon points="1080,680 1110,620 1140,680"/>
+    <polygon points="900,560 960,480 1020,560"/>
+    <!-- battlements -->
+    <rect x="820" y="630" width="20" height="20"/>
+    <rect x="860" y="630" width="20" height="20"/>
+    <rect x="900" y="630" width="20" height="20"/>
+    <rect x="1000" y="630" width="20" height="20"/>
+    <rect x="1040" y="630" width="20" height="20"/>
+    <rect x="1080" y="630" width="20" height="20"/>
+    <!-- glowing windows -->
+    <rect x="930" y="600" width="10" height="20" fill="#e6c060" opacity="0.85"/>
+    <rect x="980" y="600" width="10" height="20" fill="#e6c060" opacity="0.85"/>
+    <rect x="850" y="730" width="12" height="22" fill="#caa040" opacity="0.7"/>
+    <rect x="1058" y="730" width="12" height="22" fill="#caa040" opacity="0.7"/>
+  </g>
+</svg>

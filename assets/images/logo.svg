@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" width="480" height="160">
+  <defs>
+    <linearGradient id="goldGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff5b8"/>
+      <stop offset="35%" stop-color="#e6c34a"/>
+      <stop offset="60%" stop-color="#a87a18"/>
+      <stop offset="100%" stop-color="#5a3d05"/>
+    </linearGradient>
+    <linearGradient id="goldShine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffe88a"/>
+      <stop offset="50%" stop-color="#caa040"/>
+      <stop offset="100%" stop-color="#7a5210"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#glow)">
+    <text x="240" y="105" text-anchor="middle"
+          font-family="Cinzel, 'Times New Roman', serif"
+          font-size="96" font-weight="900"
+          fill="url(#goldGrad)" stroke="#3a2a07" stroke-width="2"
+          letter-spacing="6">A2K MU</text>
+    <text x="240" y="138" text-anchor="middle"
+          font-family="Cinzel, 'Times New Roman', serif"
+          font-size="20" font-weight="700"
+          fill="url(#goldShine)" stroke="#2a1d05" stroke-width="0.6"
+          letter-spacing="14">ONLINE</text>
+  </g>
+</svg>
