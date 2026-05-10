@@ -47,17 +47,25 @@ function db()
 /** Store the last connection error for templates and logs. */
 function db_set_error($msg)
 {
-    $GLOBALS["__db_connection_error"] = (string)$msg;
+    global $config;
+    $config["__db_connection_error"] = (string)$msg;
     if ($msg !== "") {
         db_log($msg);
     }
 }
 
-/** Return the current connection error, trying to connect once if needed. */
-function db_connection_error()
+/** Return the last connection error without opening a new connection. */
+function db_last_error()
+{
+    global $config;
+    return $config["__db_connection_error"] ?? "";
+}
+
+/** Check the connection once and return the current connection error. */
+function db_check_connection_error()
 {
     db();
-    return $GLOBALS["__db_connection_error"] ?? "";
+    return db_last_error();
 }
 
 /**
