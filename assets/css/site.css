@@ -824,3 +824,450 @@ code {
     .btn-major { min-width: 220px; padding: 22px 36px; font-size: 28px; letter-spacing: 6px; }
     .season-banner { grid-template-columns: 1fr; }
 }
+
+/* =====================================================================
+ * 3D LAYER — additive enhancement of the gold/bronze theme.
+ *
+ * This block is appended after the original styles so existing selectors
+ * keep their normal look, while .*-3d wrappers add perspective shadows,
+ * extruded text and tilt-on-hover. Every effect respects
+ * prefers-reduced-motion (already defined above) by virtue of the
+ * universal transition/animation override.
+ *
+ * Self-contained: no new fonts, no new dependencies.
+ * ===================================================================== */
+
+/* ---------- Shared perspective root ---------- */
+body { perspective: 1400px; perspective-origin: 50% 0%; }
+
+/* ---------- HEADER 3D ---------- */
+.site-header.header-3d {
+    background:
+        linear-gradient(180deg, rgba(28,18,6,0.97) 0%, rgba(10,6,2,0.94) 100%),
+        repeating-linear-gradient(135deg, rgba(255,240,168,0.025) 0 2px, transparent 2px 6px);
+    border-bottom: 1px solid rgba(255, 240, 168, 0.10);
+    box-shadow:
+        0 4px 20px rgba(202, 160, 64, 0.22),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 rgba(255, 240, 168, 0.18),
+        0 10px 30px -10px rgba(0, 0, 0, 0.9);
+}
+.site-header.header-3d::after {
+    /* Thin gold beam under the header — gives the "edge of metal plate" feel. */
+    content: '';
+    position: absolute; left: 0; right: 0; bottom: -3px; height: 3px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(202,160,64,0.0) 4%,
+        rgba(230,195,74,0.85) 25%,
+        rgba(255,240,168,1) 50%,
+        rgba(230,195,74,0.85) 75%,
+        rgba(202,160,64,0.0) 96%,
+        transparent 100%);
+    filter: blur(0.4px);
+    box-shadow: 0 0 14px rgba(230,195,74,0.55);
+    pointer-events: none;
+}
+.header-glow {
+    position: absolute; inset: 0;
+    background:
+        radial-gradient(ellipse 600px 80px at 50% 100%, rgba(230,195,74,0.25), transparent 70%);
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+/* Brand — extruded gold lettering */
+.brand-3d { transform-style: preserve-3d; }
+.brand-3d .brand-logo-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 30% 25%, rgba(255,240,168,0.35), transparent 55%),
+        radial-gradient(circle at center, #3a280a 0%, #0a0602 80%);
+    border: 1px solid rgba(202,160,64,0.55);
+    box-shadow:
+        inset 0 2px 0 rgba(255,240,168,0.25),
+        inset 0 -4px 8px rgba(0,0,0,0.7),
+        0 0 18px rgba(230,195,74,0.35),
+        0 6px 14px rgba(0,0,0,0.7);
+    transition: transform .35s ease, box-shadow .35s ease;
+}
+.brand-3d:hover .brand-logo-wrap {
+    transform: rotateY(18deg) rotateX(-6deg) scale(1.05);
+    box-shadow:
+        inset 0 2px 0 rgba(255,240,168,0.35),
+        inset 0 -4px 8px rgba(0,0,0,0.7),
+        0 0 28px rgba(230,195,74,0.55),
+        0 10px 20px rgba(0,0,0,0.8);
+}
+.brand-3d .brand-logo-wrap img { height: 46px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8)); }
+
+.brand-3d .brand-text {
+    position: relative;
+    display: inline-block;
+    /* layered "extrude" via stacked text-shadow — multiple bronze copies receding */
+    text-shadow:
+        0 1px 0 #8a6018,
+        0 2px 0 #6a4818,
+        0 3px 0 #4a3210,
+        0 4px 0 #2a1d08,
+        0 5px 0 #1a1206,
+        0 6px 10px rgba(0,0,0,0.85),
+        0 0 18px rgba(230,195,74,0.45);
+    transition: transform .35s ease;
+}
+.brand-3d:hover .brand-text { transform: translateY(-1px) rotateX(8deg); }
+
+/* Nav buttons — facetted 3D button look */
+.site-header.header-3d .nav-btn {
+    transform-style: preserve-3d;
+    background:
+        linear-gradient(180deg, #3a280c 0%, #1a120a 50%, #0a0703 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 240, 168, 0.25),
+        inset 0 -2px 0 rgba(0,0,0,0.55),
+        inset 0 0 0 1px rgba(202,160,64,0.18),
+        0 3px 0 #0a0703,
+        0 6px 14px rgba(0,0,0,0.7);
+}
+.site-header.header-3d .nav-btn:hover,
+.site-header.header-3d .nav-btn.active {
+    transform: translateY(-2px) rotateX(6deg);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 240, 168, 0.45),
+        inset 0 -2px 0 rgba(0,0,0,0.55),
+        inset 0 0 0 1px rgba(230, 195, 74, 0.5),
+        0 5px 0 #0a0703,
+        0 10px 22px rgba(0,0,0,0.75),
+        0 0 22px rgba(230,195,74,0.55);
+}
+.site-header.header-3d .nav-btn:active {
+    transform: translateY(0) rotateX(0);
+    box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.6),
+        inset 0 0 0 1px rgba(202,160,64,0.4),
+        0 0 0 #0a0703;
+}
+.site-header.header-3d .nav-btn.active {
+    /* "Pressed" indicator on the currently active page. */
+    background: linear-gradient(180deg, #4a3210 0%, #2a1d08 100%);
+}
+
+/* Server-status pill — 3D ribbon */
+.server-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--gold-light);
+    background: linear-gradient(180deg, #2a1d08 0%, #14100a 100%);
+    border: 1px solid var(--border-gold);
+    border-radius: 999px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,240,168,0.25),
+        inset 0 -2px 0 rgba(0,0,0,0.5),
+        0 4px 10px rgba(0,0,0,0.65);
+    transform: rotateX(8deg);
+    transform-origin: center bottom;
+}
+.server-status-pill .dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+}
+.server-status-pill.online  { color: #c8f0a0; }
+.server-status-pill.online  .dot { background: #6abf3a; animation: pulse-dot 1.8s ease-in-out infinite; }
+.server-status-pill.offline { color: #f0b8a0; }
+.server-status-pill.offline .dot { background: #c4332a; }
+@keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 6px #6abf3a; }
+    50%      { box-shadow: 0 0 16px #6abf3a, 0 0 4px #fff; }
+}
+
+/* ---------- Global buttons — make `.btn` truly 3D ---------- */
+.btn {
+    transform-style: preserve-3d;
+    box-shadow:
+        inset 0 1px 0 rgba(255,240,168,0.25),
+        inset 0 -2px 0 rgba(0,0,0,0.55),
+        0 4px 0 #0a0703,
+        0 8px 18px rgba(0,0,0,0.7);
+}
+.btn:hover {
+    transform: translateY(-3px) rotateX(4deg);
+    box-shadow:
+        inset 0 1px 0 rgba(255,240,168,0.45),
+        inset 0 -2px 0 rgba(0,0,0,0.55),
+        0 7px 0 #0a0703,
+        0 12px 26px rgba(0,0,0,0.8),
+        0 0 24px rgba(230,195,74,0.55);
+}
+.btn:active {
+    transform: translateY(2px) rotateX(0);
+    box-shadow:
+        inset 0 2px 4px rgba(0,0,0,0.6),
+        0 1px 0 #0a0703,
+        0 3px 8px rgba(0,0,0,0.6);
+}
+
+/* ---------- Panels & cards — perspective tilt on hover ---------- */
+.panel-corner {
+    transform-style: preserve-3d;
+    transition: transform .45s ease, box-shadow .45s ease;
+    box-shadow:
+        0 10px 28px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(202, 160, 64, 0.18) inset,
+        0 0 30px rgba(230, 195, 74, 0.05) inset;
+}
+.panel-corner:hover {
+    transform: translateY(-2px) rotateX(1.6deg);
+    box-shadow:
+        0 18px 38px rgba(0, 0, 0, 0.78),
+        0 0 0 1px rgba(230, 195, 74, 0.3) inset,
+        0 0 50px rgba(230, 195, 74, 0.1) inset,
+        0 0 30px rgba(202, 160, 64, 0.2);
+}
+
+/* Stats-bar tiles get a subtle 3D pop */
+.stats-bar .stat {
+    transform-style: preserve-3d;
+    transition: transform .35s ease, box-shadow .35s ease;
+    box-shadow:
+        inset 0 1px 0 rgba(255,240,168,0.10),
+        inset 0 -2px 0 rgba(0,0,0,0.5),
+        0 6px 14px rgba(0,0,0,0.55);
+}
+.stats-bar .stat:hover {
+    transform: translateY(-3px) rotateX(6deg);
+    box-shadow:
+        inset 0 1px 0 rgba(255,240,168,0.25),
+        inset 0 -2px 0 rgba(0,0,0,0.5),
+        0 10px 22px rgba(0,0,0,0.7),
+        0 0 22px rgba(230,195,74,0.35);
+}
+
+/* Tabs — pressed/raised feel */
+.tab {
+    transform-style: preserve-3d;
+    transition: transform .25s ease, background .25s ease, color .25s ease, box-shadow .25s ease;
+    box-shadow: inset 0 -2px 0 rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.45);
+}
+.tab:hover { transform: translateY(-2px) rotateX(6deg); }
+.tab.active {
+    transform: translateY(1px);
+    box-shadow:
+        inset 0 2px 6px rgba(0,0,0,0.6),
+        inset 0 0 0 1px rgba(230,195,74,0.45);
+}
+
+/* Page titles — multi-layer extrude */
+.page-title {
+    text-shadow:
+        0 1px 0 #8a6018,
+        0 2px 0 #6a4818,
+        0 3px 0 #4a3210,
+        0 4px 0 #2a1d08,
+        0 6px 12px rgba(0,0,0,0.85),
+        0 0 22px rgba(230,195,74,0.4);
+}
+
+/* Guild mark placeholder — small 3D coin */
+.guild-mark {
+    display: inline-block;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background:
+        radial-gradient(circle at 30% 25%, #fff5b8 0%, #e6c34a 25%, #a87a18 60%, #5a3d05 100%);
+    border: 1px solid #2a1d08;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.4),
+        inset 0 -2px 3px rgba(0,0,0,0.5),
+        0 2px 4px rgba(0,0,0,0.5),
+        0 0 8px rgba(230,195,74,0.4);
+}
+
+/* ---------- FOOTER 3D ---------- */
+.site-footer.footer-3d {
+    margin-top: 60px;
+    padding: 40px 24px 24px;
+    background:
+        linear-gradient(180deg, transparent 0%, rgba(10,6,2,0.92) 30%, rgba(6,4,2,0.96) 100%);
+    border-top: 1px solid rgba(255, 240, 168, 0.10);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 240, 168, 0.10),
+        inset 0 4px 16px rgba(0, 0, 0, 0.7);
+    text-transform: none;
+    letter-spacing: normal;
+    color: var(--gold-light);
+}
+.site-footer.footer-3d::before {
+    content: '';
+    display: block;
+    height: 3px;
+    margin: -40px auto 36px;
+    max-width: 1100px;
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(230,195,74,0.85) 30%,
+        rgba(255,240,168,1) 50%,
+        rgba(230,195,74,0.85) 70%,
+        transparent 100%);
+    filter: blur(0.4px);
+    box-shadow: 0 0 14px rgba(230,195,74,0.5);
+}
+.footer-grid {
+    display: grid;
+    gap: 24px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    max-width: 1100px;
+    margin: 0 auto 32px;
+    perspective: 1200px;
+}
+.footer-card {
+    position: relative;
+    padding: 22px 24px;
+    background:
+        linear-gradient(180deg, rgba(28,18,6,0.85) 0%, rgba(10,6,2,0.92) 100%),
+        repeating-linear-gradient(135deg, rgba(255,240,168,0.04) 0 2px, transparent 2px 8px);
+    border: 1px solid rgba(202, 160, 64, 0.45);
+    border-radius: 4px;
+    transform-style: preserve-3d;
+    transition: transform .45s ease, box-shadow .45s ease, border-color .45s ease;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 240, 168, 0.14),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.55),
+        0 10px 22px rgba(0, 0, 0, 0.6);
+}
+.footer-card::before {
+    content: '';
+    position: absolute; inset: 4px;
+    border: 1px solid rgba(202, 160, 64, 0.15);
+    border-radius: 2px;
+    pointer-events: none;
+}
+.footer-card:hover {
+    transform: translateY(-4px) rotateX(6deg);
+    border-color: rgba(230, 195, 74, 0.7);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 240, 168, 0.25),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.55),
+        0 18px 34px rgba(0, 0, 0, 0.7),
+        0 0 28px rgba(230, 195, 74, 0.35);
+}
+.footer-card-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin: 0 0 14px;
+    background: linear-gradient(180deg, var(--gold-light) 0%, var(--gold) 60%, var(--gold-dark) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+.footer-links { list-style: none; margin: 0; padding: 0; }
+.footer-links li { margin: 6px 0; }
+.footer-links a {
+    display: inline-block;
+    padding: 4px 0;
+    font-size: 13px;
+    letter-spacing: 1.2px;
+    color: var(--gold-light);
+    text-decoration: none;
+    transition: transform .2s ease, color .2s ease, text-shadow .2s ease;
+}
+.footer-links a:hover {
+    color: #fff;
+    transform: translateX(4px);
+    text-shadow: 0 0 10px rgba(230,195,74,0.6);
+}
+
+.footer-bottom {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding-top: 18px;
+    border-top: 1px solid rgba(202, 160, 64, 0.25);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+}
+.footer-bottom .copy {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--gold-dark);
+}
+.footer-bottom .copy::first-letter { color: var(--gold); }
+.socials { display: flex; gap: 10px; }
+.social-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px; height: 38px;
+    font-family: 'Cinzel Decorative', serif;
+    font-weight: 900;
+    font-size: 16px;
+    color: var(--gold-light);
+    text-decoration: none;
+    background:
+        radial-gradient(circle at 30% 25%, rgba(255,240,168,0.25), transparent 60%),
+        linear-gradient(180deg, #2a1d08 0%, #0a0703 100%);
+    border: 1px solid var(--border-gold);
+    border-radius: 50%;
+    transition: transform .25s ease, box-shadow .25s ease, color .25s ease, border-color .25s ease;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 240, 168, 0.25),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.55),
+        0 5px 12px rgba(0, 0, 0, 0.65);
+    transform-style: preserve-3d;
+}
+.social-btn:hover {
+    color: #fff;
+    border-color: var(--gold);
+    transform: translateY(-3px) rotateY(180deg);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 240, 168, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.55),
+        0 10px 20px rgba(0, 0, 0, 0.75),
+        0 0 22px rgba(230, 195, 74, 0.6);
+}
+.site-footer.footer-3d .credits {
+    max-width: 1100px;
+    margin: 16px auto 0;
+    text-align: center;
+}
+
+@media (max-width: 900px) {
+    .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+    .footer-grid { grid-template-columns: 1fr; }
+    .footer-bottom { justify-content: center; text-align: center; }
+}
+
+/* ---------- Loader / spinner on home (rotate3d) ---------- */
+.loader-3d {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    border: 4px solid rgba(202,160,64,0.18);
+    border-top-color: var(--gold);
+    border-right-color: var(--gold-dark);
+    animation: spin3d 1.4s linear infinite;
+    box-shadow: 0 0 22px rgba(230,195,74,0.4);
+}
+@keyframes spin3d {
+    0%   { transform: rotate3d(1, 0.4, 0.2,   0deg); }
+    100% { transform: rotate3d(1, 0.4, 0.2, 360deg); }
+}

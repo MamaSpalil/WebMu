@@ -1,5 +1,7 @@
 <?php if (!defined("insite")) die("no access");
-$show_master = trim((string)($config["char_master_col"] ?? "")) !== "";
+$show_master = trim((string)($config["char_master_col"] ?? "")) !== ""
+               && db_column_exists($config["char_table"] ?? "Character",
+                                   $config["char_master_col"] ?? "MasterLevel");
 ?>
 <main class="page">
     <header class="page-header">

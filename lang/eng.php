@@ -12,6 +12,11 @@ return [
     "nav.logout"       => "Log out",
 
     "footer.tagline"   => "Forge your legend in the eternal continent",
+    "footer.col.server"    => "Server",
+    "footer.col.community" => "Community",
+    "footer.col.support"   => "Support",
+    "footer.forum"         => "Forum",
+    "footer.faq"           => "FAQ",
     "maintenance.title"=> "Server maintenance in progress",
     "maintenance.text" => "We'll be back shortly. Please check again later.",
 

@@ -62,6 +62,70 @@ function mu_class($code)
     return $map[$base] ?? ["Unknown", "dw"];
 }
 
+/**
+ * Map MuOnline Character.MapNumber to a human-readable map name.
+ * Covers the standard Season 3 Episode 1 map list. Unknown ids fall back
+ * to "Map #<n>" so the rank/online tables always show something useful.
+ */
+function mu_map($id)
+{
+    $id = (int)$id;
+    static $map = [
+        0  => "Lorencia",
+        1  => "Dungeon",
+        2  => "Devias",
+        3  => "Noria",
+        4  => "Lost Tower",
+        5  => "Exile",
+        6  => "Arena",
+        7  => "Atlans",
+        8  => "Tarkan",
+        9  => "Devil Square",
+        10 => "Icarus",
+        11 => "Blood Castle 1",
+        12 => "Blood Castle 2",
+        13 => "Blood Castle 3",
+        14 => "Blood Castle 4",
+        15 => "Blood Castle 5",
+        16 => "Blood Castle 6",
+        17 => "Blood Castle 7",
+        18 => "Chaos Castle 1",
+        19 => "Chaos Castle 2",
+        20 => "Chaos Castle 3",
+        21 => "Chaos Castle 4",
+        22 => "Chaos Castle 5",
+        23 => "Chaos Castle 6",
+        24 => "Kalima 1",
+        25 => "Kalima 2",
+        26 => "Kalima 3",
+        27 => "Kalima 4",
+        28 => "Kalima 5",
+        29 => "Kalima 6",
+        30 => "Valley of Loren",
+        31 => "Land of Trial",
+        32 => "Devil Square 2",
+        33 => "Aida",
+        34 => "Crywolf",
+        37 => "Kalima 7",
+        38 => "Kanturu 1",
+        39 => "Kanturu 2",
+        40 => "Kanturu 3 (Boss)",
+        41 => "Silent Map",
+        42 => "Barracks of Balgass",
+        43 => "Refuge of Balgass",
+        45 => "Illusion Temple 1",
+        46 => "Illusion Temple 2",
+        47 => "Illusion Temple 3",
+        48 => "Illusion Temple 4",
+        49 => "Illusion Temple 5",
+        50 => "Illusion Temple 6",
+        51 => "Elveland",
+        52 => "Blood Castle 8",
+        53 => "Chaos Castle 7",
+    ];
+    return $map[$id] ?? ("Map #" . $id);
+}
+
 /** ---- file cache (used by ranking/widgets) ---- */
 function cache_get($key, $ttl)
 {

@@ -45,17 +45,47 @@ if ($errors) {
     redirect("index.php?m=registration");
 }
 
-// Insert account. Stock MuOnline schema column list.
-$ok = db_exec(
-    "INSERT INTO MEMB_INFO
-       (memb___id, memb_name, memb__pwd, sno__numb, mail_addr,
-        bloc_code, ctl1_code, AccountLevel, IsVaultPin, appl_days)
-     VALUES (?, ?, ?, '0000000000000', ?, 0, 0, 0, ?, CONVERT(varchar(10), GETDATE(), 120))",
-    [$login, $login, pwd_for_db($password), $email, $pin]
-);
+// Insert account. Build the column list dynamically — stock Season 3 backups
+// (MuOnline_Bak) do not always have AccountLevel/IsVaultPin, so we only add
+// those when the columns actually exist. memb___id/memb_name/memb__pwd/
+// sno__numb/mail_addr/bloc_code/ctl1_code/appl_days are present in every
+// known MuOnline schema (verified against the MuOnline_Bak in this repo).
+$cols   = ["memb___id", "memb_name", "memb__pwd", "sno__numb", "mail_addr",
+           "bloc_code", "ctl1_code", "appl_days"];
+$vals   = ["?", "?", "?", "'0000000000000'", "?", "0", "0",
+           "CONVERT(varchar(10), GETDATE(), 120)"];
+$params = [$login, $login, pwd_for_db($password), $email];
+
+if (db_column_exists("MEMB_INFO", "AccountLevel")) {
+    $cols[]   = "AccountLevel";
+    $vals[]   = "0";
+}
+if (db_column_exists("MEMB_INFO", "IsVaultPin")) {
+    $cols[]   = "IsVaultPin";
+    $vals[]   = "?";
+    $params[] = $pin;
+}
+$col_list = implode(", ", array_map(function ($c) { return db_ident($c); }, $cols));
+$val_list = implode(", ", $vals);
+
+$ok = db_exec("INSERT INTO MEMB_INFO ($col_list) VALUES ($val_list)", $params);
 if (!$ok) {
-    flash_set("error", "DB error during registration. Please contact support.");
+    $err = db_last_odbc_error();
+    db_log("registration insert failed for `$login`: " . $err);
+    flash_set("error", "DB error during registration"
+        . (!empty($config["debug"]) && $err !== "" ? ": " . $err : "") . ".");
     redirect("index.php?m=registration");
+}
+
+// Seed MEMB_STAT row so the player immediately appears as "offline" in the
+// online-listings instead of being absent (stock MuOnline schema).
+if (db_table_exists("MEMB_STAT")) {
+    db_exec(
+        "INSERT INTO MEMB_STAT (memb___id, ConnectStat, ServerName, IP)
+         SELECT ?, 0, '', ''
+         WHERE NOT EXISTS (SELECT 1 FROM MEMB_STAT WHERE memb___id = ?)",
+        [$login, $login]
+    );
 }
 
 // Starter pack: credits + WCoin (using configured currency tables).
@@ -75,22 +105,27 @@ $starter_credits = (int)($config["starter_credits"] ?? 100);
 $starter_wcoin   = (int)($config["starter_wcoin"] ?? 100);
 $referral_credits = (int)($config["referral_credits"] ?? 50);
 
-if ($cr_t === "MEMB_INFO") {
+// Credits — only if the configured column actually exists on the table.
+if ($starter_credits > 0 && db_column_exists($cr_t, $cr_c)) {
     db_exec("UPDATE $cr_tq SET $cr_cq = ISNULL($cr_cq,0) + ? WHERE $cr_aq = ?",
             [$starter_credits, $login]);
 }
-// MERGE for GameShopPoint (insert if missing, otherwise add).
-db_exec(
-    "MERGE INTO $wc_tq AS T
-     USING (SELECT ? AS acc, ? AS amt) AS S
-       ON T.$wc_aq = S.acc
-     WHEN MATCHED THEN UPDATE SET T.$wc_cq = ISNULL(T.$wc_cq,0) + S.amt
-     WHEN NOT MATCHED THEN INSERT ($wc_aq, $wc_cq) VALUES (S.acc, S.amt);",
-    [$login, $starter_wcoin]
-);
+// WCoin — only if the optional GameShopPoint table exists.
+if ($starter_wcoin > 0 && db_table_exists($wc_t)) {
+    // MERGE inserts a new row when missing, otherwise increments existing balance.
+    db_exec(
+        "MERGE INTO $wc_tq AS T
+         USING (SELECT ? AS acc, ? AS amt) AS S
+           ON T.$wc_aq = S.acc
+         WHEN MATCHED THEN UPDATE SET T.$wc_cq = ISNULL(T.$wc_cq,0) + S.amt
+         WHEN NOT MATCHED THEN INSERT ($wc_aq, $wc_cq) VALUES (S.acc, S.amt);",
+        [$login, $starter_wcoin]
+    );
+}
 
 // Optional referral bonus
-if ($referrer !== "" && valid_login($referrer) && $referrer !== $login) {
+if ($referrer !== "" && valid_login($referrer) && $referrer !== $login
+    && $referral_credits > 0 && db_column_exists($cr_t, $cr_c)) {
     if (db_one("SELECT 1 AS x FROM MEMB_INFO WHERE memb___id = ?", [$referrer])) {
         db_exec("UPDATE $cr_tq SET $cr_cq = ISNULL($cr_cq,0) + ? WHERE $cr_aq = ?",
                 [$referral_credits, $referrer]);

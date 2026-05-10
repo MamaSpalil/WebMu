@@ -42,6 +42,10 @@ $wc_aq = db_ident($wc_a, "AccountID");
 // Atomically deduct using "WHERE balance >= ?" — prevents race & overdraft.
 $debited = false;
 if ($it["credits"] > 0) {
+    if (!db_column_exists($cr_t, $cr_c)) {
+        flash_set("error", "Credits column is not configured on this server.");
+        redirect("index.php?m=donate");
+    }
     $debited = db_exec(
         "UPDATE $cr_tq SET $cr_cq = $cr_cq - ? WHERE $cr_aq = ? AND ISNULL($cr_cq,0) >= ?",
         [$it["credits"], $me["id"], $it["credits"]]
@@ -51,6 +55,10 @@ if ($it["credits"] > 0) {
         $debited = $r && (int)$r["r"] > 0;
     }
 } elseif ($it["wcoin"] > 0) {
+    if (!db_table_exists($wc_t) || !db_column_exists($wc_t, $wc_c)) {
+        flash_set("error", "WCoin storage is not available on this server.");
+        redirect("index.php?m=donate");
+    }
     $debited = db_exec(
         "UPDATE $wc_tq SET $wc_cq = $wc_cq - ? WHERE $wc_aq = ? AND ISNULL($wc_cq,0) >= ?",
         [$it["wcoin"], $me["id"], $it["wcoin"]]

@@ -37,6 +37,11 @@ $config["db_persistent"] = 0;                 // 1 = use odbc_pconnect (pooled),
 // ---- Site addresses ----
 $config["siteaddress"]  = "http://localhost/";
 $config["forum"]        = "http://localhost/forum";
+// Optional social channel URLs — footer hides each button when empty.
+$config["social_discord"]  = "";
+$config["social_telegram"] = "";
+$config["social_vk"]       = "";
+$config["social_youtube"]  = "";
 
 // ---- Localization & theme ----
 $config["def_lang"]     = "rus";              // rus | eng
@@ -109,6 +114,10 @@ $config["guild_member_table"] = "GuildMember";
 $config["guild_name_col"]     = "G_Name";
 $config["guild_master_col"]   = "G_Master";
 $config["guild_score_col"]    = "G_Score";
+// GuildMember has both a character-name column and a guild-name column.
+// Defaults match the stock MuOnline schema.
+$config["guild_member_name_col"]  = "Name";
+$config["guild_member_guild_col"] = "G_Name";
 $config["stat_table"]         = "MEMB_STAT";
 $config["stat_account_col"]   = "memb___id";
 $config["stat_connect_col"]   = "ConnectStat";
@@ -119,6 +128,9 @@ $config["market_open_col"]    = "";            // e.g. "IsStoreOpen"; empty list
 // ---- Optional WebMu tables ----
 $config["donate_items_table"] = "WebDonateItems";
 $config["donate_log_table"]   = "WebDonateLog";
+// Fallback storage for vote points when $config["gr_*"] columns are not
+// present on MEMB_INFO (stock Season 3 backups). Auto-created on demand.
+$config["web_vote_table"]     = "WebVotePoints";
 
 // ---- Vote sites (replace URLs/ids with real top-list links) ----
 $config["vote_sites"] = [
