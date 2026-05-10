@@ -7,7 +7,6 @@
 //  concatenate values into SQL.
 // =====================================================================
 if (!defined("insite")) die("no access");
-const DB_NO_ERROR = "";
 
 /**
  * Lazily open and cache the ODBC connection.
@@ -41,7 +40,7 @@ function db()
         return null;
     }
     $conn = $c;
-    db_set_error(DB_NO_ERROR);
+    db_set_error("");
     return $conn;
 }
 
@@ -65,8 +64,7 @@ function db_last_error()
 /** Check the connection once and return the current connection error. */
 function db_check_connection_error()
 {
-    // Trigger lazy connection initialization so any connection error is captured.
-    db();
+    db(); // Initializes the lazy connection and populates any connection error.
     return db_last_error();
 }
 
