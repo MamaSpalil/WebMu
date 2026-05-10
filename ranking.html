@@ -29,6 +29,61 @@
         }
         .castle-banner .guild { font-size: 26px; color: #fff5b8; text-shadow: 0 0 14px var(--gold); letter-spacing: 4px; }
         .castle-banner p { color: #c8b890; font-size: 13.5px; margin-top: 4px; }
+
+        /* Inventory cell inside the rank table — shows the character's gear */
+        table.rank td.inv-cell { padding: 8px 10px; }
+        table.rank td.inv-cell .inv-row { gap: 4px; }
+        table.rank td.inv-cell .item-slot { width: 36px; height: 36px; }
+
+        /* Hero cards above the table for the podium */
+        .podium {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin: 0 0 28px;
+        }
+        @media (max-width: 820px) { .podium { grid-template-columns: 1fr; } }
+
+        .hero-card {
+            position: relative;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 14px;
+            padding: 16px 18px;
+            background: linear-gradient(180deg, rgba(40,26,8,0.85) 0%, rgba(14,9,3,0.92) 100%);
+            border: 1px solid var(--border-gold);
+            border-radius: 4px;
+            box-shadow: inset 0 1px 0 rgba(255,240,168,.08), 0 4px 14px rgba(0,0,0,.55);
+            transition: transform .25s, border-color .25s, box-shadow .25s;
+        }
+        .hero-card:hover { transform: translateY(-3px); border-color: var(--gold);
+            box-shadow: 0 0 20px rgba(230,195,74,.25), 0 8px 22px rgba(0,0,0,.7); }
+        .hero-card.gold   { border-color: var(--gold);  box-shadow: 0 0 18px rgba(230,195,74,.35); }
+        .hero-card.silver { border-color: #b6b09a; }
+        .hero-card.bronze { border-color: #b58a3a; }
+
+        .hero-card .medal {
+            display: flex; align-items: center; justify-content: center;
+            width: 54px; height: 54px;
+            font-family: 'Cinzel Decorative',serif; font-size: 28px; font-weight: 900;
+            background: radial-gradient(circle at center, rgba(202,160,64,0.3), transparent 70%), #0a0703;
+            border: 1px solid var(--gold);
+            border-radius: 50%;
+            color: #fff5b8; text-shadow: 0 0 12px var(--gold);
+            align-self: start;
+        }
+        .hero-card.silver .medal { color: #ddd0a0; border-color: #b6b09a; text-shadow: 0 0 10px #b6b09a; }
+        .hero-card.bronze .medal { color: #e0a070; border-color: #b58a3a; text-shadow: 0 0 10px #b58a3a; }
+
+        .hero-card h3 {
+            font-family: 'Cinzel Decorative',serif;
+            font-size: 20px; color: var(--gold-light);
+            letter-spacing: 2px; line-height: 1.1;
+        }
+        .hero-card .meta { color: #c8b890; font-size: 12.5px; margin: 4px 0 10px; letter-spacing: 1.2px; }
+        .hero-card .meta strong { color: var(--gold); }
+        .hero-card .gear { display: flex; flex-wrap: wrap; gap: 5px; }
+        .hero-card .gear .item-slot { width: 38px; height: 38px; }
     </style>
 </head>
 <body>
@@ -88,23 +143,126 @@
 
         <!-- Top players -->
         <section class="panel panel-corner" id="players">
-            <h2 class="panel-title left">Top 10 Heroes — by Resets</h2>
+            <h2 class="panel-title left">Top 3 Heroes — Inventory Showcase</h2>
+
+            <div class="podium">
+                <article class="hero-card gold">
+                    <div class="medal">1</div>
+                    <div>
+                        <h3>LordGarion</h3>
+                        <p class="meta"><strong>Dark Lord</strong> · Lv 400 · Resets <strong>87</strong> · Eternals</p>
+                        <div class="gear" aria-label="Equipped items">
+                            <span class="item-slot exc" title="Dragon Slayer +13"><img src="assets/images/items/0190.gif" alt="Dragon Slayer"></span>
+                            <span class="item-slot anc" title="Hyon Plate +11"><img src="assets/images/items/8110.gif" alt="Plate"></span>
+                            <span class="item-slot" title="Sylphid Helm +11"><img src="assets/images/items/7330.gif" alt="Helm"></span>
+                            <span class="item-slot exc" title="Dragon Shield +12"><img src="assets/images/items/6210.gif" alt="Shield"></span>
+                            <span class="item-slot mythic" title="Wings of Storm +13"><img src="assets/images/items/12110.gif" alt="Wings"></span>
+                            <span class="item-slot" title="Dark Horse Lv 30"><img src="assets/images/items/13188.gif" alt="Pet"></span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="hero-card silver">
+                    <div class="medal">2</div>
+                    <div>
+                        <h3>Selene</h3>
+                        <p class="meta"><strong>Elf</strong> · Lv 400 · Resets <strong>84</strong> · Eternals</p>
+                        <div class="gear" aria-label="Equipped items">
+                            <span class="item-slot exc" title="Crystal Bow +13"><img src="assets/images/items/4150.gif" alt="Bow"></span>
+                            <span class="item-slot" title="Sylphid Helm +11"><img src="assets/images/items/7330.gif" alt="Helm"></span>
+                            <span class="item-slot anc" title="Plate +11"><img src="assets/images/items/8110.gif" alt="Plate"></span>
+                            <span class="item-slot mythic" title="Wings of Storm +13"><img src="assets/images/items/12110.gif" alt="Wings"></span>
+                            <span class="item-slot" title="Jewel of Bless"><img src="assets/images/items/14130.gif" alt="Jewel"></span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="hero-card bronze">
+                    <div class="medal">3</div>
+                    <div>
+                        <h3>NightFury</h3>
+                        <p class="meta"><strong>Dark Knight</strong> · Lv 400 · Resets <strong>81</strong> · WolfPack</p>
+                        <div class="gear" aria-label="Equipped items">
+                            <span class="item-slot soc" title="Bloodangel Blade +13"><img src="assets/images/items/0260.gif" alt="Sword"></span>
+                            <span class="item-slot exc" title="Dragon Shield +12"><img src="assets/images/items/6210.gif" alt="Shield"></span>
+                            <span class="item-slot" title="Sylphid Helm +11"><img src="assets/images/items/7330.gif" alt="Helm"></span>
+                            <span class="item-slot anc" title="Plate +11"><img src="assets/images/items/8110.gif" alt="Plate"></span>
+                            <span class="item-slot mythic" title="Wings of Storm +13"><img src="assets/images/items/12110.gif" alt="Wings"></span>
+                        </div>
+                    </div>
+                </article>
+            </div>
+
+            <h2 class="panel-title left" style="margin-top: 14px">Top 10 Heroes — by Resets</h2>
             <div class="table-wrap">
                 <table class="rank">
                     <thead>
-                        <tr><th>#</th><th>Character</th><th>Class</th><th>Level</th><th>Resets</th><th>Master Lv</th><th>Guild</th></tr>
+                        <tr><th>#</th><th>Character</th><th>Class</th><th>Level</th><th>Resets</th><th>Master Lv</th><th>Guild</th><th>Inventory</th></tr>
                     </thead>
                     <tbody>
-                        <tr class="top-1"><td class="rank-pos">1</td><td>LordGarion</td><td><span class="cls-tag cls-dl">Dark Lord</span></td><td>400</td><td>87</td><td>320</td><td>Eternals</td></tr>
-                        <tr class="top-2"><td class="rank-pos">2</td><td>Selene</td><td><span class="cls-tag cls-elf">Elf</span></td><td>400</td><td>84</td><td>318</td><td>Eternals</td></tr>
-                        <tr class="top-3"><td class="rank-pos">3</td><td>NightFury</td><td><span class="cls-tag cls-dk">Dark Knight</span></td><td>400</td><td>81</td><td>301</td><td>WolfPack</td></tr>
-                        <tr><td class="rank-pos">4</td><td>VoidMage</td><td><span class="cls-tag cls-dw">Dark Wizard</span></td><td>400</td><td>78</td><td>295</td><td>Arcanum</td></tr>
-                        <tr><td class="rank-pos">5</td><td>Triton</td><td><span class="cls-tag cls-sm">Summoner</span></td><td>400</td><td>76</td><td>289</td><td>—</td></tr>
-                        <tr><td class="rank-pos">6</td><td>Hex</td><td><span class="cls-tag cls-mg">Magic Gladiator</span></td><td>400</td><td>74</td><td>284</td><td>Arcanum</td></tr>
-                        <tr><td class="rank-pos">7</td><td>Akira</td><td><span class="cls-tag cls-rf">Rage Fighter</span></td><td>400</td><td>72</td><td>271</td><td>WolfPack</td></tr>
-                        <tr><td class="rank-pos">8</td><td>BowQueen</td><td><span class="cls-tag cls-elf">Elf</span></td><td>400</td><td>70</td><td>266</td><td>Eternals</td></tr>
-                        <tr><td class="rank-pos">9</td><td>Iron</td><td><span class="cls-tag cls-dk">Dark Knight</span></td><td>399</td><td>69</td><td>262</td><td>Forge</td></tr>
-                        <tr><td class="rank-pos">10</td><td>Pyra</td><td><span class="cls-tag cls-dw">Dark Wizard</span></td><td>398</td><td>68</td><td>258</td><td>Arcanum</td></tr>
+                        <tr class="top-1"><td class="rank-pos">1</td><td>LordGarion</td><td><span class="cls-tag cls-dl">Dark Lord</span></td><td>400</td><td>87</td><td>320</td><td>Eternals</td>
+                            <td class="inv-cell"><div class="inv-row">
+                                <span class="item-slot exc"><img src="assets/images/items/0190.gif" alt=""></span>
+                                <span class="item-slot anc"><img src="assets/images/items/8110.gif" alt=""></span>
+                                <span class="item-slot"><img src="assets/images/items/6210.gif" alt=""></span>
+                                <span class="item-slot mythic"><img src="assets/images/items/12110.gif" alt=""></span>
+                            </div></td></tr>
+                        <tr class="top-2"><td class="rank-pos">2</td><td>Selene</td><td><span class="cls-tag cls-elf">Elf</span></td><td>400</td><td>84</td><td>318</td><td>Eternals</td>
+                            <td class="inv-cell"><div class="inv-row">
+                                <span class="item-slot exc"><img src="assets/images/items/4150.gif" alt=""></span>
+                                <span class="item-slot"><img src="assets/images/items/7330.gif" alt=""></span>
+                                <span class="item-slot anc"><img src="assets/images/items/8110.gif" alt=""></span>
+                                <span class="item-slot mythic"><img src="assets/images/items/12110.gif" alt=""></span>
+                            </div></td></tr>
+                        <tr class="top-3"><td class="rank-pos">3</td><td>NightFury</td><td><span class="cls-tag cls-dk">Dark Knight</span></td><td>400</td><td>81</td><td>301</td><td>WolfPack</td>
+                            <td class="inv-cell"><div class="inv-row">
+                                <span class="item-slot soc"><img src="assets/images/items/0260.gif" alt=""></span>
+                                <span class="item-slot exc"><img src="assets/images/items/6210.gif" alt=""></span>
+                                <span class="item-slot"><img src="assets/images/items/8110.gif" alt=""></span>
+                                <span class="item-slot mythic"><img src="assets/images/items/12110.gif" alt=""></span>
+                            </div></td></tr>
+                        <tr><td class="rank-pos">4</td><td>VoidMage</td><td><span class="cls-tag cls-dw">Dark Wizard</span></td><td>400</td><td>78</td><td>295</td><td>Arcanum</td>
+                            <td class="inv-cell"><div class="inv-row">
+                                <span class="item-slot soc"><img src="assets/images/items/5200.gif" alt=""></span>
+                                <span class="item-slot anc"><img src="assets/images/items/8110.gif" alt=""></span>
+                                <span class="item-slot"><img src="assets/images/items/12110.gif" alt=""></span>
+                            </div></td></tr>
+                        <tr><td class="rank-pos">5</td><td>Triton</td><td><span class="cls-tag cls-sm">Summoner</span></td><td>400</td><td>76</td><td>289</td><td>—</td>
+                            <td class="inv-cell"><div class="inv-row">
+                                <span class="item-slot exc"><img src="assets/images/items/5200.gif" alt=""></span>
+                                <span class="item-slot"><img src="assets/images/items/7330.gif" alt=""></span>
+                                <span class="item-slot mythic"><img src="assets/images/items/12110.gif" alt=""></span>
+                            </div></td></tr>
+                        <tr><td class="rank-pos">6</td><td>Hex</td><td><span class="cls-tag cls-mg">Magic Gladiator</span></td><td>400</td><td>74</td><td>284</td><td>Arcanum</td>
+                            <td class="inv-cell"><div class="inv-row">
+                                <span class="item-slot exc"><img src="assets/images/items/0190.gif" alt=""></span>
+                                <span class="item-slot anc"><img src="assets/images/items/8110.gif" alt=""></span>
+                                <span class="item-slot"><img src="assets/images/items/12110.gif" alt=""></span>
+                            </div></td></tr>
+                        <tr><td class="rank-pos">7</td><td>Akira</td><td><span class="cls-tag cls-rf">Rage Fighter</span></td><td>400</td><td>72</td><td>271</td><td>WolfPack</td>
+                            <td class="inv-cell"><div class="inv-row">
+                                <span class="item-slot soc"><img src="assets/images/items/0260.gif" alt=""></span>
+                                <span class="item-slot"><img src="assets/images/items/8110.gif" alt=""></span>
+                                <span class="item-slot exc"><img src="assets/images/items/6210.gif" alt=""></span>
+                            </div></td></tr>
+                        <tr><td class="rank-pos">8</td><td>BowQueen</td><td><span class="cls-tag cls-elf">Elf</span></td><td>400</td><td>70</td><td>266</td><td>Eternals</td>
+                            <td class="inv-cell"><div class="inv-row">
+                                <span class="item-slot exc"><img src="assets/images/items/4150.gif" alt=""></span>
+                                <span class="item-slot"><img src="assets/images/items/7330.gif" alt=""></span>
+                                <span class="item-slot mythic"><img src="assets/images/items/12110.gif" alt=""></span>
+                            </div></td></tr>
+                        <tr><td class="rank-pos">9</td><td>Iron</td><td><span class="cls-tag cls-dk">Dark Knight</span></td><td>399</td><td>69</td><td>262</td><td>Forge</td>
+                            <td class="inv-cell"><div class="inv-row">
+                                <span class="item-slot exc"><img src="assets/images/items/0190.gif" alt=""></span>
+                                <span class="item-slot anc"><img src="assets/images/items/8110.gif" alt=""></span>
+                                <span class="item-slot"><img src="assets/images/items/6210.gif" alt=""></span>
+                            </div></td></tr>
+                        <tr><td class="rank-pos">10</td><td>Pyra</td><td><span class="cls-tag cls-dw">Dark Wizard</span></td><td>398</td><td>68</td><td>258</td><td>Arcanum</td>
+                            <td class="inv-cell"><div class="inv-row">
+                                <span class="item-slot soc"><img src="assets/images/items/5200.gif" alt=""></span>
+                                <span class="item-slot"><img src="assets/images/items/14130.gif" alt=""></span>
+                                <span class="item-slot"><img src="assets/images/items/14230.gif" alt=""></span>
+                            </div></td></tr>
                     </tbody>
                 </table>
             </div>
