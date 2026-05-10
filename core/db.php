@@ -53,9 +53,7 @@ function db_set_error($msg)
         return;
     }
     $config["__db_connection_error"] = (string)$msg;
-    if (!empty($config["__db_connection_error"])) {
-        db_log($config["__db_connection_error"]);
-    }
+    db_log($config["__db_connection_error"]);
 }
 
 /** Return the last connection error without opening a new connection. */
