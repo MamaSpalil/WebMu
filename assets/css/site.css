@@ -7,12 +7,25 @@
     --gold: #e6c34a;
     --gold-dark: #a87a18;
     --gold-deep: #5a3d05;
+    --bronze: #6a4a18;
+    --bronze-dark: #2d1f08;
     --bg-deep: #050301;
-    --bg-panel: rgba(14, 9, 3, 0.78);
-    --bg-panel-2: rgba(28, 18, 6, 0.85);
-    --border-gold: rgba(202, 160, 64, 0.55);
+    --bg-stone: #0c0a07;
+    --bg-stone-2: #15110a;
+    --bg-panel: rgba(10, 7, 3, 0.88);
+    --bg-panel-2: rgba(18, 12, 5, 0.92);
+    --bg-slot: #0a0805;
+    --border-gold: rgba(168, 122, 24, 0.55);
+    --border-iron: rgba(60, 48, 24, 0.9);
     --red: #c4332a;
     --green: #6abf3a;
+
+    /* Item grade colours used in market & inventory tooltips */
+    --grade-common: #d8c89a;
+    --grade-exc:   #6abf3a; /* excellent — green */
+    --grade-anc:   #5a8cd8; /* ancient — blue   */
+    --grade-soc:   #e0a040; /* socket — orange  */
+    --grade-mythic:#b86ad8; /* mythic — purple  */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
