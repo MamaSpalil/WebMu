@@ -68,6 +68,7 @@ html { scroll-behavior: smooth; }
 
 body {
     background:
+        radial-gradient(circle at 50% 10%, rgba(230,195,74,0.12), transparent 28%),
         url('../images/background.svg') center top / cover no-repeat fixed,
         radial-gradient(ellipse at top, #2a1a08 0%, #0a0602 70%, #000 100%);
     position: relative;
@@ -437,6 +438,44 @@ a:hover { color: var(--gold-light); }
 .card ul { padding-left: 18px; color: #ddc89a; font-size: 13.5px; line-height: 1.6; }
 .card ul li { margin-bottom: 4px; }
 
+.pack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 18px;
+    background: linear-gradient(180deg, rgba(33,21,7,.82), rgba(10,6,2,.88));
+    border: 1px solid var(--border-gold);
+    border-radius: 3px;
+    text-align: center;
+    box-shadow: inset 0 1px 0 rgba(255,240,168,.08), 0 4px 14px rgba(0,0,0,.45);
+}
+.pack .ico { width: 48px; height: 48px; margin: 0 auto; filter: drop-shadow(0 0 10px rgba(230,195,74,.5)); }
+.pack .name { font-family: 'Cinzel Decorative',serif; color: var(--gold); font-size: 18px; letter-spacing: 2px; }
+.pack .price { font-family: 'Cinzel Decorative',serif; color: #fff5b8; font-size: 22px; }
+.pack .price small { color: #b89968; font-size: 11px; letter-spacing: 2px; margin-left: 4px; }
+.pack form { margin-top: 8px; }
+
+.season-banner {
+    display: grid;
+    grid-template-columns: minmax(220px, 360px) 1fr;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(22,13,4,.92), rgba(6,3,1,.92));
+    border: 1px solid var(--gold-dark);
+    box-shadow: inset 0 0 32px rgba(0,0,0,.55), 0 8px 28px rgba(0,0,0,.55);
+}
+.season-banner img { width: 100%; border-radius: 6px; filter: drop-shadow(0 0 16px rgba(230,195,74,.28)); }
+.season-banner h2 {
+    font-family: 'Cinzel Decorative',serif;
+    font-size: clamp(24px,3vw,40px);
+    color: var(--gold-light);
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+}
+.season-banner p { color: #ddc89a; line-height: 1.7; }
+
 /* ====================== FORMS ====================== */
 .form-grid {
     display: grid;
@@ -680,6 +719,13 @@ table.rank .top-3 td.rank-pos { color: #c8923a; }
 }
 
 .note.warn { background: rgba(74, 16, 8, 0.45); border-left-color: #e07a4a; }
+code {
+    color: #fff5b8;
+    background: rgba(8,5,2,.78);
+    border: 1px solid rgba(168,122,24,.45);
+    border-radius: 3px;
+    padding: 1px 5px;
+}
 
 /* ====================== ITEM SLOTS / INVENTORY ====================== */
 /* Reusable item slot for both market thumbnails and character inventory grids */
@@ -770,4 +816,5 @@ table.rank .top-3 td.rank-pos { color: #c8923a; }
     .brand-text { font-size: 18px; letter-spacing: 2px; }
     .nav-btn { padding: 10px 14px; font-size: 11.5px; letter-spacing: 1.8px; }
     .btn-major { min-width: 220px; padding: 22px 36px; font-size: 28px; letter-spacing: 6px; }
+    .season-banner { grid-template-columns: 1fr; }
 }

@@ -18,7 +18,11 @@ function read_balance($prefix, $account) {
         ?? $config[$prefix . "_points_acc"]
         ?? "memb___id";
     if (!$col || !$tbl) return null;
-    $row = db_one("SELECT [$col] AS v FROM [$tbl] WHERE [$acc] = ?", [$account]);
+    $colq = db_ident($col);
+    $tblq = db_ident($tbl);
+    $accq = db_ident($acc, "memb___id");
+    if (!$colq || !$tblq) return null;
+    $row = db_one("SELECT $colq AS v FROM $tblq WHERE $accq = ?", [$account]);
     return $row ? (string)$row["v"] : "0";
 }
 
@@ -30,10 +34,20 @@ $balances = [
 ];
 
 // Characters owned by this account
+$char_t = db_ident($config["char_table"] ?? "Character", "Character");
+$char_name = db_ident($config["char_name_col"] ?? "Name", "Name");
+$char_account = db_ident($config["char_account_col"] ?? "AccountID", "AccountID");
+$char_level = db_ident($config["char_level_col"] ?? "cLevel", "cLevel");
+$char_resets = db_ident($config["char_resets_col"] ?? "Resets", "Resets");
+$char_class = db_ident($config["char_class_col"] ?? "Class", "Class");
+$char_master_cfg = trim((string)($config["char_master_col"] ?? ""));
+$char_master = $char_master_cfg !== "" ? db_ident($char_master_cfg, "MasterLevel") : null;
+$master_select = $char_master ? "$char_master AS MasterLevel" : "0 AS MasterLevel";
 $chars = db_all(
-    "SELECT TOP 10 Name, cLevel, Resets, MasterLevel, Class
-     FROM Character WHERE AccountID = ?
-     ORDER BY Resets DESC, cLevel DESC",
+    "SELECT TOP 10 $char_name AS Name, $char_level AS cLevel,
+            $char_resets AS Resets, $master_select, $char_class AS Class
+     FROM $char_t WHERE $char_account = ?
+     ORDER BY $char_resets DESC, $char_level DESC",
     [$account]
 );
 foreach ($chars as &$c) {

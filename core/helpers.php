@@ -38,7 +38,7 @@ function fmt_int($n)
 
 /**
  * Map MuOnline Character.Class numeric code to a short name + slug.
- * Codes follow the standard Season 6 layout (base / 1st-quest / 2nd-quest):
+ * Codes follow the common MuOnline layout (base / quest evolutions):
  *   0,1,2,3 = DW;  16,17,18,19 = DK;  32,33,34,35 = ELF;  48,49,50 = MG;
  *   64,65,66 = DL; 80,81,82,83 = SM;  96,97,98 = RF.
  */

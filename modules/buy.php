@@ -32,12 +32,18 @@ $cr_a = $config["cr_acc"]      ?? "memb___id";
 $wc_t = $config["wcoin_table"] ?? "GameShopPoint";
 $wc_c = $config["wcoin_column"]?? "WCoinP";
 $wc_a = $config["wcoin_acc"]   ?? "AccountID";
+$cr_tq = db_ident($cr_t, "MEMB_INFO");
+$cr_cq = db_ident($cr_c, "credits");
+$cr_aq = db_ident($cr_a, "memb___id");
+$wc_tq = db_ident($wc_t, "GameShopPoint");
+$wc_cq = db_ident($wc_c, "WCoinP");
+$wc_aq = db_ident($wc_a, "AccountID");
 
 // Atomically deduct using "WHERE balance >= ?" — prevents race & overdraft.
 $debited = false;
 if ($it["credits"] > 0) {
     $debited = db_exec(
-        "UPDATE [$cr_t] SET [$cr_c] = [$cr_c] - ? WHERE [$cr_a] = ? AND ISNULL([$cr_c],0) >= ?",
+        "UPDATE $cr_tq SET $cr_cq = $cr_cq - ? WHERE $cr_aq = ? AND ISNULL($cr_cq,0) >= ?",
         [$it["credits"], $me["id"], $it["credits"]]
     );
     if ($debited) {
@@ -46,7 +52,7 @@ if ($it["credits"] > 0) {
     }
 } elseif ($it["wcoin"] > 0) {
     $debited = db_exec(
-        "UPDATE [$wc_t] SET [$wc_c] = [$wc_c] - ? WHERE [$wc_a] = ? AND ISNULL([$wc_c],0) >= ?",
+        "UPDATE $wc_tq SET $wc_cq = $wc_cq - ? WHERE $wc_aq = ? AND ISNULL($wc_cq,0) >= ?",
         [$it["wcoin"], $me["id"], $it["wcoin"]]
     );
     if ($debited) {
@@ -61,11 +67,15 @@ if (!$debited) {
 }
 
 // Log the order so an in-game delivery service can fulfill it.
-db_exec(
-    "INSERT INTO WebDonateLog (account, item_id, item_name, paid_credits, paid_wcoin, ip, ts)
-     VALUES (?, ?, ?, ?, ?, ?, GETDATE())",
-    [$me["id"], $item_id, $it["name"], $it["credits"], $it["wcoin"], client_ip()]
-);
+$log_table = $config["donate_log_table"] ?? "WebDonateLog";
+if (db_table_exists($log_table)) {
+    $log_tableq = db_ident($log_table, "WebDonateLog");
+    db_exec(
+        "INSERT INTO $log_tableq (account, item_id, item_name, paid_credits, paid_wcoin, ip, ts)
+         VALUES (?, ?, ?, ?, ?, ?, GETDATE())",
+        [$me["id"], $item_id, $it["name"], $it["credits"], $it["wcoin"], client_ip()]
+    );
+}
 
 flash_set("success", lang("donate.bought"));
 redirect("index.php?m=donate");

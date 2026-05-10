@@ -57,7 +57,7 @@ $baners  = $widget_data["baners"]    ?? [];
         <a class="card" href="index.php?m=ranking" style="text-decoration:none">
             <img class="card-icon" src="assets/icons/ranking.svg" alt="">
             <div class="card-title"><?= h(lang("nav.ranking")) ?></div>
-            <p>Top heroes, guilds and Castle Siege owners.</p>
+            <p>Top Season 3 heroes, guilds and Castle Siege owners.</p>
         </a>
     </div>
 </section>
@@ -73,7 +73,9 @@ $baners  = $widget_data["baners"]    ?? [];
             <p style="text-align:center;color:#c8b890;font-size:13px">
                 <?= h($strongest["class"][0]) ?> · Lv <?= (int)$strongest["level"] ?>
                 · Resets <strong><?= (int)$strongest["resets"] ?></strong>
-                · ML <?= (int)$strongest["master"] ?>
+                <?php if (trim((string)($config["char_master_col"] ?? "")) !== ""): ?>
+                    · ML <?= (int)$strongest["master"] ?>
+                <?php endif; ?>
             </p>
         </article>
         <?php endif; ?>

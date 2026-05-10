@@ -28,17 +28,22 @@ function donate_catalog_static() {
  * Returns ["name", "credits", "wcoin"] or null.
  */
 function donate_item($id) {
+    global $config;
     $id = (int)$id;
-    $row = db_one(
-        "SELECT name, price_credits, price_wcoin FROM WebDonateItems WHERE id = ?",
-        [$id]
-    );
-    if ($row) {
-        return [
-            "name"    => (string)$row["name"],
-            "credits" => (int)$row["price_credits"],
-            "wcoin"   => (int)$row["price_wcoin"],
-        ];
+    $table = $config["donate_items_table"] ?? "WebDonateItems";
+    if (db_table_exists($table)) {
+        $tableq = db_ident($table, "WebDonateItems");
+        $row = db_one(
+            "SELECT name, price_credits, price_wcoin FROM $tableq WHERE id = ?",
+            [$id]
+        );
+        if ($row) {
+            return [
+                "name"    => (string)$row["name"],
+                "credits" => (int)$row["price_credits"],
+                "wcoin"   => (int)$row["price_wcoin"],
+            ];
+        }
     }
     $static = donate_catalog_static();
     return $static[$id] ?? null;
@@ -49,6 +54,10 @@ function donate_item($id) {
  * replace YOUR_ID in each URL with the real partner-site ID.
  */
 function vote_sites() {
+    global $config;
+    if (!empty($config["vote_sites"]) && is_array($config["vote_sites"])) {
+        return $config["vote_sites"];
+    }
     return [
         ["id"=>"topmu",  "name"=>"TopMu Online", "desc"=>"Largest MU top-list",
          "reward"=>50, "cooldown"=>12*3600,

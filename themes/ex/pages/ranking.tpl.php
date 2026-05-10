@@ -1,9 +1,11 @@
-<?php if (!defined("insite")) die("no access"); ?>
+<?php if (!defined("insite")) die("no access");
+$show_master = trim((string)($config["char_master_col"] ?? "")) !== "";
+?>
 <main class="page">
     <header class="page-header">
         <img class="icon-glyph" src="assets/icons/ranking.svg" alt="">
         <h1 class="page-title"><?= h(lang("rank.title")) ?></h1>
-        <p class="page-subtitle">Heroes — Guilds — Castle owners</p>
+        <p class="page-subtitle">Season 3 rankings from the live game database</p>
         <div class="divider" aria-hidden="true"></div>
     </header>
 
@@ -26,7 +28,7 @@
         <h2 class="panel-title left">Top 100 — by Resets</h2>
         <div class="table-wrap">
             <table class="rank">
-                <thead><tr><th>#</th><th>Character</th><th>Class</th><th>Level</th><th>Resets</th><th>Master Lv</th><th>Guild</th></tr></thead>
+                <thead><tr><th>#</th><th>Character</th><th>Class</th><th>Level</th><th>Resets</th><?php if ($show_master): ?><th>Master Lv</th><?php endif; ?><th>Guild</th></tr></thead>
                 <tbody>
                 <?php foreach ($players as $i => $p): ?>
                 <tr<?= $i<3 ? ' class="top-'.($i+1).'"' : '' ?>>
@@ -35,11 +37,11 @@
                     <td><span class="cls-tag cls-<?= h($p["class_h"][1]) ?>"><?= h($p["class_h"][0]) ?></span></td>
                     <td><?= (int)$p["cLevel"] ?></td>
                     <td><?= (int)$p["Resets"] ?></td>
-                    <td><?= (int)$p["MasterLevel"] ?></td>
+                    <?php if ($show_master): ?><td><?= (int)$p["MasterLevel"] ?></td><?php endif; ?>
                     <td><?= h($p["G_Name"] ?? "—") ?></td>
                 </tr>
                 <?php endforeach; ?>
-                <?php if (!$players): ?><tr><td colspan="7" class="text-mute" style="text-align:center">No data</td></tr><?php endif; ?>
+                <?php if (!$players): ?><tr><td colspan="<?= $show_master ? 7 : 6 ?>" class="text-mute" style="text-align:center">No data</td></tr><?php endif; ?>
                 </tbody>
             </table>
         </div>

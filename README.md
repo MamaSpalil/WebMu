@@ -1,6 +1,6 @@
 # WebMu
 
-A PHP web front-end for a MuOnline (Season 6 Ep.3) game server.
+A PHP web front-end for a MuOnline (Season 3 Ep.1) game server.
 Reads the live game database (MS SQL Server) through `opt.php` and
 exposes registration, ranking, online status, vote rewards, donate
 shop, market and a personal account dashboard.
@@ -45,8 +45,10 @@ cache/, logs/          runtime data (git-ignored)
 `db_*` / `odbc_driver` describe the ODBC connection.
 `siteaddress`, `forum`, `def_lang`, `theme` control the site.
 `debug`, `maxconnect`, `onlineplus`, `under_rec` control runtime behavior.
-`cr_*`, `usd_*`, `wcoin_*`, `gr_*` map each balance to its
+`char_*`, `guild_*`, `stat_*` map ranking/account queries to your
+MuOnline schema. `cr_*`, `usd_*`, `wcoin_*`, `gr_*` map each balance to its
 `<table>.<column>` and per-account key — change them and the dashboard,
 donate shop and vote callback follow automatically.
+Download links, starter rewards, vote sites and optional WebMu donate
+tables are configured in `opt.php`.
 `mainmod` lists the home-page widgets to render in order.
-

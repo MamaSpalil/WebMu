@@ -40,9 +40,9 @@ unmodified (only displayed at smaller sizes / recolored via CSS where noted).
 
 ## Other images (`assets/images/`)
 
-`background.svg`, `logo.svg`, `ornament.svg`, `knight.svg`, `wizard.svg` —
-original artwork created for this repository, released under the same
-license as the rest of the project.
+`background.svg`, `logo.svg`, `ornament.svg`, `knight.svg`, `wizard.svg`,
+`crest-season3.svg`, `season3-banner.svg` — original artwork created for
+this repository, released under the same license as the rest of the project.
 
 ## Fonts
 
