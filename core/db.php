@@ -49,7 +49,7 @@ function db_set_error($msg)
 {
     global $config;
     $config["__db_connection_error"] = (string)$msg;
-    if ($config["__db_connection_error"] !== "") {
+    if (!empty($config["__db_connection_error"])) {
         db_log($config["__db_connection_error"]);
     }
 }

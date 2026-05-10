@@ -57,18 +57,19 @@
     </div>
 <?php endif; ?>
 
-<?php if (!empty($config["__using_example"]) || !empty($db_error)): ?>
+<?php if (!empty($config["__using_example"])): ?>
     <div class="flash-stack">
-        <?php if (!empty($config["__using_example"])): ?>
-            <p class="note warn"><?= h(lang("db.config_example")) ?></p>
-        <?php endif; ?>
-        <?php if (!empty($db_error)): ?>
-            <p class="note warn">
-                <?= h(lang("db.connection_error")) ?>
-                <?php if (!empty($config["debug"])): ?>
-                    <br><small><?= h($db_error) ?></small>
-                <?php endif; ?>
-            </p>
-        <?php endif; ?>
+        <p class="note warn"><?= h(lang("db.config_example")) ?></p>
+    </div>
+<?php endif; ?>
+
+<?php if (!empty($db_error)): ?>
+    <div class="flash-stack">
+        <p class="note warn">
+            <?= h(lang("db.connection_error")) ?>
+            <?php if (!empty($config["debug"])): ?>
+                <br><small><?= h($db_error) ?></small>
+            <?php endif; ?>
+        </p>
     </div>
 <?php endif; ?>
