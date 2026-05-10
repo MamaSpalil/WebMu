@@ -1,0 +1,16 @@
+# --- secrets / local config ---
+opt.php
+
+# --- runtime caches & logs ---
+cache/*
+!cache/.gitkeep
+logs/*
+!logs/.gitkeep
+
+# --- editor / OS ---
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
