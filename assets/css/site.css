@@ -708,6 +708,12 @@ table.rank .top-3 td.rank-pos { color: #c8923a; }
 .mt-30 { margin-top: 30px; }
 .mb-20 { margin-bottom: 20px; }
 
+.flash-stack {
+    max-width: 1100px;
+    margin: 14px auto 0;
+    padding: 0 20px;
+}
+
 .note {
     padding: 14px 18px;
     background: rgba(74,40,8,0.4);

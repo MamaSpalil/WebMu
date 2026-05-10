@@ -50,9 +50,26 @@
 </header>
 
 <?php if (!empty($flashes)): ?>
-    <div class="flash-stack" style="max-width:1100px;margin:14px auto 0;padding:0 20px">
+    <div class="flash-stack">
         <?php foreach ($flashes as $f): ?>
             <p class="note <?= $f["t"] === "error" ? "warn" : "" ?>"><?= h($f["m"]) ?></p>
         <?php endforeach; ?>
+    </div>
+<?php endif; ?>
+
+<?php if (!empty($config["__using_example"])): ?>
+    <div class="flash-stack">
+        <p class="note warn"><?= h(lang("db.config_example")) ?></p>
+    </div>
+<?php endif; ?>
+
+<?php if (!empty($db_error)): ?>
+    <div class="flash-stack">
+        <p class="note warn">
+            <?= h(lang("db.connection_error")) ?>
+            <?php if (!empty($config["debug"])): ?>
+                <br><small><?= h($db_error) ?></small>
+            <?php endif; ?>
+        </p>
     </div>
 <?php endif; ?>
