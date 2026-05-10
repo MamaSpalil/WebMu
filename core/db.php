@@ -270,11 +270,43 @@ function db_table_exists($table)
     if (!preg_match('~^[A-Za-z_][A-Za-z0-9_]*$~', $table)) {
         return false;
     }
+    static $cache = [];
+    $key = strtolower($table);
+    if (isset($cache[$key])) return $cache[$key];
     $row = db_one(
         "SELECT 1 AS x FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = ?",
         [$table]
     );
-    return (bool)$row;
+    return $cache[$key] = (bool)$row;
+}
+
+/**
+ * Best-effort column existence check (cached per request).
+ * Used by modules that read optional columns (e.g. MEMB_INFO.cash, .usd,
+ * Character.MasterLevel) so the site degrades gracefully on stock backups.
+ */
+function db_column_exists($table, $column)
+{
+    $table  = trim((string)$table);
+    $column = trim((string)$column);
+    if (!preg_match('~^[A-Za-z_][A-Za-z0-9_]*$~', $table))  return false;
+    if (!preg_match('~^[A-Za-z_][A-Za-z0-9_]*$~', $column)) return false;
+    static $cache = [];
+    $key = strtolower($table . "." . $column);
+    if (isset($cache[$key])) return $cache[$key];
+    $row = db_one(
+        "SELECT 1 AS x FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND COLUMN_NAME = ?",
+        [$table, $column]
+    );
+    return $cache[$key] = (bool)$row;
+}
+
+/** Return the last ODBC error message (empty string if none). */
+function db_last_odbc_error()
+{
+    $c = db();
+    if (!$c) return db_last_error();
+    return (string)@odbc_errormsg($c);
 }
 
 /** Append to the error log; only echoed when debug=1. */

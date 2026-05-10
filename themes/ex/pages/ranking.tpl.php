@@ -1,5 +1,13 @@
 <?php if (!defined("insite")) die("no access");
-$show_master = trim((string)($config["char_master_col"] ?? "")) !== "";
+$show_master = isset($players[0]["MasterLevel"]) && trim((string)($config["char_master_col"] ?? "")) !== "";
+$has_stats   = isset($players[0]["Strength"]) || isset($players[0]["Energy"]);
+$has_zen     = isset($players[0]["Money"]);
+$has_quest   = isset($players[0]["Quest"]);
+$player_cols = 5 + ($show_master ? 1 : 0) + 1 /*Guild*/ + ($has_stats ? 1 : 0) + ($has_zen ? 1 : 0) + ($has_quest ? 1 : 0);
+$has_guild_mark   = isset($guilds[0]["G_Mark"]);
+$has_guild_notice = isset($guilds[0]["G_Notice"]);
+$guild_cols = 5 + ($has_guild_mark ? 1 : 0) + ($has_guild_notice ? 1 : 0);
+$has_online_map = isset($online[0]["map_h"]);
 ?>
 <main class="page">
     <header class="page-header">
@@ -28,7 +36,14 @@ $show_master = trim((string)($config["char_master_col"] ?? "")) !== "";
         <h2 class="panel-title left">Top 100 — by Resets</h2>
         <div class="table-wrap">
             <table class="rank">
-                <thead><tr><th>#</th><th>Character</th><th>Class</th><th>Level</th><th>Resets</th><?php if ($show_master): ?><th>Master Lv</th><?php endif; ?><th>Guild</th></tr></thead>
+                <thead><tr>
+                    <th>#</th><th>Character</th><th>Class</th><th>Level</th><th>Resets</th>
+                    <?php if ($show_master): ?><th>Master Lv</th><?php endif; ?>
+                    <?php if ($has_stats): ?><th title="Strength / Agility / Vitality / Energy / Command">Stats</th><?php endif; ?>
+                    <?php if ($has_zen): ?><th>Zen</th><?php endif; ?>
+                    <?php if ($has_quest): ?><th>Quest</th><?php endif; ?>
+                    <th>Guild</th>
+                </tr></thead>
                 <tbody>
                 <?php foreach ($players as $i => $p): ?>
                 <tr<?= $i<3 ? ' class="top-'.($i+1).'"' : '' ?>>
@@ -38,10 +53,17 @@ $show_master = trim((string)($config["char_master_col"] ?? "")) !== "";
                     <td><?= (int)$p["cLevel"] ?></td>
                     <td><?= (int)$p["Resets"] ?></td>
                     <?php if ($show_master): ?><td><?= (int)$p["MasterLevel"] ?></td><?php endif; ?>
+                    <?php if ($has_stats): ?>
+                        <td class="text-mute" title="STR / AGI / VIT / ENE / CMD">
+                            <?= fmt_int($p["Strength"]   ?? 0) ?>/<?= fmt_int($p["Dexterity"]  ?? 0) ?>/<?= fmt_int($p["Vitality"]   ?? 0) ?>/<?= fmt_int($p["Energy"]     ?? 0) ?><?php if (isset($p["Leadership"])): ?>/<?= fmt_int($p["Leadership"]) ?><?php endif; ?>
+                        </td>
+                    <?php endif; ?>
+                    <?php if ($has_zen): ?><td><?= fmt_zen($p["Money"] ?? 0) ?></td><?php endif; ?>
+                    <?php if ($has_quest): ?><td><?= (int)($p["Quest"] ?? 0) ?></td><?php endif; ?>
                     <td><?= h($p["G_Name"] ?? "—") ?></td>
                 </tr>
                 <?php endforeach; ?>
-                <?php if (!$players): ?><tr><td colspan="<?= $show_master ? 7 : 6 ?>" class="text-mute" style="text-align:center">No data</td></tr><?php endif; ?>
+                <?php if (!$players): ?><tr><td colspan="<?= $player_cols ?>" class="text-mute" style="text-align:center">No data</td></tr><?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -52,18 +74,29 @@ $show_master = trim((string)($config["char_master_col"] ?? "")) !== "";
         <h2 class="panel-title left">Top 50 Guilds</h2>
         <div class="table-wrap">
             <table class="rank">
-                <thead><tr><th>#</th><th>Guild</th><th>Master</th><th>Members</th><th>Score</th></tr></thead>
+                <thead><tr>
+                    <th>#</th>
+                    <?php if ($has_guild_mark): ?><th>Mark</th><?php endif; ?>
+                    <th>Guild</th><th>Master</th><th>Members</th><th>Score</th>
+                    <?php if ($has_guild_notice): ?><th>Notice</th><?php endif; ?>
+                </tr></thead>
                 <tbody>
                 <?php foreach ($guilds as $i => $g): ?>
                 <tr<?= $i<3 ? ' class="top-'.($i+1).'"' : '' ?>>
                     <td class="rank-pos"><?= $i+1 ?></td>
+                    <?php if ($has_guild_mark): ?>
+                        <td><?php if (!empty($g["G_Mark"])): ?><span class="guild-mark" title="Guild mark"></span><?php else: ?>—<?php endif; ?></td>
+                    <?php endif; ?>
                     <td><?= h($g["G_Name"]) ?></td>
                     <td><?= h($g["G_Master"]) ?></td>
                     <td><?= (int)$g["members"] ?></td>
                     <td><?= fmt_int($g["total_resets"]) ?></td>
+                    <?php if ($has_guild_notice): ?>
+                        <td class="text-mute"><?= h(mb_strimwidth((string)($g["G_Notice"] ?? ""), 0, 60, "…", "UTF-8")) ?></td>
+                    <?php endif; ?>
                 </tr>
                 <?php endforeach; ?>
-                <?php if (!$guilds): ?><tr><td colspan="5" class="text-mute" style="text-align:center">No data</td></tr><?php endif; ?>
+                <?php if (!$guilds): ?><tr><td colspan="<?= $guild_cols ?>" class="text-mute" style="text-align:center">No data</td></tr><?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -95,16 +128,24 @@ $show_master = trim((string)($config["char_master_col"] ?? "")) !== "";
         <h2 class="panel-title left"><?= h(lang("rank.online")) ?></h2>
         <div class="table-wrap">
             <table class="rank">
-                <thead><tr><th>#</th><th>Account</th><th>Character</th><th>Class</th><th>Level</th></tr></thead>
+                <thead><tr>
+                    <th>#</th><th>Account</th><th>Character</th><th>Class</th><th>Level</th><th>Resets</th>
+                    <?php if ($has_online_map): ?><th>Location</th><?php endif; ?>
+                </tr></thead>
                 <tbody>
                 <?php foreach ($online as $i => $o): ?>
                 <tr><td class="rank-pos"><?= $i+1 ?></td>
                     <td><?= h($o["memb___id"]) ?></td>
                     <td><?= h($o["Name"] ?? "—") ?></td>
                     <td><?php if (isset($o["Name"])): ?><span class="cls-tag cls-<?= h($o["class_h"][1]) ?>"><?= h($o["class_h"][0]) ?></span><?php endif; ?></td>
-                    <td><?= (int)($o["cLevel"] ?? 0) ?></td></tr>
+                    <td><?= (int)($o["cLevel"] ?? 0) ?></td>
+                    <td><?= (int)($o["Resets"] ?? 0) ?></td>
+                    <?php if ($has_online_map): ?>
+                        <td class="text-mute"><?= h($o["map_h"] ?? "—") ?></td>
+                    <?php endif; ?>
+                </tr>
                 <?php endforeach; ?>
-                <?php if (!$online): ?><tr><td colspan="5" class="text-mute" style="text-align:center">Nobody online right now</td></tr><?php endif; ?>
+                <?php if (!$online): ?><tr><td colspan="<?= 6 + ($has_online_map ? 1 : 0) ?>" class="text-mute" style="text-align:center">Nobody online right now</td></tr><?php endif; ?>
                 </tbody>
             </table>
         </div>

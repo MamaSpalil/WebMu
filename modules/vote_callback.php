@@ -30,17 +30,47 @@ if (is_file($f)) {
     }
 }
 
-// Credit the reward to the gr_* column (cash by default).
+// Credit the reward. Preferred path: configured gr_* column on MEMB_INFO.
+// Fallback path: dedicated WebVotePoints table (auto-created on demand) —
+// used when the column doesn't exist on the stock Season 3 schema.
 $tbl = $config["gr_table"]         ?? "MEMB_INFO";
 $col = $config["gr_points_column"] ?? "cash";
 $acc = $config["gr_points_acc"]    ?? "memb___id";
-$tblq = db_ident($tbl, "MEMB_INFO");
-$colq = db_ident($col, "cash");
-$accq = db_ident($acc, "memb___id");
-$ok = db_exec(
-    "UPDATE $tblq SET $colq = ISNULL($colq,0) + ? WHERE $accq = ?",
-    [(int)$site["reward"], $me["id"]]
-);
+$reward = (int)$site["reward"];
+$ok = false;
+
+if (db_column_exists($tbl, $col)) {
+    $tblq = db_ident($tbl, "MEMB_INFO");
+    $colq = db_ident($col, "cash");
+    $accq = db_ident($acc, "memb___id");
+    $ok = db_exec(
+        "UPDATE $tblq SET $colq = ISNULL($colq,0) + ? WHERE $accq = ?",
+        [$reward, $me["id"]]
+    );
+} else {
+    // Fallback: WebVotePoints (account varchar(10), points int).
+    $vote_tbl = (string)($config["web_vote_table"] ?? "WebVotePoints");
+    $vote_tblq = db_ident($vote_tbl, "WebVotePoints");
+    if (!db_table_exists($vote_tbl)) {
+        db_exec(
+            "CREATE TABLE $vote_tblq (
+                account   varchar(10) NOT NULL PRIMARY KEY,
+                points    int          NOT NULL DEFAULT 0,
+                updated_at datetime    NOT NULL DEFAULT GETDATE()
+            )"
+        );
+    }
+    if (db_table_exists($vote_tbl)) {
+        $ok = db_exec(
+            "MERGE INTO $vote_tblq AS T
+             USING (SELECT ? AS acc, ? AS amt) AS S
+               ON T.account = S.acc
+             WHEN MATCHED THEN UPDATE SET T.points = ISNULL(T.points,0) + S.amt, T.updated_at = GETDATE()
+             WHEN NOT MATCHED THEN INSERT (account, points, updated_at) VALUES (S.acc, S.amt, GETDATE());",
+            [$me["id"], $reward]
+        );
+    }
+}
 if (!$ok) {
     flash_set("error", "Could not credit reward (DB error).");
     redirect("index.php?m=vote");
