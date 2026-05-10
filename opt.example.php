@@ -16,13 +16,23 @@
 if (!defined("insite")) die("no access");
 
 // ---- Database (MS SQL Server, MuOnline schema) ----
-// Copy this template to opt.php and set these values to your remote SQL Server.
-$config["db_host"]      = "127.0.0.1";        // remote SQL Server host or host,port
+// All site modules read these values from opt.php — never hardcode
+// credentials anywhere else. core/db.php builds the ODBC DSN from them.
+$config["db_host"]      = "127.0.0.1";        // remote SQL Server host (IP or hostname). Can also be "host,port".
+$config["db_port"]      = "";                 // optional explicit TCP port, e.g. "1433". Leave empty if baked into db_host.
 $config["db_user"]      = "web_app";          // dedicated SQL login (NOT sa)
-$config["db_upwd"]      = "CHANGE_ME";        // password for the SQL login
+$config["db_upwd"]      = "CHANGE_ME";        // password for the SQL login (must be changed before going live)
 $config["ctype"]        = "ODBC";             // currently only ODBC is supported
 $config["db_name"]      = "MuOnline";         // main game database
-$config["odbc_driver"]  = "SQL Server";       // ODBC driver name
+$config["odbc_driver"]  = "SQL Server";       // ODBC driver name, e.g. "SQL Server", "ODBC Driver 17 for SQL Server"
+
+// ---- Optional remote-connection tuning -----------------------------------
+// Leave these empty/0 unless you need them. They are forwarded to ODBC.
+$config["db_dsn"]        = "";                // full DSN override; if set, overrides db_host/db_port/db_name/odbc_driver
+$config["db_appname"]    = "WebMu";           // application name reported to SQL Server (visible in sp_who2)
+$config["db_charset"]    = "";                // e.g. "UTF-8" with MSODBCSQL; leave empty for driver default
+$config["db_timeout"]    = 5;                 // connection / login timeout in seconds (0 = driver default)
+$config["db_persistent"] = 0;                 // 1 = use odbc_pconnect (pooled), 0 = fresh connection per request
 
 // ---- Site addresses ----
 $config["siteaddress"]  = "http://localhost/";

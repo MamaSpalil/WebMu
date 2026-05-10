@@ -9,8 +9,89 @@
 if (!defined("insite")) die("no access");
 
 /**
+ * Validate the database section of $config loaded from opt.php.
+ * Returns an empty string on success, or a human-readable error message
+ * naming the missing/placeholder keys. All site modules read DB settings
+ * exclusively from opt.php — never hardcode credentials elsewhere.
+ */
+function db_validate_config()
+{
+    global $config;
+
+    if (!empty($config["__using_example"])) {
+        return "Loaded opt.example.php — copy it to opt.php and fill in real database credentials.";
+    }
+
+    // If a full DSN override is supplied, only credentials are required.
+    $hasDsn = !empty($config["db_dsn"]);
+    $required = $hasDsn
+        ? ["db_user", "db_upwd"]
+        : ["db_host", "db_user", "db_upwd", "db_name", "odbc_driver"];
+
+    $missing = [];
+    foreach ($required as $key) {
+        $val = $config[$key] ?? "";
+        if ($val === "" || $val === null) {
+            $missing[] = $key;
+        }
+    }
+    // Reject obvious template placeholder so the site fails loudly instead
+    // of silently trying to connect with the example password.
+    if (isset($config["db_upwd"]) && $config["db_upwd"] === "CHANGE_ME") {
+        $missing[] = "db_upwd (still set to CHANGE_ME)";
+    }
+    if ($missing) {
+        return "opt.php is missing or has placeholder values for: " . implode(", ", $missing) . ".";
+    }
+    return "";
+}
+
+/**
+ * Build the ODBC DSN string from $config (opt.php). All connection
+ * settings — host, port, database, driver, timeout, charset, app name —
+ * come from opt.php so that every module/file shares one source of truth.
+ *
+ * If $config["db_dsn"] is set, it is returned verbatim so advanced setups
+ * can supply a complete DSN (e.g. SQL Native Client with TrustServerCertificate).
+ */
+function db_build_dsn()
+{
+    global $config;
+
+    if (!empty($config["db_dsn"])) {
+        return (string)$config["db_dsn"];
+    }
+
+    $driver = $config["odbc_driver"] ?? "SQL Server";
+    $host   = $config["db_host"]     ?? "127.0.0.1";
+    $port   = $config["db_port"]     ?? "";
+    $name   = $config["db_name"]     ?? "MuOnline";
+
+    // Allow either explicit db_port or "host,port" baked into db_host.
+    $server = $host;
+    if ($port !== "" && strpos($host, ",") === false) {
+        $server = $host . "," . $port;
+    }
+
+    $parts = [
+        "Driver={" . $driver . "}",
+        "Server="  . $server,
+        "Database=" . $name,
+    ];
+    if (!empty($config["db_appname"])) {
+        $parts[] = "APP=" . $config["db_appname"];
+    }
+    if (!empty($config["db_charset"])) {
+        // Honored by SQL Server Native Client / MSODBCSQL.
+        $parts[] = "CharacterSet=" . $config["db_charset"];
+    }
+    return implode(";", $parts) . ";";
+}
+
+/**
  * Lazily open and cache the ODBC connection.
  * Returns the connection resource, or null if the driver/host is unavailable.
+ * All settings are read from opt.php via $config — see db_build_dsn().
  */
 function db()
 {
@@ -27,14 +108,28 @@ function db()
         db_set_error("ODBC extension is not installed — database features disabled.");
         return null;
     }
-    $driver = $config["odbc_driver"] ?? "SQL Server";
-    $host   = $config["db_host"]     ?? "127.0.0.1";
-    $name   = $config["db_name"]     ?? "MuOnline";
-    $user   = $config["db_user"]     ?? "";
-    $pwd    = $config["db_upwd"]     ?? "";
 
-    $dsn = "Driver={" . $driver . "};Server=" . $host . ";Database=" . $name . ";";
-    $c = @odbc_connect($dsn, $user, $pwd);
+    $cfgError = db_validate_config();
+    if ($cfgError !== "") {
+        db_set_error($cfgError);
+        return null;
+    }
+
+    $user = $config["db_user"] ?? "";
+    $pwd  = $config["db_upwd"] ?? "";
+    $dsn  = db_build_dsn();
+
+    // Optional connection / login timeouts (seconds).
+    $timeout = isset($config["db_timeout"]) ? (int)$config["db_timeout"] : 0;
+    if ($timeout > 0 && function_exists("ini_set")) {
+        @ini_set("odbc.defaultlrl", (string)max(8192, $timeout * 1024));
+    }
+
+    $persistent = !empty($config["db_persistent"]);
+    $cursorType = defined("SQL_CUR_USE_ODBC") ? SQL_CUR_USE_ODBC : 2;
+    $c = $persistent
+        ? @odbc_pconnect($dsn, $user, $pwd, $cursorType)
+        : @odbc_connect($dsn, $user, $pwd, $cursorType);
     if (!$c) {
         db_set_error("ODBC connect failed: " . odbc_errormsg());
         return null;
@@ -42,6 +137,23 @@ function db()
     $conn = $c;
     db_set_error(null);
     return $conn;
+}
+
+/**
+ * Lightweight connectivity probe — opens (or reuses) the connection and
+ * runs a trivial round-trip. Returns true if the remote DB is reachable
+ * with the credentials currently in opt.php.
+ */
+function db_ping()
+{
+    $c = db();
+    if (!$c) return false;
+    $r = @odbc_exec($c, "SELECT 1");
+    if (!$r) {
+        db_set_error("ODBC ping failed: " . odbc_errormsg($c));
+        return false;
+    }
+    return true;
 }
 
 /** Store the last connection error for templates and logs. */

@@ -19,7 +19,7 @@ return [
     "form.csrf_invalid"=> "Your session expired, please try again.",
     "form.required"    => "Please fill in every required field.",
     "db.config_example"=> "opt.example.php is being used. Copy it to opt.php and enter the real remote database settings.",
-    "db.connection_error" => "No connection to the remote database. Check db_host, db_user, db_upwd, db_name and odbc_driver in opt.php.",
+    "db.connection_error" => "No connection to the remote database. Check db_host, db_port, db_user, db_upwd, db_name and odbc_driver in opt.php.",
 
     "reg.title"        => "Create Account",
     "reg.success"      => "Account created! Welcome to the continent.",
