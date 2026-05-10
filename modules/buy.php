@@ -19,33 +19,12 @@ if ($item_id <= 0) {
     redirect("index.php?m=donate");
 }
 
-// Reload catalog (mirror modules/donate.php so prices match).
-$items = [];
-$rows  = db_all("SELECT id, name, price_credits, price_wcoin FROM WebDonateItems WHERE id = ?", [$item_id]);
-if ($rows) {
-    $r = $rows[0];
-    $items[$item_id] = ["name" => $r["name"], "credits" => (int)$r["price_credits"], "wcoin" => (int)$r["price_wcoin"]];
-} else {
-    // mirror the static fallback in modules/donate.php
-    $static = [
-        1=>["name"=>"500 WCoin Pack",  "credits"=>5,  "wcoin"=>0],
-        2=>["name"=>"1200 WCoin Pack", "credits"=>10, "wcoin"=>0],
-        3=>["name"=>"3000 WCoin Pack", "credits"=>25, "wcoin"=>0],
-        4=>["name"=>"VIP Bronze 30d",  "credits"=>8,  "wcoin"=>0],
-        5=>["name"=>"VIP Silver 30d",  "credits"=>15, "wcoin"=>0],
-        6=>["name"=>"VIP Gold 30d",    "credits"=>25, "wcoin"=>0],
-        7=>["name"=>"Demon Pet",       "credits"=>0,  "wcoin"=>800],
-        8=>["name"=>"Name Change",     "credits"=>0,  "wcoin"=>600],
-        9=>["name"=>"Class Reset",     "credits"=>0,  "wcoin"=>1200],
-    ];
-    if (isset($static[$item_id])) $items[$item_id] = $static[$item_id];
-}
-
-if (!isset($items[$item_id])) {
+// Resolve the item from the shared catalog (DB row or static fallback).
+$it = donate_item($item_id);
+if (!$it) {
     flash_set("error", lang("donate.no_item"));
     redirect("index.php?m=donate");
 }
-$it = $items[$item_id];
 
 $cr_t = $config["cr_table"]    ?? "MEMB_INFO";
 $cr_c = $config["cr_column"]   ?? "credits";

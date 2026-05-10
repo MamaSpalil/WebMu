@@ -60,7 +60,8 @@ function db_query($sql, array $args = [])
         db_log("prepare failed: " . odbc_errormsg($c) . " | SQL: " . $sql);
         return false;
     }
-    // odbc_execute requires every param to be a string.
+    // odbc_execute requires every bound parameter to be a string —
+    // it does not infer types from PHP scalars, so we coerce here.
     $bound = [];
     foreach ($args as $v) {
         $bound[] = ($v === null) ? null : (string)$v;

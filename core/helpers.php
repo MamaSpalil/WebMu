@@ -45,6 +45,10 @@ function fmt_int($n)
 function mu_class($code)
 {
     $code = (int)$code;
+    // The high nibble of Character.Class identifies the base class:
+    //   0x0=DW, 0x1=DK, 0x2=ELF, 0x3=MG, 0x4=DL, 0x5=SM, 0x6=RF.
+    // The low nibble distinguishes 1st/2nd/3rd quest variants of the
+    // same class; we collapse them to the base class for display.
     $base = ($code >> 4) & 0x0F;
     $map = [
         0x0 => ["Dark Wizard",    "dw"],

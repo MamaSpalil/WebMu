@@ -9,12 +9,13 @@ $cached = cache_get("market.listings", 60);
 if ($cached !== null) {
     $listings = $cached;
 } else {
-    // Try Character.PersonalShop / IsStoreOpen depending on emulator.
+    // NOTE: replace the WHERE clause with `c.PersonalShop IS NOT NULL AND c.IsStoreOpen = 1`
+    // (or your emulator's equivalent) to filter to characters with an open shop.
+    // We use 1=1 by default so the query never accidentally excludes valid rows.
     $rows = db_all(
         "SELECT TOP 200 c.Name AS seller, c.Class
          FROM Character c
-         WHERE c.PkCount IS NOT NULL  -- safe placeholder; replaced per-emulator
-        "
+         WHERE 1=1"
     );
     foreach ($rows as $r) {
         $listings[] = [

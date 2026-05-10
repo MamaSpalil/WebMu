@@ -57,6 +57,7 @@ require $config["__core"] . "/lang.php";
 require $config["__core"] . "/db.php";
 require $config["__core"] . "/auth.php";
 require $config["__core"] . "/render.php";
+require $config["__core"] . "/catalog.php";
 
 // load language strings
 lang_load($config["def_lang"] ?? "rus");
