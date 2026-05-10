@@ -40,7 +40,7 @@ function db()
         return null;
     }
     $conn = $c;
-    db_set_error("");
+    db_set_error(null);
     return $conn;
 }
 
@@ -48,6 +48,10 @@ function db()
 function db_set_error($msg)
 {
     global $config;
+    if ($msg === null) {
+        unset($config["__db_connection_error"]);
+        return;
+    }
     $config["__db_connection_error"] = (string)$msg;
     if (!empty($config["__db_connection_error"])) {
         db_log($config["__db_connection_error"]);
