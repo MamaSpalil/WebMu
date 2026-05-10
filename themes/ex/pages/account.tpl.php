@@ -1,4 +1,6 @@
-<?php if (!defined("insite")) die("no access"); ?>
+<?php if (!defined("insite")) die("no access");
+$show_master = trim((string)($config["char_master_col"] ?? "")) !== "";
+?>
 <main class="page">
     <header class="page-header">
         <img class="icon-glyph" src="assets/icons/registration.svg" alt="">
@@ -26,14 +28,14 @@
             <?php else: ?>
                 <div class="table-wrap">
                 <table class="rank">
-                    <thead><tr><th>Name</th><th>Class</th><th>Level</th><th>Resets</th><th>ML</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Class</th><th>Level</th><th>Resets</th><?php if ($show_master): ?><th>ML</th><?php endif; ?></tr></thead>
                     <tbody>
                     <?php foreach ($chars as $c): ?>
                         <tr><td><?= h($c["Name"]) ?></td>
                             <td><span class="cls-tag cls-<?= h($c["class_h"][1]) ?>"><?= h($c["class_h"][0]) ?></span></td>
                             <td><?= (int)$c["cLevel"] ?></td>
                             <td><?= (int)$c["Resets"] ?></td>
-                            <td><?= (int)$c["MasterLevel"] ?></td></tr>
+                            <?php if ($show_master): ?><td><?= (int)$c["MasterLevel"] ?></td><?php endif; ?></tr>
                     <?php endforeach; ?>
                     </tbody>
                 </table>

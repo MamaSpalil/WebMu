@@ -73,7 +73,9 @@ $baners  = $widget_data["baners"]    ?? [];
             <p style="text-align:center;color:#c8b890;font-size:13px">
                 <?= h($strongest["class"][0]) ?> · Lv <?= (int)$strongest["level"] ?>
                 · Resets <strong><?= (int)$strongest["resets"] ?></strong>
-                · ML <?= (int)$strongest["master"] ?>
+                <?php if (trim((string)($config["char_master_col"] ?? "")) !== ""): ?>
+                    · ML <?= (int)$strongest["master"] ?>
+                <?php endif; ?>
             </p>
         </article>
         <?php endif; ?>
