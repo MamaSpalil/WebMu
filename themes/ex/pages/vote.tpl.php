@@ -25,7 +25,7 @@
                 <div class="name"><?= h($s["name"]) ?></div>
                 <div class="desc"><?= h($s["desc"]) ?> · Cooldown: <?= (int)($s["cooldown"]/3600) ?>h</div>
             </div>
-            <div class="reward"><img src="assets/icons/coins.svg" alt=""> +<?= (int)$s["reward"] ?> Cash</div>
+            <div class="reward"><img src="assets/icons/coins.svg" alt=""> +<?= (int)$s["reward"] ?> Vote points</div>
 
             <?php if ($user && $ready): ?>
                 <form action="<?= h($s["url"]) ?>" method="get" target="_blank" rel="noopener" style="display:inline">
