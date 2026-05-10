@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>WebMu — настройка подключения к базе данных через opt.php</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    :root{
+        --bg:#0d1117; --panel:#161b22; --panel2:#1c232c; --line:#30363d;
+        --text:#e6edf3; --muted:#9da7b3; --accent:#f0b429; --accent2:#58a6ff;
+        --ok:#3fb950; --warn:#d29922; --err:#f85149;
+        --code-bg:#0b1020; --code-text:#cde3ff;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:var(--bg);color:var(--text);
+        font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+        line-height:1.55;}
+    .deck{max-width:1080px;margin:0 auto;padding:24px 16px 96px;}
+    header.cover{
+        background:linear-gradient(135deg,#1a1f2c 0%,#11161f 60%,#0a0d13 100%);
+        border:1px solid var(--line);border-radius:16px;
+        padding:48px 40px;margin-bottom:28px;position:relative;overflow:hidden;
+    }
+    header.cover::after{
+        content:"";position:absolute;right:-80px;top:-80px;width:280px;height:280px;
+        background:radial-gradient(circle,rgba(240,180,41,.25),transparent 70%);
+    }
+    header.cover h1{margin:0 0 8px;font-size:34px;letter-spacing:.3px;}
+    header.cover h1 span{color:var(--accent);}
+    header.cover p{margin:0;color:var(--muted);font-size:16px;max-width:720px;}
+    nav.toc{
+        background:var(--panel);border:1px solid var(--line);border-radius:12px;
+        padding:18px 22px;margin-bottom:28px;
+    }
+    nav.toc h2{margin:0 0 10px;font-size:14px;color:var(--muted);
+        text-transform:uppercase;letter-spacing:1px;}
+    nav.toc ol{margin:0;padding-left:22px;columns:2;column-gap:32px;}
+    nav.toc ol li{margin:4px 0;break-inside:avoid;}
+    nav.toc a{color:var(--accent2);text-decoration:none;}
+    nav.toc a:hover{text-decoration:underline;}
+    section.slide{
+        background:var(--panel);border:1px solid var(--line);border-radius:14px;
+        padding:28px 32px;margin:18px 0;scroll-margin-top:24px;
+    }
+    section.slide h2{
+        margin:0 0 4px;font-size:24px;color:var(--text);
+        display:flex;align-items:center;gap:12px;
+    }
+    section.slide h2 .num{
+        display:inline-block;min-width:36px;height:36px;border-radius:10px;
+        background:var(--accent);color:#1a1200;font-weight:700;font-size:16px;
+        display:inline-flex;align-items:center;justify-content:center;
+    }
+    section.slide h3{margin:24px 0 8px;font-size:17px;color:var(--accent2);}
+    section.slide p{margin:10px 0;color:#d4dbe3;}
+    .lead{color:var(--muted);font-size:14px;margin:0 0 14px 48px;}
+    pre,code{font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;}
+    pre{
+        background:var(--code-bg);color:var(--code-text);
+        border:1px solid #1d2a44;border-radius:10px;
+        padding:14px 16px;overflow-x:auto;font-size:13.5px;line-height:1.5;
+    }
+    code.inline{
+        background:#0b1020;color:#cde3ff;padding:2px 6px;border-radius:5px;
+        font-size:13px;border:1px solid #1d2a44;
+    }
+    table.cfg{
+        width:100%;border-collapse:collapse;margin:10px 0 6px;font-size:13.5px;
+        background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+        overflow:hidden;
+    }
+    table.cfg th,table.cfg td{
+        text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);
+        vertical-align:top;
+    }
+    table.cfg th{background:#202833;color:var(--muted);font-weight:600;
+        text-transform:uppercase;font-size:11px;letter-spacing:.6px;}
+    table.cfg tr:last-child td{border-bottom:none;}
+    table.cfg td:first-child{white-space:nowrap;color:var(--accent);font-weight:600;}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .card{
+        background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+        padding:14px 16px;
+    }
+    .card h4{margin:0 0 6px;color:var(--accent2);font-size:14px;
+        text-transform:uppercase;letter-spacing:.5px;}
+    .card p{margin:4px 0;font-size:13.5px;}
+    .note,.warn,.ok{
+        border-left:4px solid var(--accent2);background:#0f1722;
+        padding:10px 14px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px;
+    }
+    .warn{border-color:var(--warn);background:#241d0d;}
+    .ok{border-color:var(--ok);background:#0f1d12;}
+    .err{border-left:4px solid var(--err);background:#26110f;
+        padding:10px 14px;border-radius:0 8px 8px 0;margin:14px 0;font-size:14px;}
+    ul.checks{list-style:none;padding:0;margin:8px 0;}
+    ul.checks li{padding:6px 0 6px 28px;position:relative;}
+    ul.checks li::before{
+        content:"✔";position:absolute;left:0;top:6px;color:var(--ok);font-weight:700;
+    }
+    ul.crosses li::before{content:"✗";color:var(--err);}
+    footer{
+        text-align:center;color:var(--muted);font-size:13px;
+        margin-top:32px;padding-top:18px;border-top:1px solid var(--line);
+    }
+    .step-pill{
+        display:inline-block;background:#1d2a44;color:var(--accent2);
+        padding:2px 10px;border-radius:999px;font-size:12px;
+        margin-left:8px;vertical-align:middle;
+    }
+    @media (max-width:720px){
+        nav.toc ol{columns:1;}
+        .grid{grid-template-columns:1fr;}
+        header.cover{padding:32px 22px;}
+        section.slide{padding:22px 18px;}
+    }
+</style>
+</head>
+<body>
+<div class="deck">
+
+    <header class="cover">
+        <h1>WebMu · подключение сайта к <span>удалённой базе данных</span></h1>
+        <p>Полный туториал по настройке файла <code class="inline">opt.php</code> — единственного источника параметров подключения для всего сайта (модули, виджеты, CRON, рендер). Презентация состоит из 12 слайдов, читается сверху вниз.</p>
+    </header>
+
+    <nav class="toc">
+        <h2>Содержание</h2>
+        <ol>
+            <li><a href="#s1">Архитектура подключения</a></li>
+            <li><a href="#s2">Требования к серверу</a></li>
+            <li><a href="#s3">Подготовка SQL Server</a></li>
+            <li><a href="#s4">Установка ODBC-драйвера</a></li>
+            <li><a href="#s5">Создание opt.php</a></li>
+            <li><a href="#s6">Базовые ключи подключения</a></li>
+            <li><a href="#s7">Расширенные ключи (порт, таймаут, DSN)</a></li>
+            <li><a href="#s8">Маппинг таблиц MuOnline</a></li>
+            <li><a href="#s9">Проверка подключения</a></li>
+            <li><a href="#s10">Использование $config в модулях</a></li>
+            <li><a href="#s11">Решение типичных проблем</a></li>
+            <li><a href="#s12">Чек-лист безопасности</a></li>
+        </ol>
+    </nav>
+
+    <!-- 1 -->
+    <section class="slide" id="s1">
+        <h2><span class="num">1</span> Архитектура подключения</h2>
+        <p class="lead">Один источник правды для всех файлов сайта.</p>
+        <p>WebMu использует единый front-controller <code class="inline">index.php</code>, который подключает <code class="inline">core/init.php</code>. Bootstrap загружает <code class="inline">opt.php</code> в массив <code class="inline">$config</code> и передаёт его в <code class="inline">core/db.php</code>. <strong>Все</strong> модули (<code class="inline">modules/*.php</code>), виджеты (<code class="inline">modules/widgets/*.php</code>), языковые файлы и шаблоны читают параметры подключения только из <code class="inline">$config</code> — никогда не хардкодят логин/пароль/имя БД.</p>
+<pre>┌─────────────┐
+│   opt.php   │  ← вы редактируете только этот файл
+└──────┬──────┘
+       │ require
+┌──────▼──────────┐
+│  core/init.php  │  ← наполняет $config, стартует сессию
+└──────┬──────────┘
+       │ require core/db.php
+┌──────▼──────────┐    ┌─────────────────┐
+│ db_build_dsn()  │ →  │  odbc_connect() │ → MS SQL Server
+│ db()            │    └─────────────────┘
+└──────┬──────────┘
+       │ db_query / db_one / db_all / db_exec
+┌──────▼──────────┐
+│ modules/*.php   │  account · ranking · register · vote · donate · ...
+└─────────────────┘</pre>
+        <div class="ok"><strong>Ключевой принцип:</strong> чтобы переехать на другой сервер БД — достаточно поменять значения в <code class="inline">opt.php</code>. Код модулей трогать не нужно.</div>
+    </section>
+
+    <!-- 2 -->
+    <section class="slide" id="s2">
+        <h2><span class="num">2</span> Требования к серверу <span class="step-pill">prerequisites</span></h2>
+        <div class="grid">
+            <div class="card">
+                <h4>Веб-сервер</h4>
+                <p>PHP 7.4+ или 8.x</p>
+                <p>Расширение <code class="inline">php_odbc</code> включено в <code class="inline">php.ini</code></p>
+                <p>Apache / Nginx / IIS — любой</p>
+            </div>
+            <div class="card">
+                <h4>База данных</h4>
+                <p>Microsoft SQL Server 2008 R2+</p>
+                <p>Включён TCP/IP в SQL Server Configuration Manager</p>
+                <p>Открыт порт <code class="inline">1433</code> (или иной)</p>
+            </div>
+            <div class="card">
+                <h4>База MuOnline</h4>
+                <p>Развёрнутая БД <code class="inline">MuOnline</code> (Season 3 Episode 1)</p>
+                <p>Доступ к таблицам <code class="inline">MEMB_INFO</code>, <code class="inline">Character</code>, <code class="inline">Guild</code>, <code class="inline">MEMB_STAT</code> и др.</p>
+            </div>
+            <div class="card">
+                <h4>Сетевая связность</h4>
+                <p>С веб-сервера до SQL Server открыт TCP-порт</p>
+                <p>Проверка: <code class="inline">telnet 192.168.0.10 1433</code></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3 -->
+    <section class="slide" id="s3">
+        <h2><span class="num">3</span> Подготовка SQL Server</h2>
+        <p class="lead">Создайте отдельный логин для сайта — никогда не используйте <code class="inline">sa</code>.</p>
+        <p>Подключитесь к SQL Server через SSMS под <code class="inline">sa</code> и выполните:</p>
+<pre>-- 1. Создаём логин уровня сервера
+CREATE LOGIN web_app WITH PASSWORD = 'Strong#Pass2026!',
+    CHECK_POLICY = ON;
+
+-- 2. Привязываем логин к базе MuOnline
+USE MuOnline;
+CREATE USER web_app FOR LOGIN web_app;
+
+-- 3. Минимально необходимые права
+GRANT SELECT, INSERT, UPDATE ON SCHEMA::dbo TO web_app;
+
+-- 4. Проверяем
+SELECT name, type_desc FROM sys.database_principals WHERE name = 'web_app';</pre>
+        <div class="warn"><strong>Включите Mixed Mode Authentication</strong> в свойствах SQL Server, иначе SQL-логин работать не будет. После изменения перезапустите службу SQL Server.</div>
+        <p>Откройте <strong>SQL Server Configuration Manager → SQL Server Network Configuration → Protocols for MSSQLSERVER</strong> и убедитесь, что <em>TCP/IP</em> = Enabled, а во вкладке <em>IP Addresses</em> в разделе <code class="inline">IPAll</code> указан порт <code class="inline">1433</code>.</p>
+    </section>
+
+    <!-- 4 -->
+    <section class="slide" id="s4">
+        <h2><span class="num">4</span> Установка ODBC-драйвера</h2>
+        <p class="lead">PHP подключается к MS SQL через ODBC.</p>
+        <h3>Windows</h3>
+        <p>В большинстве серверных Windows-сборок драйвер <code class="inline">SQL Server</code> уже доступен. Для современных версий рекомендуется <em>Microsoft ODBC Driver 17/18 for SQL Server</em>:</p>
+<pre>https://learn.microsoft.com/sql/connect/odbc/download-odbc-driver-for-sql-server</pre>
+        <p>После установки укажите его в <code class="inline">opt.php</code>:</p>
+<pre>$config["odbc_driver"] = "ODBC Driver 17 for SQL Server";</pre>
+        <h3>Linux</h3>
+<pre># Debian / Ubuntu
+sudo apt-get install unixodbc unixodbc-dev php-odbc
+# затем установите msodbcsql17 по инструкции Microsoft</pre>
+        <p>Проверьте, что драйвер виден:</p>
+<pre>odbcinst -q -d</pre>
+        <h3>PHP</h3>
+<pre>php -m | grep -i odbc      # должно вывести: odbc</pre>
+        <div class="err"><strong>Если в логе видите</strong> «ODBC extension is not installed — database features disabled.» — значит расширение PHP-ODBC не загружено. Раскомментируйте <code class="inline">extension=odbc</code> в <code class="inline">php.ini</code> и перезапустите веб-сервер.</div>
+    </section>
+
+    <!-- 5 -->
+    <section class="slide" id="s5">
+        <h2><span class="num">5</span> Создание opt.php</h2>
+        <p class="lead">Это <strong>единственный</strong> файл с реальными секретами. Он добавлен в <code class="inline">.gitignore</code>.</p>
+<pre># из корня сайта
+cp opt.example.php opt.php
+chmod 640 opt.php          # читать может только владелец и группа веб-сервера</pre>
+        <p>Откройте <code class="inline">opt.php</code> в любом редакторе и заполните параметры. Структура файла:</p>
+        <ul class="checks">
+            <li>Блок <strong>Database</strong> — хост, порт, логин, пароль, имя БД, ODBC-драйвер.</li>
+            <li>Блок <strong>Optional remote-connection tuning</strong> — таймаут, charset, persistent, готовый DSN.</li>
+            <li>Блок <strong>Site addresses</strong> — адрес сайта и форума.</li>
+            <li>Блоки <strong>Currency mapping</strong>, <strong>Char/Guild/Stat tables</strong> — маппинг таблиц MuOnline.</li>
+            <li>Блок <strong>Vote sites</strong>, <strong>Downloads</strong> — внешние ссылки и тексты.</li>
+        </ul>
+        <div class="warn"><strong>Никогда не коммитьте opt.php в Git.</strong> Если пароль попал в историю — немедленно смените его в SQL Server.</div>
+    </section>
+
+    <!-- 6 -->
+    <section class="slide" id="s6">
+        <h2><span class="num">6</span> Базовые ключи подключения</h2>
+        <p>Минимальный набор, который обязан быть заполнен реальными значениями:</p>
+        <table class="cfg">
+            <tr><th>Ключ</th><th>Назначение</th><th>Пример</th></tr>
+            <tr><td>db_host</td><td>IP или DNS-имя SQL Server</td><td><code class="inline">192.168.0.10</code></td></tr>
+            <tr><td>db_port</td><td>TCP-порт (если не 1433)</td><td><code class="inline">1433</code></td></tr>
+            <tr><td>db_user</td><td>SQL-логин (не <code class="inline">sa</code>)</td><td><code class="inline">web_app</code></td></tr>
+            <tr><td>db_upwd</td><td>Пароль логина</td><td><code class="inline">Strong#Pass2026!</code></td></tr>
+            <tr><td>db_name</td><td>Имя базы данных</td><td><code class="inline">MuOnline</code></td></tr>
+            <tr><td>odbc_driver</td><td>Имя установленного ODBC-драйвера</td><td><code class="inline">ODBC Driver 17 for SQL Server</code></td></tr>
+        </table>
+        <p>Пример заполненного блока:</p>
+<pre>$config["db_host"]     = "192.168.0.10";
+$config["db_port"]     = "1433";
+$config["db_user"]     = "web_app";
+$config["db_upwd"]     = "Strong#Pass2026!";
+$config["db_name"]     = "MuOnline";
+$config["odbc_driver"] = "ODBC Driver 17 for SQL Server";</pre>
+        <div class="ok">При старте сайта <code class="inline">db_validate_config()</code> проверит, что все обязательные ключи заполнены и пароль не равен значению-заглушке <code class="inline">CHANGE_ME</code>. Если что-то не так — вы увидите понятное сообщение, а не таинственный белый экран.</div>
+    </section>
+
+    <!-- 7 -->
+    <section class="slide" id="s7">
+        <h2><span class="num">7</span> Расширенные ключи: порт, таймаут, DSN</h2>
+        <p class="lead">Опциональные настройки для тонкого тюнинга подключения.</p>
+        <table class="cfg">
+            <tr><th>Ключ</th><th>По умолчанию</th><th>Описание</th></tr>
+            <tr><td>db_dsn</td><td>(пусто)</td><td>Полная DSN-строка. Если задана — игнорирует <code class="inline">db_host/port/name/odbc_driver</code>.</td></tr>
+            <tr><td>db_appname</td><td>WebMu</td><td>Имя приложения, которое видно в <code class="inline">sp_who2</code> на стороне SQL Server.</td></tr>
+            <tr><td>db_charset</td><td>(драйвер)</td><td>Например <code class="inline">UTF-8</code> при использовании MSODBCSQL.</td></tr>
+            <tr><td>db_timeout</td><td>5</td><td>Таймаут логина в секундах (0 = по умолчанию драйвера).</td></tr>
+            <tr><td>db_persistent</td><td>0</td><td>1 — пул соединений через <code class="inline">odbc_pconnect</code>.</td></tr>
+        </table>
+        <h3>Когда использовать db_dsn</h3>
+        <p>Полезно для нестандартных сценариев: TLS-соединение, именованный экземпляр, доверие к самоподписанному сертификату:</p>
+<pre>$config["db_dsn"] = "Driver={ODBC Driver 18 for SQL Server};"
+                  . "Server=tcp:db.example.com,1433;"
+                  . "Database=MuOnline;"
+                  . "Encrypt=yes;TrustServerCertificate=yes;";</pre>
+        <h3>Альтернатива записи порта</h3>
+        <p>SQL Server-овский синтаксис «host,port» по-прежнему работает — просто оставьте <code class="inline">db_port</code> пустым:</p>
+<pre>$config["db_host"] = "192.168.0.10,1433";
+$config["db_port"] = "";</pre>
+    </section>
+
+    <!-- 8 -->
+    <section class="slide" id="s8">
+        <h2><span class="num">8</span> Маппинг таблиц MuOnline</h2>
+        <p class="lead">Структура схемы у разных репаков отличается. Названия таблиц/колонок берутся из <code class="inline">opt.php</code>, а не из кода.</p>
+        <p>Все запросы к таблицам персонажей, гильдий, статистики и валют используют значения из <code class="inline">$config</code> и проходят через хелпер <code class="inline">db_ident()</code>, который безопасно квотит идентификатор. Поэтому смена схемы — это правка <code class="inline">opt.php</code>, не модулей.</p>
+        <table class="cfg">
+            <tr><th>Группа</th><th>Ключи в opt.php</th></tr>
+            <tr><td>Персонажи</td><td>char_table, char_name_col, char_account_col, char_level_col, char_resets_col, char_master_col, char_class_col, char_pk_count_col, char_pk_level_col</td></tr>
+            <tr><td>Гильдии</td><td>guild_table, guild_member_table, guild_name_col, guild_master_col, guild_score_col</td></tr>
+            <tr><td>Онлайн-статистика</td><td>stat_table, stat_account_col, stat_connect_col</td></tr>
+            <tr><td>Валюты</td><td>cr_*, usd_*, wcoin_*, gr_* (table / column / acc)</td></tr>
+            <tr><td>Donate / Vote</td><td>donate_items_table, donate_log_table, vote_sites</td></tr>
+        </table>
+        <p>Опциональные WebMu-таблицы (например <code class="inline">WebDonateLog</code>) проверяются через <code class="inline">db_table_exists()</code>: если таблицы нет — соответствующий блок просто скрывается, ошибки не возникнет.</p>
+    </section>
+
+    <!-- 9 -->
+    <section class="slide" id="s9">
+        <h2><span class="num">9</span> Проверка подключения</h2>
+        <p class="lead">Три способа убедиться, что сайт видит базу.</p>
+        <h3>А. Открыть главную страницу</h3>
+        <p>Если в шапке появляется красный баннер «Нет подключения к удалённой базе данных» — детали смотрите в <code class="inline">logs/db.log</code>.</p>
+
+        <h3>Б. Через CLI-скрипт</h3>
+<pre>php -r 'define("insite",1);
+require "core/init.php";
+var_dump(db_ping());
+echo db_last_error(), PHP_EOL;'</pre>
+        <p><code class="inline">db_ping()</code> установит соединение и выполнит <code class="inline">SELECT 1</code>. Возвращает <code class="inline">true</code>, если БД доступна с текущими настройками <code class="inline">opt.php</code>.</p>
+
+        <h3>В. Через лог</h3>
+        <p>Если в <code class="inline">opt.php</code> установить <code class="inline">$config["debug"] = 1;</code>, ошибки SQL/ODBC будут выводиться прямо в браузер. На продакшене обязательно верните <code class="inline">0</code>.</p>
+        <pre>tail -f logs/db.log</pre>
+    </section>
+
+    <!-- 10 -->
+    <section class="slide" id="s10">
+        <h2><span class="num">10</span> Использование $config в модулях</h2>
+        <p class="lead">Так устроены ВСЕ модули — следуйте тому же шаблону при доработках.</p>
+        <p>Никаких <code class="inline">odbc_connect()</code> в модулях. Никаких хардкодов имён таблиц. Только функции из <code class="inline">core/db.php</code> и значения из <code class="inline">$config</code>.</p>
+<pre>// modules/account.php — чтение баланса
+global $config;
+$tbl = db_ident($config["cr_table"]);     // [MEMB_INFO]
+$col = db_ident($config["cr_column"]);    // [credits]
+$acc = db_ident($config["cr_acc"]);       // [memb___id]
+
+$row = db_one(
+    "SELECT $col AS balance FROM $tbl WHERE $acc = ?",
+    [$_SESSION["uid"]]
+);</pre>
+        <ul class="checks">
+            <li><code class="inline">db_query($sql, $args)</code> — параметризованный запрос (<code class="inline">?</code>-плейсхолдеры).</li>
+            <li><code class="inline">db_one($sql, $args)</code> — одна строка (или <code class="inline">null</code>).</li>
+            <li><code class="inline">db_all($sql, $args)</code> — массив строк.</li>
+            <li><code class="inline">db_exec($sql, $args)</code> — INSERT/UPDATE/DELETE.</li>
+            <li><code class="inline">db_ident($name, $fallback)</code> — безопасное квотирование идентификатора из <code class="inline">$config</code>.</li>
+            <li><code class="inline">db_table_exists($name)</code> — проверка опциональных таблиц.</li>
+        </ul>
+        <ul class="checks crosses">
+            <li>Никогда не склеивайте пользовательский ввод в строку SQL — только через <code class="inline">?</code>.</li>
+            <li>Никогда не пишите <code class="inline">"MEMB_INFO.credits"</code> в коде — читайте <code class="inline">$config["cr_table"]</code> / <code class="inline">cr_column</code>.</li>
+        </ul>
+    </section>
+
+    <!-- 11 -->
+    <section class="slide" id="s11">
+        <h2><span class="num">11</span> Решение типичных проблем</h2>
+        <table class="cfg">
+            <tr><th>Сообщение / симптом</th><th>Причина и решение</th></tr>
+            <tr><td>opt.php is missing or has placeholder values for: db_upwd (still set to CHANGE_ME)</td><td>Вы скопировали шаблон, но не заменили пароль. Откройте <code class="inline">opt.php</code> и впишите реальный.</td></tr>
+            <tr><td>ODBC extension is not installed</td><td>Включите <code class="inline">extension=odbc</code> в <code class="inline">php.ini</code> и перезапустите веб-сервер.</td></tr>
+            <tr><td>SQLSTATE[08001] / Login timeout expired</td><td>Веб-сервер не достучится до SQL Server. Проверьте firewall, TCP/IP в SQL Server Configuration Manager, порт 1433.</td></tr>
+            <tr><td>SQLSTATE[28000] Login failed for user 'web_app'</td><td>Неверный логин/пароль или не включён Mixed Mode Authentication в свойствах сервера.</td></tr>
+            <tr><td>Cannot open database "MuOnline" requested by the login</td><td>Логину не выдан доступ к базе. Выполните <code class="inline">CREATE USER ... FOR LOGIN ...</code> и <code class="inline">GRANT</code>.</td></tr>
+            <tr><td>Loaded opt.example.php — copy it to opt.php</td><td>Файла <code class="inline">opt.php</code> ещё нет. Скопируйте шаблон: <code class="inline">cp opt.example.php opt.php</code>.</td></tr>
+            <tr><td>Invalid SQL identifier `...`</td><td>В <code class="inline">opt.php</code> в одном из <code class="inline">char_*</code>/<code class="inline">guild_*</code>/<code class="inline">cr_*</code> ключей задано имя с пробелами/спецсимволами. Допустимы только <code class="inline">[A-Za-z0-9_]</code>.</td></tr>
+        </table>
+        <div class="note">Все ODBC-ошибки дублируются в <code class="inline">logs/db.log</code> с временной меткой. При <code class="inline">debug=1</code> — ещё и в HTML страницы (только для разработки!).</div>
+    </section>
+
+    <!-- 12 -->
+    <section class="slide" id="s12">
+        <h2><span class="num">12</span> Чек-лист безопасности</h2>
+        <ul class="checks">
+            <li><code class="inline">opt.php</code> в <code class="inline">.gitignore</code>, секреты не уезжают в репозиторий.</li>
+            <li>Используется выделенный SQL-логин с минимальными правами (<code class="inline">SELECT/INSERT/UPDATE</code>), не <code class="inline">sa</code>.</li>
+            <li>Пароль изменён со значения-заглушки <code class="inline">CHANGE_ME</code>.</li>
+            <li>Все запросы идут через <code class="inline">db_query()</code> с параметризацией — нет ручной конкатенации.</li>
+            <li>В продакшене <code class="inline">$config["debug"] = 0;</code> — ошибки только в лог.</li>
+            <li>Файл <code class="inline">opt.php</code> доступен веб-серверу на чтение, но не миру (<code class="inline">chmod 640</code>).</li>
+            <li>Логи <code class="inline">logs/</code> и кеш <code class="inline">cache/</code> не доступны напрямую через HTTP (используйте правила веб-сервера).</li>
+            <li>SQL Server слушает не на публичном интерфейсе или защищён файрволом по IP.</li>
+        </ul>
+        <div class="ok"><strong>Готово!</strong> Сайт WebMu подключён к удалённой базе данных. Все будущие изменения параметров подключения делаются <em>только</em> в файле <code class="inline">opt.php</code>.</div>
+    </section>
+
+    <footer>
+        WebMu · документация · <code>docs/setup.html</code> · отрисовывается локально, без внешних ресурсов.
+    </footer>
+</div>
+</body>
+</html>
