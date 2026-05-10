@@ -15,6 +15,11 @@ return [
 
     // misc
     "footer.tagline"   => "Создай свою легенду на вечном континенте",
+    "footer.col.server"    => "Сервер",
+    "footer.col.community" => "Сообщество",
+    "footer.col.support"   => "Поддержка",
+    "footer.forum"         => "Форум",
+    "footer.faq"           => "FAQ",
     "maintenance.title"=> "Сервер на технических работах",
     "maintenance.text" => "Мы скоро вернёмся. Загляните чуть позже.",
 

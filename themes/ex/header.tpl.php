@@ -16,11 +16,14 @@
 </head>
 <body>
 
-<header class="site-header">
+<header class="site-header header-3d">
+    <div class="header-glow" aria-hidden="true"></div>
     <div class="nav-container">
-        <a class="brand" href="index.php">
-            <img src="assets/images/logo.svg" alt="<?= h($config["server_name"] ?? "WebMu") ?>">
-            <span class="brand-text"><?= h($config["server_team"] ?? "WebMu") ?></span>
+        <a class="brand brand-3d" href="index.php">
+            <span class="brand-logo-wrap" aria-hidden="true">
+                <img src="assets/images/logo.svg" alt="<?= h($config["server_name"] ?? "WebMu") ?>">
+            </span>
+            <span class="brand-text" data-text="<?= h($config["server_team"] ?? "WebMu") ?>"><?= h($config["server_team"] ?? "WebMu") ?></span>
         </a>
         <nav class="main-nav" aria-label="Primary">
             <?php
@@ -46,6 +49,14 @@
                    href="index.php?m=login"><?= h(lang("nav.login")) ?></a>
             <?php endif; ?>
         </nav>
+        <?php
+        // Live server-status pill: green when DB ping succeeds, red otherwise.
+        $__server_ok = empty($db_error) && empty($config["__using_example"]);
+        ?>
+        <div class="server-status-pill <?= $__server_ok ? "online" : "offline" ?>" aria-live="polite">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="lbl"><?= $__server_ok ? "Online" : "Offline" ?></span>
+        </div>
     </div>
 </header>
 

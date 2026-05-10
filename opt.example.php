@@ -37,6 +37,11 @@ $config["db_persistent"] = 0;                 // 1 = use odbc_pconnect (pooled),
 // ---- Site addresses ----
 $config["siteaddress"]  = "http://localhost/";
 $config["forum"]        = "http://localhost/forum";
+// Optional social channel URLs — footer hides each button when empty.
+$config["social_discord"]  = "";
+$config["social_telegram"] = "";
+$config["social_vk"]       = "";
+$config["social_youtube"]  = "";
 
 // ---- Localization & theme ----
 $config["def_lang"]     = "rus";              // rus | eng
