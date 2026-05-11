@@ -436,6 +436,8 @@ function mu_slot_allowed_codes($slot, $group)
         // Ring slots: elemental and transformation rings only.
         return [8, 9, 10, 20, 21, 22, 23, 24, 38, 39, 40, 41, 42];
     }
+    // Null means this slot/group has no item-code restriction: every code
+    // within the expected item group is valid.
     return null;
 }
 
