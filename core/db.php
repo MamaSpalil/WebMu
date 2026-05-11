@@ -129,9 +129,10 @@ function db()
     // Prefer driver cursors: the ODBC cursor library can re-query result
     // columns by alias during SQLGetData, which breaks SELECT aliases such as
     // CharName/total_resets on SQL Server.
+    $driverCursor = defined("SQL_CUR_USE_DRIVER") ? SQL_CUR_USE_DRIVER : 2;
     $cursorType = isset($config["odbc_cursor_type"])
         ? (int)$config["odbc_cursor_type"]
-        : (defined("SQL_CUR_USE_DRIVER") ? SQL_CUR_USE_DRIVER : 2);
+        : $driverCursor;
     $c = $persistent
         ? @odbc_pconnect($dsn, $user, $pwd, $cursorType)
         : @odbc_connect($dsn, $user, $pwd, $cursorType);
