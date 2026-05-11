@@ -13,7 +13,9 @@
 // =====================================================================
 if (!defined("insite")) die("no access");
 
-// Validate the requested character name: 3–10 chars, letters & digits only.
+// Validate the requested character name: 1–10 chars, letters & digits only
+// (MuOnline allows short in-game names; we deliberately mirror the game's
+// own constraints rather than the stricter account-login validator).
 $name = trim((string)($_GET["name"] ?? ""));
 if (!preg_match('~^[A-Za-z0-9]{1,10}$~', $name)) {
     http_response_code(404);
