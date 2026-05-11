@@ -50,8 +50,20 @@
             <?php endif; ?>
         </nav>
         <?php
-        // Live server-status pill: green when DB ping succeeds, red otherwise.
-        $__server_ok = empty($db_error) && empty($config["__using_example"]);
+        // Live server-status pill: green when the game server's TCP
+        // port answers (and DB is reachable), red otherwise. Falls back
+        // to a DB-only check when server_ip / server_port are unset.
+        $__db_ok = empty($db_error) && empty($config["__using_example"]);
+        $__srv_ip   = trim((string)($config["server_ip"]   ?? ""));
+        $__srv_port = (int)($config["server_port"]         ?? 0);
+        if ($__srv_ip !== "" && $__srv_port > 0) {
+            $__server_ok = $__db_ok && server_status_check(
+                $__srv_ip, $__srv_port,
+                (int)($config["server_timeout"] ?? 2)
+            );
+        } else {
+            $__server_ok = $__db_ok;
+        }
         ?>
         <div class="server-status-pill <?= $__server_ok ? "online" : "offline" ?>" aria-live="polite">
             <span class="dot" aria-hidden="true"></span>

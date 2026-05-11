@@ -153,6 +153,33 @@ function redirect($url)
     exit;
 }
 
+/**
+ * Probe a TCP host:port to see if the game server is reachable.
+ *
+ * Cached per request and per (ip,port,timeout) tuple so calling it from
+ * multiple widgets does not multiply the latency. Returns true on a
+ * successful connection, false on failure or invalid input.
+ */
+function server_status_check($ip, $port, $timeout = 2)
+{
+    static $memo = [];
+    $ip      = trim((string)$ip);
+    $port    = (int)$port;
+    $timeout = max(1, (int)$timeout);
+    if ($ip === "" || $port < 1 || $port > 65535) return false;
+
+    $key = $ip . ":" . $port . ":" . $timeout;
+    if (isset($memo[$key])) return $memo[$key];
+
+    $errno = 0; $errstr = "";
+    $sock = @fsockopen($ip, $port, $errno, $errstr, $timeout);
+    if ($sock) {
+        @fclose($sock);
+        return $memo[$key] = true;
+    }
+    return $memo[$key] = false;
+}
+
 /** Build a flash message for the next request. */
 function flash_set($type, $text)
 {

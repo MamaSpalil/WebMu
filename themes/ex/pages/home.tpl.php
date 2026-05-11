@@ -1,5 +1,7 @@
 <?php if (!defined("insite")) die("no access");
-$qinfo = $widget_data["qinfo"]   ?? null;
+$qinfo     = $widget_data["qinfo"]   ?? null;
+$srv       = $widget_data["server_status"] ?? null;
+$srv_stats = $widget_data["server_stats"]  ?? null;
 $strongest = $widget_data["strongest"] ?? null;
 $lastinf = $widget_data["lastinf"] ?? [];
 $top5g   = $widget_data["top5guild"] ?? [];
@@ -23,6 +25,32 @@ $baners  = $widget_data["baners"]    ?? [];
         height:24px; overflow:hidden; margin-top:8px; }
     .gauge > span { display:block; height:100%; background:linear-gradient(90deg,#caa040,#fff5b8);
         box-shadow:0 0 12px rgba(230,195,74,.6); }
+    .srv-status { max-width: 560px; margin: 0 auto;
+        display:flex; align-items:center; justify-content:center; gap:14px;
+        padding:10px 18px;
+        background: rgba(14,9,3,0.7); border:1px solid var(--border-gold); border-radius:3px;
+        color:var(--gold); font-size:13px; letter-spacing:3px; text-transform:uppercase;}
+    .srv-status .pill { display:inline-flex; align-items:center; gap:8px;
+        padding:4px 12px; border:1px solid var(--gold); border-radius:999px; font-weight:700;}
+    .srv-status .pill.up   { color:#9be39b; border-color:#3e8f3e;
+        box-shadow:0 0 12px rgba(80,200,80,.35); }
+    .srv-status .pill.down { color:#e89b9b; border-color:#8f3e3e;
+        box-shadow:0 0 12px rgba(220,80,80,.35); }
+    .srv-status .pill .dot { width:8px; height:8px; border-radius:50%; background:currentColor;
+        box-shadow:0 0 8px currentColor; }
+    .stats-strip { max-width:1280px; margin:0 auto 30px; padding:0 30px;
+        display:grid; gap:18px; grid-template-columns:repeat(4,minmax(0,1fr)); }
+    @media (max-width:720px) { .stats-strip { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    .stats-strip .stat {
+        text-align:center; padding:18px 14px;
+        background:linear-gradient(180deg, rgba(28,18,6,0.85) 0%, rgba(10,6,2,0.92) 100%);
+        border:1px solid var(--border-gold); border-radius:4px;
+        box-shadow:inset 0 1px 0 rgba(255,240,168,0.10), 0 6px 14px rgba(0,0,0,0.55);}
+    .stats-strip .stat .num {
+        font-family:'Cinzel Decorative',serif; font-size:28px; color:var(--gold-light);
+        text-shadow:0 0 12px rgba(230,195,74,.4); }
+    .stats-strip .stat .lbl {
+        margin-top:4px; font-size:12px; letter-spacing:3px; text-transform:uppercase; color:#c8b890; }
 </style>
 
 <section class="hero">
@@ -34,13 +62,69 @@ $baners  = $widget_data["baners"]    ?? [];
         <a class="btn-major" href="<?= h($config["forum"] ?? "#") ?>"><span class="icon" aria-hidden="true">📜</span>FORUM</a>
     </div>
 
-    <?php if ($qinfo): ?>
-        <div style="max-width:520px;margin:0 auto;color:var(--gold);font-size:13px;letter-spacing:3px;text-transform:uppercase">
-            Online: <strong><?= fmt_int($qinfo["online"]) ?></strong> / <?= fmt_int($qinfo["max"]) ?>
-            <div class="gauge"><span style="width:<?= (int)$qinfo["percent"] ?>%"></span></div>
+    <?php
+    // Prefer the dedicated server_status widget (does a TCP probe of the
+    // configured game-server IP:Port). Fall back to qinfo when the new
+    // widget is not enabled, so existing installs keep showing the bar.
+    $online = null; $max = null; $percent = null;
+    if ($srv) {
+        $online  = $srv["online"];
+        $max     = $srv["max"];
+        $percent = $srv["percent"];
+    } elseif ($qinfo) {
+        $online  = $qinfo["online"];
+        $max     = $qinfo["max"];
+        $percent = $qinfo["percent"];
+    }
+    ?>
+
+    <?php if ($srv): ?>
+        <div class="srv-status">
+            <?php if ($srv["probed"]): ?>
+                <span class="pill <?= $srv["is_up"] ? "up" : "down" ?>">
+                    <span class="dot" aria-hidden="true"></span>
+                    <?= $srv["is_up"] ? "Server Online" : "Server Offline" ?>
+                </span>
+                <span class="text-mute" style="letter-spacing:2px">
+                    <?= h($srv["ip"]) ?>:<?= (int)$srv["port"] ?>
+                </span>
+            <?php else: ?>
+                <span class="text-mute">
+                    Set <code>server_ip</code> &amp; <code>server_port</code> in <code>opt.php</code>
+                    to enable the live server probe.
+                </span>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($online !== null): ?>
+        <div style="max-width:520px;margin:18px auto 0;color:var(--gold);font-size:13px;letter-spacing:3px;text-transform:uppercase">
+            Online: <strong><?= fmt_int($online) ?></strong> / <?= fmt_int($max) ?>
+            <div class="gauge"><span style="width:<?= (int)$percent ?>%"></span></div>
         </div>
     <?php endif; ?>
 </section>
+
+<?php if ($srv_stats): ?>
+<section class="stats-strip" aria-label="Server statistics">
+    <div class="stat">
+        <div class="num"><?= fmt_int($srv_stats["accounts"]) ?></div>
+        <div class="lbl">Accounts</div>
+    </div>
+    <div class="stat">
+        <div class="num"><?= fmt_int($srv_stats["characters"]) ?></div>
+        <div class="lbl">Characters</div>
+    </div>
+    <div class="stat">
+        <div class="num"><?= fmt_int($srv_stats["guilds"]) ?></div>
+        <div class="lbl">Guilds</div>
+    </div>
+    <div class="stat">
+        <div class="num"><?= fmt_int($srv_stats["online"]) ?></div>
+        <div class="lbl">Online now</div>
+    </div>
+</section>
+<?php endif; ?>
 
 <section class="featured">
     <div class="grid-3">

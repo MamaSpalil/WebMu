@@ -43,6 +43,14 @@ $config["social_telegram"] = "";
 $config["social_vk"]       = "";
 $config["social_youtube"]  = "";
 
+// ---- Game server (used by the server-status widget on the home page) ----
+// Public IP / TCP port that the MU game client connects to. The home
+// page does a fast TCP probe (server_timeout seconds) to show whether
+// the server is reachable, in addition to the live online count.
+$config["server_ip"]    = "127.0.0.1";          // game server (ConnectServer / GameServer) IP
+$config["server_port"]  = 44405;                // ConnectServer port (default for Season 3)
+$config["server_timeout"] = 2;                  // TCP probe timeout in seconds
+
 // ---- Localization & theme ----
 $config["def_lang"]     = "rus";              // rus | eng
 $config["theme"]        = "ex";               // themes/<theme>/
@@ -61,8 +69,8 @@ $config["server_name"]  = "MuOnline Season 3 Episode 1";
 $config["server_team"]  = "WebMu";
 
 // ---- Home-page widgets (rendered, in order) ----
-$config["mainmod"]      = "qinfo,strongest,questtop,top5items,lastinf,lastinforum";
-$config["mainmod_def"]  = "qinfo,strongest,questtop,top5guild,baners";
+$config["mainmod"]      = "qinfo,server_status,server_stats,strongest,questtop,top5items,lastinf,lastinforum";
+$config["mainmod_def"]  = "qinfo,server_status,server_stats,strongest,questtop,top5guild,baners";
 
 // ---- Currency mapping (table / column / account-key for each balance) ----
 // Credits — main donate currency
@@ -123,7 +131,15 @@ $config["stat_account_col"]   = "memb___id";
 $config["stat_connect_col"]   = "ConnectStat";
 
 // ---- Market ----
-$config["market_open_col"]    = "";            // e.g. "IsStoreOpen"; empty lists recent characters
+// Optional table where the server (or a server-side export job) writes
+// items currently listed for sale via PersonalShop and/or the Web-Vault
+// "Sundook Reitingi" feature. Leave empty to hide market listings.
+// Expected columns: Seller, ItemName, Price (required) plus optional
+// Currency, ItemImage, ItemLevel, Quantity, ListedAt, Source.
+$config["market_items_table"] = "";            // e.g. "WebMarketItems"
+$config["market_seller_col"]  = "Seller";
+$config["market_item_col"]    = "ItemName";
+$config["market_price_col"]   = "Price";
 
 // ---- Optional WebMu tables ----
 $config["donate_items_table"] = "WebDonateItems";
