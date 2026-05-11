@@ -422,7 +422,7 @@ function mu_slot_allowed_codes($slot, $group)
     if ($slot === 7 && $group === 12) {
         // Wings slot: 1st/2nd/3rd wings, cloaks and mantles from group 12.
         return array_merge(
-            range(0, 6),   // 1st and 2nd generation wings.
+            range(0, 6),   // Wing codes used by the bundled Season 3 catalog.
             range(36, 45)  // 3rd generation wings, cloaks and mantles.
         );
     }
@@ -481,9 +481,10 @@ function mu_item_code_variants($bytes)
     $b0 = ord($bytes[0]);
     $b9 = ord($bytes[9]);
     $item_index = $b0 & 0x1F;
+    $extended_item_index = $item_index + (($b9 & MU_EXTENDED_ITEM_INDEX_FLAG) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0);
     return [
         "full" => $b0,
-        "extended" => $item_index + (($b9 & MU_EXTENDED_ITEM_INDEX_FLAG) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0),
+        "extended" => $extended_item_index,
         "base" => $item_index,
     ];
 }
@@ -539,7 +540,7 @@ function mu_decode_slot_item_candidates($bytes, $slot)
         if (!mu_slot_allows_identity($slot, $group, $code, $expected)) {
             continue;
         }
-        $key = $group . "_" . $code;
+        $key = $group . "|" . $code;
         if (isset($seen[$key])) {
             continue;
         }
