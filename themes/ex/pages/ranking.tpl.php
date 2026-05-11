@@ -4,7 +4,11 @@ $has_greset  = isset($players[0]["GReset"]);
 $has_stats   = isset($players[0]["Strength"]) || isset($players[0]["Energy"]);
 $has_zen     = isset($players[0]["Money"]);
 $has_quest   = isset($players[0]["Quest"]);
-$player_cols = 5 + ($has_greset ? 1 : 0) + ($show_master ? 1 : 0) + 1 /*Guild*/ + ($has_stats ? 1 : 0) + ($has_zen ? 1 : 0) + ($has_quest ? 1 : 0);
+$has_account = isset($players[0]["AccountID"]);
+$has_map     = isset($players[0]["MapNumber"]);
+$has_pos     = isset($players[0]["MapPosX"]) && isset($players[0]["MapPosY"]);
+$has_exquest = isset($players[0]["ExQuestNum"]);
+$player_cols = 5 + ($has_greset ? 1 : 0) + ($show_master ? 1 : 0) + 1 /*Guild*/ + ($has_stats ? 1 : 0) + ($has_zen ? 1 : 0) + ($has_quest ? 1 : 0) + ($has_account ? 1 : 0) + ($has_map ? 1 : 0) + ($has_exquest ? 1 : 0);
 $has_guild_mark   = isset($guilds[0]["G_Mark"]);
 $has_guild_notice = isset($guilds[0]["G_Notice"]);
 $guild_cols = 5 + ($has_guild_mark ? 1 : 0) + ($has_guild_notice ? 1 : 0);
@@ -38,12 +42,16 @@ $has_online_map = isset($online[0]["map_h"]);
         <div class="table-wrap">
             <table class="rank">
                 <thead><tr>
-                    <th>#</th><th>Character</th><th>Class</th><th>Level</th><th>Resets</th>
+                    <th>#</th><th>Character</th>
+                    <?php if ($has_account): ?><th>Account</th><?php endif; ?>
+                    <th>Class</th><th>Level</th><th>Resets</th>
                     <?php if ($has_greset): ?><th title="Grand Reset">GR</th><?php endif; ?>
                     <?php if ($show_master): ?><th>Master Lv</th><?php endif; ?>
                     <?php if ($has_stats): ?><th title="Strength / Agility / Vitality / Energy / Command">Stats</th><?php endif; ?>
                     <?php if ($has_zen): ?><th>Zen</th><?php endif; ?>
                     <?php if ($has_quest): ?><th>Quest</th><?php endif; ?>
+                    <?php if ($has_exquest): ?><th title="Ex Quest number">Ex&nbsp;Quest</th><?php endif; ?>
+                    <?php if ($has_map): ?><th>Location</th><?php endif; ?>
                     <th>Guild</th>
                 </tr></thead>
                 <tbody>
@@ -51,6 +59,7 @@ $has_online_map = isset($online[0]["map_h"]);
                 <tr<?= $i<3 ? ' class="top-'.($i+1).'"' : '' ?>>
                     <td class="rank-pos"><?= $i+1 ?></td>
                     <td><a class="char-link" href="index.php?m=character&amp;name=<?= h(urlencode($p["Name"])) ?>"><?= h($p["Name"]) ?></a></td>
+                    <?php if ($has_account): ?><td class="text-mute"><?= h($p["AccountID"] ?? "—") ?></td><?php endif; ?>
                     <td><span class="cls-tag cls-<?= h($p["class_h"][1]) ?>"><?= h($p["class_h"][0]) ?></span></td>
                     <td><?= (int)$p["cLevel"] ?></td>
                     <td><?= (int)$p["Resets"] ?></td>
@@ -63,6 +72,10 @@ $has_online_map = isset($online[0]["map_h"]);
                     <?php endif; ?>
                     <?php if ($has_zen): ?><td><?= fmt_zen($p["Money"] ?? 0) ?></td><?php endif; ?>
                     <?php if ($has_quest): ?><td><?= (int)($p["Quest"] ?? 0) ?></td><?php endif; ?>
+                    <?php if ($has_exquest): ?><td><?= (int)($p["ExQuestNum"] ?? 0) ?></td><?php endif; ?>
+                    <?php if ($has_map): ?>
+                        <td class="text-mute"><?= h(mu_map((int)($p["MapNumber"] ?? 0))) ?><?php if ($has_pos): ?> <span class="text-mute">(<?= (int)($p["MapPosX"] ?? 0) ?>,<?= (int)($p["MapPosY"] ?? 0) ?><?php if (isset($p["MapDir"])): ?>·<?= (int)$p["MapDir"] ?><?php endif; ?>)</span><?php endif; ?></td>
+                    <?php endif; ?>
                     <td><?= h($p["G_Name"] ?? "—") ?></td>
                 </tr>
                 <?php endforeach; ?>
