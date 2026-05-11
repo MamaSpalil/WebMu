@@ -3,6 +3,12 @@
 //  Helpers: validators, formatters, MuOnline class lookup, file cache.
 // =====================================================================
 if (!defined("insite")) die("no access");
+if (!defined("MU_EQUIPPED_SLOTS")) define("MU_EQUIPPED_SLOTS", 12);
+if (!defined("MU_ITEM_BYTES")) define("MU_ITEM_BYTES", 12);
+if (!defined("MU_ITEM_TYPE_HIGH_BIT_OFFSET")) define("MU_ITEM_TYPE_HIGH_BIT_OFFSET", 8);
+if (!defined("MU_ITEM_SCORE_EXPECTED_SLOT")) define("MU_ITEM_SCORE_EXPECTED_SLOT", 4);
+if (!defined("MU_ITEM_SCORE_KNOWN_NAME")) define("MU_ITEM_SCORE_KNOWN_NAME", 2);
+if (!defined("MU_ITEM_SCORE_HAS_IMAGE")) define("MU_ITEM_SCORE_HAS_IMAGE", 1);
 
 /** ---- escaping ---- */
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, "UTF-8"); }
@@ -340,7 +346,7 @@ function mu_decode_item_candidates($bytes)
 {
     $b0 = ord($bytes[0]);
     $b9 = ord($bytes[9]);
-    $item_type  = ($b0 >> 5) + (($b9 & 0x80) ? 8 : 0);
+    $item_type  = ($b0 >> 5) + (($b9 & 0x80) ? MU_ITEM_TYPE_HIGH_BIT_OFFSET : 0);
     $item_index = $b0 & 0x1F;
     return [
         ["group" => $item_type, "code" => $item_index],
@@ -367,9 +373,9 @@ function mu_choose_item_identity($bytes, $slot, $level)
         $name  = mu_item_name($group, $code);
         $image = mu_item_image($group, $code, $level);
         $score = 0;
-        if ($expected && in_array($group, $expected, true)) $score += 4;
-        if ($name !== "Unknown") $score += 2;
-        if ($image !== "") $score += 1;
+        if ($expected && in_array($group, $expected, true)) $score += MU_ITEM_SCORE_EXPECTED_SLOT;
+        if ($name !== "Unknown") $score += MU_ITEM_SCORE_KNOWN_NAME;
+        if ($image !== "") $score += MU_ITEM_SCORE_HAS_IMAGE;
         if ($score > $best_score) {
             $best_score = $score;
             $best = ["group" => $group, "code" => $code, "name" => $name, "image" => $image];
@@ -383,14 +389,13 @@ function mu_inventory_bytes($blob)
     if ($blob === null || $blob === "" || !is_string($blob)) return "";
     $trimmed = trim($blob);
     if (stripos($trimmed, "0x") === 0) $trimmed = substr($trimmed, 2);
-    $has_hex_formatting = preg_match('/\s/', $trimmed) === 1 || stripos(trim($blob), "0x") === 0;
+    $has_hex_formatting = preg_match('/\s/', $trimmed) === 1 || stripos($trimmed, "0x") === 0;
     $compact = preg_replace('/\s+/', '', $trimmed);
     if ($has_hex_formatting && mu_is_hex_inventory($compact, 24)) {
         $packed = @hex2bin($compact);
         if ($packed !== false) return $packed;
     }
-    // 288 = 12 equipped slots × 12 bytes per item × 2 hex characters per byte.
-    if (mu_is_hex_inventory($compact, 288)) {
+    if (mu_is_hex_inventory($compact, MU_EQUIPPED_SLOTS * MU_ITEM_BYTES * 2)) {
         $packed = @hex2bin($compact);
         if ($packed !== false) return $packed;
     }
@@ -419,7 +424,7 @@ function mu_inventory_bytes($blob)
  */
 function mu_parse_equipped_inventory($blob)
 {
-    $slots = array_fill(0, 12, [
+    $slots = array_fill(0, MU_EQUIPPED_SLOTS, [
         "empty" => true, "group" => 0, "code" => 0, "level" => 0,
         "skill" => false, "luck" => false, "opt" => 0, "exc" => 0,
         "raw" => "", "name" => "Empty", "image" => "",
@@ -429,9 +434,8 @@ function mu_parse_equipped_inventory($blob)
         return $slots;
     }
     $len = strlen($blob);
-    // Each item slot occupies 12 bytes; equipped block = 144 bytes minimum.
-    $slot_size = 12;
-    for ($i = 0; $i < 12; $i++) {
+    $slot_size = MU_ITEM_BYTES;
+    for ($i = 0; $i < MU_EQUIPPED_SLOTS; $i++) {
         $off = $i * $slot_size;
         if ($off + $slot_size > $len) break;
         $bytes = substr($blob, $off, $slot_size);
