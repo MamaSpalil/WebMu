@@ -5,7 +5,7 @@
 // map_number, map_x, map_y, pk_count, pk_level, class (label/slug),
 // class_code, guild, online, equipped[12], has_inventory.
 $is_dl = (($class_code >> 4) & 0x0F) === 0x4;
-$slots = mu_equip_slots();
+$layout = mu_equipment_layout();
 $map_name = $map_number !== null ? mu_map($map_number) : null;
 ?>
 <style>
@@ -30,16 +30,22 @@ $map_name = $map_number !== null ? mu_map($map_number) : null;
     .stat-grid .kv .v { color:var(--gold-light); font-weight:700; }
 
     .equip-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
-        gap:8px; margin-top:6px; }
-    .equip-cell { padding:10px 12px; min-height:64px;
-        background:rgba(14,9,3,0.55); border:1px solid var(--border-gold); border-radius:3px;
-        display:flex; flex-direction:column; justify-content:center; gap:3px; }
-    .equip-cell.empty { opacity:.45; }
-    .equip-cell .slot { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:#c8b890; }
-    .equip-cell .item { font-size:13.5px; color:var(--gold-light); font-weight:600; word-break:break-word; }
-    .equip-cell .item small { display:block; color:#a0916a; font-weight:400; font-size:11px; margin-top:2px; }
-    .equip-cell .badges { display:flex; flex-wrap:wrap; gap:4px; margin-top:3px; }
-    .equip-cell .badges span { font-size:10px; letter-spacing:1.5px; padding:1px 6px;
+        gap:16px 18px; margin-top:10px; }
+    .equip-cell { min-height:116px; display:flex; flex-direction:column; align-items:center; gap:7px;
+        text-align:center; position:relative; }
+    .equip-cell.empty { opacity:.62; }
+    .equip-cell .slot-box { width:78px; height:78px; border-radius:5px;
+        background:rgba(34,48,65,.78); border:1px solid rgba(140,160,184,.28);
+        display:flex; align-items:center; justify-content:center; position:relative;
+        overflow:visible; box-shadow:inset 0 0 0 1px rgba(255,255,255,.03); }
+    .equip-cell .slot-box img { max-width:70px; max-height:70px; object-fit:contain; }
+    .equip-cell .slot-box .lvl { position:absolute; top:-10px; right:-10px;
+        padding:2px 6px; border-radius:4px; background:#ff4d55; color:#fff;
+        font-size:13px; line-height:1.2; font-weight:800; letter-spacing:.4px; }
+    .equip-cell .item { font-size:13.5px; color:#d8deeb; font-weight:500; word-break:break-word; }
+    .equip-cell .item small { display:block; color:#8e98aa; font-weight:400; font-size:11px; margin-top:2px; }
+    .equip-cell .badges { display:flex; flex-wrap:wrap; justify-content:center; gap:4px; }
+    .equip-cell .badges span { font-size:9.5px; letter-spacing:1.2px; padding:1px 5px;
         border:1px solid var(--gold-dark); border-radius:2px; color:var(--gold); }
 </style>
 
@@ -114,22 +120,25 @@ $map_name = $map_number !== null ? mu_map($map_number) : null;
                 <p class="text-mute">Inventory column is not available in this database.</p>
             <?php else: ?>
             <div class="equip-grid">
-                <?php foreach ($slots as $idx => $label):
-                    $s = $equipped[$idx] ?? ["empty" => true]; ?>
+                <?php foreach ($layout as $cell):
+                    $idx = (int)$cell["slot"];
+                    $s = $equipped[$idx] ?? ["empty" => true, "name" => "Empty", "image" => ""];
+                    $image = (string)($s["image"] ?? "");
+                    if (!preg_match('~^[A-Za-z0-9_.-]+\.gif$~', $image)) $image = "";
+                    ?>
                     <div class="equip-cell<?= empty($s["empty"]) ? "" : " empty" ?>">
-                        <span class="slot"><?= h($label) ?></span>
+                        <div class="slot-box" title="<?= h($cell["label"]) ?>">
                         <?php if (empty($s["empty"])): ?>
-                            <span class="item">
-                                <?php
-                                $disp = "Item " . (int)$s["group"] . "/" . (int)$s["code"];
-                                if (!empty($s["level"])) $disp .= " +" . (int)$s["level"];
-                                if (!empty($s["opt"]))   $disp .= " +" . ((int)$s["opt"] * 4);
-                                echo h($disp);
-                                ?>
-                                <?php if (!empty($s["raw"])): ?>
-                                    <small><?= h($s["raw"]) ?></small>
-                                <?php endif; ?>
-                            </span>
+                            <?php if ($image !== ""): ?>
+                                <img src="assets/images/items/<?= h($image) ?>" alt="<?= h($s["name"] ?? "Unknown") ?>">
+                            <?php endif; ?>
+                            <?php if (!empty($s["level"])): ?>
+                                <span class="lvl">+<?= (int)$s["level"] ?></span>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                        </div>
+                        <?php if (empty($s["empty"])): ?>
+                            <span class="item"><?= h($s["name"] ?? "Unknown") ?></span>
                             <?php if (!empty($s["skill"]) || !empty($s["luck"]) || !empty($s["exc"])): ?>
                             <div class="badges">
                                 <?php if (!empty($s["skill"])): ?><span>Skill</span><?php endif; ?>
@@ -138,7 +147,7 @@ $map_name = $map_number !== null ? mu_map($map_number) : null;
                             </div>
                             <?php endif; ?>
                         <?php else: ?>
-                            <span class="item text-mute">— empty —</span>
+                            <span class="item text-mute">Empty</span>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
