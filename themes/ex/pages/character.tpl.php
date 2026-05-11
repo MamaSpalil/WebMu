@@ -129,7 +129,9 @@ $map_name = $map_number !== null ? mu_map($map_number) : null;
                             <?php if (!empty($s["image"])): ?>
                                 <img src="assets/images/items/<?= h($s["image"]) ?>" alt="<?= h($s["name"] ?? "Unknown") ?>">
                             <?php endif; ?>
-                            <?php if (!empty($s["level"])): ?><span class="lvl">+<?= (int)$s["level"] ?></span><?php endif; ?>
+                            <?php if (!empty($s["level"])): ?>
+                                <span class="lvl">+<?= (int)$s["level"] ?></span>
+                            <?php endif; ?>
                         <?php endif; ?>
                         </div>
                         <?php if (empty($s["empty"])): ?>

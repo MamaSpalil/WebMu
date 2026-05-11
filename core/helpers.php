@@ -300,11 +300,14 @@ function mu_item_image($group, $code, $level = 0)
     $group = (int)$group;
     $code  = (int)$code;
     $level = max(0, (int)$level);
-    $bucket = $level >= 10 ? 10 : 0;
+    // The bundled item sprites mostly use level bucket 0 or 10 for glowing gear.
+    $fallback_level = $level >= 10 ? 10 : 0;
     $dir = dirname(__DIR__) . "/assets/images/items";
+    // Keep the client filename convention: <ItemType><ItemIndex><level>.gif
+    // (for example item 12/1 at +0 uses 1210.gif: Wings of Heaven).
     $candidates = array_unique([
         $group . $code . $level . ".gif",
-        $group . $code . $bucket . ".gif",
+        $group . $code . $fallback_level . ".gif",
         $group . $code . "0.gif",
     ]);
     foreach ($candidates as $file) {
@@ -340,6 +343,7 @@ function mu_decode_item_candidates($bytes)
     $old_code  = $b0 & 0x1F;
     return [
         ["group" => $old_group, "code" => $old_code],
+        // Alternate emulator layout: byte 9 stores the group nibble and code high bit.
         ["group" => ($b9 >> 4) & 0x0F, "code" => $b0 | ((($b9 >> 7) & 0x01) << 8)],
         ["group" => ($b9 >> 4) & 0x0F, "code" => $b0 & 0x1F],
     ];
@@ -373,11 +377,13 @@ function mu_inventory_bytes($blob)
     $trimmed = trim($blob);
     if (stripos($trimmed, "0x") === 0) $trimmed = substr($trimmed, 2);
     $compact = preg_replace('/\s+/', '', $trimmed);
+    $looks_formatted_hex = strlen($compact) !== strlen($blob);
     if ($compact !== "" && (strlen($compact) % 2) === 0 && ctype_xdigit($compact)
-        && strlen($compact) >= 24 && strlen($compact) !== strlen($blob)) {
+        && strlen($compact) >= 24 && $looks_formatted_hex) {
         $packed = @hex2bin($compact);
         if ($packed !== false) return $packed;
     }
+    // 288 = 12 equipped slots × 12 bytes per item × 2 hex characters per byte.
     if ($compact !== "" && (strlen($compact) % 2) === 0 && ctype_xdigit($compact)
         && strlen($compact) >= 288) {
         $packed = @hex2bin($compact);
