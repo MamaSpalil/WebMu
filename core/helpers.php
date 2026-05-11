@@ -347,6 +347,9 @@ function mu_slot_expected_groups($slot)
 
 function mu_decode_item_candidates($bytes)
 {
+    if (!is_string($bytes) || strlen($bytes) < 10) {
+        return [];
+    }
     $b0 = ord($bytes[0]);
     $b9 = ord($bytes[9]);
     $item_type  = ($b0 >> 5) + (($b9 & 0x80) ? MU_ITEM_TYPE_HIGH_BIT_OFFSET : 0);
@@ -395,7 +398,7 @@ function mu_inventory_bytes($blob)
     $trimmed = trim($blob);
     $has_hex_prefix = stripos($trimmed, "0x") === 0;
     if ($has_hex_prefix) $trimmed = substr($trimmed, 2);
-    $has_hex_formatting = $has_hex_prefix || preg_match('/\s/', $trimmed) === 1;
+    $has_hex_formatting = $has_hex_prefix || preg_match('/\s/', $trimmed) > 0;
     $compact = preg_replace('/\s+/', '', $trimmed);
     if ($has_hex_formatting && mu_is_hex_inventory($compact, MU_HEX_FORMATTED_MIN_CHARS)) {
         $packed = @hex2bin($compact);
