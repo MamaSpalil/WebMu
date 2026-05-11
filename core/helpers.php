@@ -413,6 +413,38 @@ function mu_slot_expected_groups($slot)
     return $map[(int)$slot] ?? [];
 }
 
+function mu_slot_allowed_codes($slot, $group)
+{
+    $slot = (int)$slot;
+    $group = (int)$group;
+    if ($slot === 7 && $group === 12) {
+        return [0, 1, 2, 3, 4, 5, 6, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
+    }
+    if ($group !== 13) {
+        return null;
+    }
+    if ($slot === 8) {
+        return [0, 1, 2, 3, 4, 5, 37];
+    }
+    if ($slot === 9) {
+        return [12, 13, 25, 26, 27, 28];
+    }
+    if ($slot === 10 || $slot === 11) {
+        return [8, 9, 10, 20, 21, 22, 23, 24, 38, 39, 40, 41, 42];
+    }
+    return null;
+}
+
+function mu_slot_allows_identity($slot, $group, $code)
+{
+    $expected = mu_slot_expected_groups($slot);
+    if ($expected && !in_array((int)$group, $expected, true)) {
+        return false;
+    }
+    $allowed_codes = mu_slot_allowed_codes($slot, $group);
+    return $allowed_codes === null || in_array((int)$code, $allowed_codes, true);
+}
+
 function mu_decode_item_candidates($bytes)
 {
     if (!is_string($bytes) || strlen($bytes) < 10) {
@@ -437,6 +469,28 @@ function mu_decode_item_candidates($bytes)
     ];
 }
 
+function mu_decode_slot_item_candidates($bytes, $slot)
+{
+    if (!is_string($bytes) || strlen($bytes) < 10) {
+        return [];
+    }
+    $candidates = mu_decode_item_candidates($bytes);
+    $b0 = ord($bytes[0]);
+    $b9 = ord($bytes[9]);
+    $item_index = $b0 & 0x1F;
+    $code_candidates = array_unique([
+        $b0,
+        $item_index + (($b9 & 0x40) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0),
+        $item_index,
+    ]);
+    foreach (mu_slot_expected_groups($slot) as $group) {
+        foreach ($code_candidates as $code) {
+            $candidates[] = ["group" => $group, "code" => $code];
+        }
+    }
+    return $candidates;
+}
+
 function mu_is_hex_inventory($value, $min_chars)
 {
     return $value !== "" && (strlen($value) % 2) === 0
@@ -448,9 +502,10 @@ function mu_choose_item_identity($bytes, $slot, $level)
     $expected = mu_slot_expected_groups($slot);
     $best = null;
     $best_score = -1;
-    foreach (mu_decode_item_candidates($bytes) as $candidate) {
+    foreach (mu_decode_slot_item_candidates($bytes, $slot) as $candidate) {
         $group = (int)$candidate["group"];
         $code  = (int)$candidate["code"];
+        if (!mu_slot_allows_identity($slot, $group, $code)) continue;
         $name  = mu_item_name($group, $code);
         $image = mu_item_image($group, $code, $level);
         $score = 0;
