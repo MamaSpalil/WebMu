@@ -25,6 +25,7 @@ if ($data === null) {
     // Optional Character columns — only select what actually exists so we
     // never crash on stock Season 3 backups that lack some of them.
     $opt_cols = [
+        "AccountID"  => "AccountID",
         "Strength"   => "Strength",
         "Dexterity"  => "Dexterity",
         "Vitality"   => "Vitality",
@@ -32,7 +33,11 @@ if ($data === null) {
         "Leadership" => "Leadership",
         "Money"      => "Money",
         "MapNumber"  => "MapNumber",
+        "MapPosX"    => "MapPosX",
+        "MapPosY"    => "MapPosY",
+        "MapDir"     => "MapDir",
         "Quest"      => "Quest",
+        "ExQuestNum" => "ExQuestNum",
         "GReset"     => "GReset",
     ];
     $extra_select = [];
