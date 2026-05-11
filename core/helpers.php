@@ -421,22 +421,25 @@ function mu_slot_allowed_codes($slot, $group)
     $group = (int)$group;
     if ($slot === 7 && $group === 12) {
         // Wings slot: 1st/2nd/3rd wings, cloaks and mantles from group 12.
-        return [0, 1, 2, 3, 4, 5, 6, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
+        return array_merge(
+            range(0, 6),   // 1st and 2nd generation wings.
+            range(36, 45)  // 3rd generation wings, cloaks and mantles.
+        );
     }
     if ($group !== 13) {
         return null;
     }
     if ($slot === 8) {
         // Pet slot: 0 Angel, 1 Imp, 2 Uniria, 3 Dinorant, 4 Horse, 5 Raven, 37 Fenrir.
-        return [0, 1, 2, 3, 4, 5, 37];
+        return [0, 1, 2, 3, 4, 5, 37]; // Guardian Angel through Dark Raven, plus Fenrir.
     }
     if ($slot === 9) {
         // Pendant slot: lightning/fire/ice/wind/water/ability pendants.
-        return [12, 13, 25, 26, 27, 28];
+        return [12, 13, 25, 26, 27, 28]; // Lightning, Fire, Ice, Wind, Water, Ability.
     }
     if ($slot === 10 || $slot === 11) {
         // Ring slots: ice/poison and elemental/transformation event rings.
-        return [8, 9, 10, 20, 21, 22, 23, 24, 38, 39, 40, 41, 42];
+        return [8, 9, 10, 20, 21, 22, 23, 24, 38, 39, 40, 41, 42]; // Ice/Poison/transform rings.
     }
     // Null means no item-code restriction is configured for this slot/group;
     // group-level validation still happens in mu_slot_allows_identity().
@@ -451,7 +454,7 @@ function mu_slot_allowed_codes($slot, $group)
  * @param int $slot Equipped slot index from Character.Inventory.
  * @param int $group MU item group/type.
  * @param int $code MU item code/index within the group.
- * @param int[]|null $expected Allowed groups for the slot, or null to load them.
+ * @param int[]|null $expected Allowed groups for the slot (computed via mu_slot_expected_groups() if null).
  */
 function mu_slot_allows_identity($slot, $group, $code, $expected = null)
 {
