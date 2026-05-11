@@ -172,6 +172,7 @@ function mu_item_catalog()
     static $catalog = null;
     if ($catalog !== null) return $catalog;
 
+    // Armor sets occupy ItemType 7-11 in MuOnline: helm, armor, pants, gloves, boots.
     $sets = [
         7  => "Helm",
         8  => "Armor",
@@ -289,16 +290,16 @@ function mu_item_catalog()
     return $catalog;
 }
 
-function mu_item_name($group, $code)
+function mu_item_name($item_type, $item_index)
 {
     $catalog = mu_item_catalog();
-    return $catalog[(int)$group][(int)$code] ?? "Unknown";
+    return $catalog[(int)$item_type][(int)$item_index] ?? "Unknown";
 }
 
-function mu_item_image($group, $code, $level = 0)
+function mu_item_image($item_type, $item_index, $level = 0)
 {
-    $group = (int)$group;
-    $code  = (int)$code;
+    $item_type  = (int)$item_type;
+    $item_index = (int)$item_index;
     $level = max(0, (int)$level);
     // The bundled item sprites mostly use level bucket 0 or 10 for glowing gear.
     $fallback_level = $level >= 10 ? 10 : 0;
@@ -306,9 +307,9 @@ function mu_item_image($group, $code, $level = 0)
     // Keep the client filename convention: <ItemType><ItemIndex><level>.gif
     // (for example item 12/1 at +0 uses 1210.gif: Wings of Heaven).
     $candidates = array_unique([
-        $group . $code . $level . ".gif",
-        $group . $code . $fallback_level . ".gif",
-        $group . $code . "0.gif",
+        $item_type . $item_index . $level . ".gif",
+        $item_type . $item_index . $fallback_level . ".gif",
+        $item_type . $item_index . "0.gif",
     ]);
     foreach ($candidates as $file) {
         if (is_file($dir . "/" . $file)) return $file;
@@ -339,14 +340,20 @@ function mu_decode_item_candidates($bytes)
 {
     $b0 = ord($bytes[0]);
     $b9 = ord($bytes[9]);
-    $old_group = ($b0 >> 5) + (($b9 & 0x80) ? 8 : 0);
-    $old_code  = $b0 & 0x1F;
+    $item_type  = ($b0 >> 5) + (($b9 & 0x80) ? 8 : 0);
+    $item_index = $b0 & 0x1F;
     return [
-        ["group" => $old_group, "code" => $old_code],
+        ["group" => $item_type, "code" => $item_index],
         // Alternate emulator layout: byte 9 stores the group nibble and code high bit.
         ["group" => ($b9 >> 4) & 0x0F, "code" => $b0 | ((($b9 >> 7) & 0x01) << 8)],
         ["group" => ($b9 >> 4) & 0x0F, "code" => $b0 & 0x1F],
     ];
+}
+
+function mu_is_hex_inventory($value, $min_chars)
+{
+    return $value !== "" && (strlen($value) % 2) === 0
+        && strlen($value) >= $min_chars && ctype_xdigit($value);
 }
 
 function mu_choose_item_identity($bytes, $slot, $level)
@@ -376,16 +383,14 @@ function mu_inventory_bytes($blob)
     if ($blob === null || $blob === "" || !is_string($blob)) return "";
     $trimmed = trim($blob);
     if (stripos($trimmed, "0x") === 0) $trimmed = substr($trimmed, 2);
+    $has_hex_formatting = preg_match('/\s/', $trimmed) === 1 || stripos(trim($blob), "0x") === 0;
     $compact = preg_replace('/\s+/', '', $trimmed);
-    $looks_formatted_hex = strlen($compact) !== strlen($blob);
-    if ($compact !== "" && (strlen($compact) % 2) === 0 && ctype_xdigit($compact)
-        && strlen($compact) >= 24 && $looks_formatted_hex) {
+    if ($has_hex_formatting && mu_is_hex_inventory($compact, 24)) {
         $packed = @hex2bin($compact);
         if ($packed !== false) return $packed;
     }
     // 288 = 12 equipped slots × 12 bytes per item × 2 hex characters per byte.
-    if ($compact !== "" && (strlen($compact) % 2) === 0 && ctype_xdigit($compact)
-        && strlen($compact) >= 288) {
+    if (mu_is_hex_inventory($compact, 288)) {
         $packed = @hex2bin($compact);
         if ($packed !== false) return $packed;
     }
