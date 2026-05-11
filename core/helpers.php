@@ -414,7 +414,7 @@ function mu_decode_item_candidates($bytes)
         ["group" => $item_type, "code" => $extended_item_index],
         // Legacy Season 3 layout without the extended ItemIndex bit.
         ["group" => $item_type, "code" => $item_index],
-        // Alternate emulator layout: byte 9 stores ItemType in its high nibble and byte 0 stores ItemIndex.
+        // Alternate emulator layout: byte 9 stores ItemType in its high nibble and byte 0 stores the full 8-bit ItemIndex.
         ["group" => ($b9 >> 4) & 0x0F, "code" => $b0],
         // Same alternate layout, but capped to 5-bit ItemIndex used by older item lists.
         ["group" => ($b9 >> 4) & 0x0F, "code" => $b0 & 0x1F],
