@@ -218,8 +218,7 @@ function mu_item_catalog()
         1 => [
             0 => "Small Axe", 1 => "Hand Axe", 2 => "Double Axe", 3 => "Tomahawk",
             4 => "Elven Axe", 5 => "Battle Axe", 6 => "Nikea Axe", 7 => "Larkan Axe",
-            8 => "Crescent Axe", 9 => "Bill of Balrog", 10 => "Chaos Dragon Axe",
-            11 => "Bloodangel Axe",
+            8 => "Crescent Axe", 9 => "Bill of Balrog", 11 => "Bloodangel Axe",
         ],
         2 => [
             0 => "Mace", 1 => "Morning Star", 2 => "Flail", 3 => "Great Hammer",
@@ -336,7 +335,7 @@ function mu_item_catalog()
             9 => "Scroll of Hellfire", 10 => "Scroll of Power Wave", 11 => "Scroll of Aqua Beam",
             12 => "Scroll of Cometfall", 13 => "Scroll of Inferno", 14 => "Scroll of Teleport Ally",
             15 => "Scroll of Soul Barrier", 16 => "Scroll of Decay", 17 => "Scroll of Ice Storm",
-            18 => "Scroll of Nova", 19 => "Scroll of Wizardry Enhance", 20 => "Scroll of Wizardry Enhance",
+            18 => "Scroll of Nova", 19 => "Scroll of Wizardry Enhance", 20 => "Scroll of Gigantic Storm",
             21 => "Scroll of Sleep", 22 => "Scroll of Chain Lightning", 23 => "Scroll of Drain Life",
             24 => "Scroll of Lightning Shock", 26 => "Scroll of Weakness", 27 => "Scroll of Innovation",
             28 => "Scroll of Berserker", 29 => "Scroll of Expansion of Wizardry",
