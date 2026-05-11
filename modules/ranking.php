@@ -78,8 +78,14 @@ if ($data === null) {
     $has_greset = isset($extra_select["GReset"]);
     $players_order = ($has_greset ? "GReset DESC, " : "")
                    . "c.$char_resets DESC, c.$char_level DESC, MasterLevel DESC";
+    // NOTE: alias `c.Name` as `CharName` (not `Name`) — see character.php for
+    // the full rationale. With a `LEFT JOIN GuildMember gm` (which also has a
+    // `Name` column), aliasing as `Name` makes the ODBC SQL Server driver
+    // raise "Ambiguous column name 'Name'" during SQLGetData under
+    // SQL_CUR_USE_ODBC. We remap CharName → Name in PHP after fetch so the
+    // template/templating code is unaffected.
     $players = db_all(
-        "SELECT TOP 100 c.$char_name AS Name, c.$char_level AS cLevel,
+        "SELECT TOP 100 c.$char_name AS [CharName], c.$char_level AS cLevel,
                 c.$char_resets AS Resets, $char_master AS MasterLevel,
                 c.$char_class AS Class, gm.$gm_guild_name AS G_Name $extra_sql
          FROM $char_t c
@@ -88,22 +94,37 @@ if ($data === null) {
                = c.$char_name      COLLATE DATABASE_DEFAULT
          ORDER BY $players_order"
     );
-    foreach ($players as &$p) { $p["class_h"] = mu_class($p["Class"] ?? 0); }
+    foreach ($players as &$p) {
+        // CharName is always selected, but use the same guarded pattern as
+        // the `online` loop below for consistency. NULLs are preserved so
+        // the template's isset()/empty() checks behave like before.
+        if (array_key_exists("CharName", $p)) {
+            $p["Name"] = $p["CharName"];
+        }
+        $p["class_h"] = mu_class($p["Class"] ?? 0);
+    }
     unset($p);
 
+    // Guilds top: we use a derived subquery for the member count instead of
+    // GROUP BY on the outer Guild row. The reason is that the Guild table on
+    // stock MuOnline schemas carries `G_Mark` (image) and `G_Notice`
+    // (text/ntext/varbinary) — and image/text/ntext types cannot appear in
+    // GROUP BY, which makes `GROUP BY g.G_Name, g.G_Master, g.G_Score,
+    // g.G_Mark, g.G_Notice` fail with a SELECT/GROUP BY error. Pre-aggregating
+    // GuildMember by G_Name in a derived table sidesteps the limitation.
     $guilds = db_all(
         "SELECT TOP 50 g.$guild_name AS G_Name, g.$guild_master AS G_Master,
-                COUNT(gm.$gm_char_name) AS members,
-                ISNULL(g.$guild_score,0) AS total_resets $guild_extra_sql
+                ISNULL(gm_count.members, 0) AS members,
+                ISNULL(g.$guild_score, 0) AS total_resets $guild_extra_sql
          FROM $guild_t g
-         LEFT JOIN $guild_member_t gm
-              ON gm.$gm_guild_name COLLATE DATABASE_DEFAULT
-               = g.$guild_name      COLLATE DATABASE_DEFAULT
-         GROUP BY g.$guild_name, g.$guild_master, g.$guild_score"
-         . ($guild_extra ? ", " . implode(", ", array_map(function ($a) {
-             return "g." . db_ident($a);
-         }, array_keys($guild_extra))) : "")
-         . " ORDER BY total_resets DESC, members DESC"
+         LEFT JOIN (
+             SELECT $gm_guild_name AS G_Name, COUNT(*) AS members
+             FROM $guild_member_t
+             GROUP BY $gm_guild_name
+         ) gm_count
+              ON gm_count.G_Name COLLATE DATABASE_DEFAULT
+               = g.$guild_name   COLLATE DATABASE_DEFAULT
+         ORDER BY total_resets DESC, members DESC"
     );
 
     $kills = db_all(
@@ -117,9 +138,10 @@ if ($data === null) {
     unset($k);
 
     // Online list — also COLLATE-safe and pulls MapNumber if available.
+    // Same `Name` → `CharName` aliasing as the players query above.
     $online_map_sql = isset($extra_select["MapNumber"]) ? ", " . $extra_select["MapNumber"] : "";
     $online = db_all(
-        "SELECT TOP 100 ms.$stat_account AS memb___id, c.$char_name AS Name,
+        "SELECT TOP 100 ms.$stat_account AS memb___id, c.$char_name AS [CharName],
                 c.$char_level AS cLevel, c.$char_resets AS Resets,
                 c.$char_class AS Class $online_map_sql
          FROM $stat_t ms
@@ -130,6 +152,9 @@ if ($data === null) {
          ORDER BY c.$char_resets DESC, c.$char_level DESC"
     );
     foreach ($online as &$o) {
+        if (array_key_exists("CharName", $o)) {
+            $o["Name"] = $o["CharName"];
+        }
         $o["class_h"] = mu_class($o["Class"] ?? 0);
         $o["map_h"]   = isset($o["MapNumber"]) ? mu_map($o["MapNumber"]) : null;
     }
