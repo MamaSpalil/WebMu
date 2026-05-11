@@ -24,6 +24,12 @@ if ($data === null) {
 
     // Optional Character columns — only select what actually exists so we
     // never crash on stock Season 3 backups that lack some of them.
+    // The grand-reset column is configurable: many custom Season 3 schemas
+    // (including the reference top100 we mirror) call it `gr_res`, while
+    // stock MuOnline uses `GReset`. We always alias the result back to
+    // `GReset` so the template/PHP code can stay schema-agnostic.
+    $greset_col = trim((string)($config["char_greset_col"] ?? "gr_res"));
+    if ($greset_col === "") $greset_col = "gr_res";
     $opt_cols = [
         "AccountID"  => "AccountID",
         "Strength"   => "Strength",
@@ -38,7 +44,7 @@ if ($data === null) {
         "MapDir"     => "MapDir",
         "Quest"      => "Quest",
         "ExQuestNum" => "ExQuestNum",
-        "GReset"     => "GReset",
+        "GReset"     => $greset_col,
     ];
     $extra_select = [];
     foreach ($opt_cols as $alias => $col) {
@@ -46,7 +52,27 @@ if ($data === null) {
             $extra_select[$alias] = "c." . db_ident($col) . " AS " . db_ident($alias);
         }
     }
+    // Stock MuOnline fallback: if the configured greset column is missing
+    // but the canonical `GReset` exists, use it instead.
+    if (!isset($extra_select["GReset"]) && $greset_col !== "GReset"
+        && db_column_exists($char_t_raw, "GReset")) {
+        $extra_select["GReset"] = "c." . db_ident("GReset") . " AS " . db_ident("GReset");
+    }
     $extra_sql = $extra_select ? ", " . implode(", ", $extra_select) : "";
+
+    // Banned/hidden-GM filter — mirrors the reference top100 which excludes
+    // CtlCode = 1 (blocked) and CtlCode = 17 (hidden GM). Guarded by
+    // db_column_exists so schemas without CtlCode are unaffected.
+    $ctl_col = trim((string)($config["char_ctl_col"] ?? "CtlCode"));
+    $ctl_filter_sql = "";
+    if ($ctl_col !== "" && db_column_exists($char_t_raw, $ctl_col)) {
+        $ctl_filter_sql = " AND c." . db_ident($ctl_col) . " NOT IN (1, 17)";
+    }
+    // Same filter without the `c.` qualifier, for un-aliased queries (kills).
+    $ctl_filter_sql_unqual = "";
+    if ($ctl_col !== "" && db_column_exists($char_t_raw, $ctl_col)) {
+        $ctl_filter_sql_unqual = " AND " . db_ident($ctl_col) . " NOT IN (1, 17)";
+    }
 
     $guild_t      = db_ident($config["guild_table"] ?? "Guild", "Guild");
     $guild_t_raw  = $config["guild_table"] ?? "Guild";
@@ -92,6 +118,7 @@ if ($data === null) {
          LEFT JOIN $guild_member_t gm
               ON gm.$gm_char_name COLLATE DATABASE_DEFAULT
                = c.$char_name      COLLATE DATABASE_DEFAULT
+         WHERE 1=1$ctl_filter_sql
          ORDER BY $players_order"
     );
     foreach ($players as &$p) {
@@ -131,7 +158,7 @@ if ($data === null) {
         "SELECT TOP 25 $char_name AS Name, $char_level AS cLevel, $char_class AS Class,
                 $char_pk_count AS PkCount, $char_pk_level AS PkLevel
          FROM $char_t
-         WHERE $char_pk_count > 0
+         WHERE $char_pk_count > 0$ctl_filter_sql_unqual
          ORDER BY $char_pk_count DESC"
     );
     foreach ($kills as &$k) { $k["class_h"] = mu_class($k["Class"] ?? 0); }
@@ -139,18 +166,48 @@ if ($data === null) {
 
     // Online list — also COLLATE-safe and pulls MapNumber if available.
     // Same `Name` → `CharName` aliasing as the players query above.
+    //
+    // When the optional AccountCharacter table exists (custom servers, incl.
+    // the reference top100 schema), join through it so we surface the *one*
+    // currently-connected character per account (AccountCharacter.GameIDC)
+    // instead of every character that account owns. Falls back gracefully
+    // to the AccountID-only join on stock backups that don't have it.
     $online_map_sql = isset($extra_select["MapNumber"]) ? ", " . $extra_select["MapNumber"] : "";
-    $online = db_all(
-        "SELECT TOP 100 ms.$stat_account AS memb___id, c.$char_name AS [CharName],
-                c.$char_level AS cLevel, c.$char_resets AS Resets,
-                c.$char_class AS Class $online_map_sql
-         FROM $stat_t ms
-         LEFT JOIN $char_t c
-              ON c.$char_account COLLATE DATABASE_DEFAULT
-               = ms.$stat_account COLLATE DATABASE_DEFAULT
-         WHERE ms.$stat_connect = 1
-         ORDER BY c.$char_resets DESC, c.$char_level DESC"
-    );
+    $ac_table_raw = trim((string)($config["account_char_table"] ?? "AccountCharacter"));
+    $use_account_char = $ac_table_raw !== "" && db_table_exists($ac_table_raw)
+        && db_column_exists($ac_table_raw, $config["account_char_acc_col"]  ?? "Id")
+        && db_column_exists($ac_table_raw, $config["account_char_name_col"] ?? "GameIDC");
+    if ($use_account_char) {
+        $ac_t       = db_ident($ac_table_raw, "AccountCharacter");
+        $ac_acc     = db_ident($config["account_char_acc_col"]  ?? "Id",      "Id");
+        $ac_name    = db_ident($config["account_char_name_col"] ?? "GameIDC", "GameIDC");
+        $online = db_all(
+            "SELECT TOP 100 ms.$stat_account AS memb___id, c.$char_name AS [CharName],
+                    c.$char_level AS cLevel, c.$char_resets AS Resets,
+                    c.$char_class AS Class $online_map_sql
+             FROM $stat_t ms
+             INNER JOIN $ac_t ac
+                  ON ac.$ac_acc COLLATE DATABASE_DEFAULT
+                   = ms.$stat_account COLLATE DATABASE_DEFAULT
+             LEFT JOIN $char_t c
+                  ON c.$char_name COLLATE DATABASE_DEFAULT
+                   = ac.$ac_name  COLLATE DATABASE_DEFAULT
+             WHERE ms.$stat_connect = 1$ctl_filter_sql
+             ORDER BY c.$char_resets DESC, c.$char_level DESC"
+        );
+    } else {
+        $online = db_all(
+            "SELECT TOP 100 ms.$stat_account AS memb___id, c.$char_name AS [CharName],
+                    c.$char_level AS cLevel, c.$char_resets AS Resets,
+                    c.$char_class AS Class $online_map_sql
+             FROM $stat_t ms
+             LEFT JOIN $char_t c
+                  ON c.$char_account COLLATE DATABASE_DEFAULT
+                   = ms.$stat_account COLLATE DATABASE_DEFAULT
+             WHERE ms.$stat_connect = 1$ctl_filter_sql
+             ORDER BY c.$char_resets DESC, c.$char_level DESC"
+        );
+    }
     foreach ($online as &$o) {
         if (array_key_exists("CharName", $o)) {
             $o["Name"] = $o["CharName"];

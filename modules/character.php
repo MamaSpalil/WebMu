@@ -38,6 +38,11 @@ if ($data === null) {
     $char_pk_level = db_ident($config["char_pk_level_col"] ?? "PkLevel", "PkLevel");
 
     // Optional columns — only added to SELECT when they actually exist.
+    // Grand-reset column: many custom Season 3 schemas (incl. the reference
+    // top100 we mirror) call it `gr_res`; stock MuOnline calls it `GReset`.
+    // We always alias it back to `GReset` so downstream code stays uniform.
+    $greset_col = trim((string)($config["char_greset_col"] ?? "gr_res"));
+    if ($greset_col === "") $greset_col = "gr_res";
     $opt_cols = [
         "Strength"   => "Strength",
         "Dexterity"  => "Dexterity",
@@ -50,8 +55,14 @@ if ($data === null) {
         "MapPosY"    => "MapPosY",
         "Quest"      => "Quest",
         "Inventory"  => "Inventory",
-        "GReset"     => "GReset",
+        "GReset"     => $greset_col,
     ];
+    // Stock MuOnline fallback: if the configured greset column is missing
+    // but the canonical `GReset` exists, fall back to it.
+    if (!db_column_exists($char_t_raw, $greset_col) && $greset_col !== "GReset"
+        && db_column_exists($char_t_raw, "GReset")) {
+        $opt_cols["GReset"] = "GReset";
+    }
     $char_master_cfg = trim((string)($config["char_master_col"] ?? ""));
     if ($char_master_cfg !== "") {
         $opt_cols["MasterLevel"] = $char_master_cfg;
