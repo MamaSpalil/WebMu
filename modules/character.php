@@ -57,8 +57,13 @@ if ($data === null) {
         $opt_cols["MasterLevel"] = $char_master_cfg;
     }
 
+    // NOTE: we deliberately alias `c.Name` as `CharName` (not `Name`) because
+    // GuildMember also has a `Name` column; with some ODBC SQL Server drivers
+    // and the dynamic cursor SQL_CUR_USE_ODBC this collision triggers
+    // "Ambiguous column name 'Name'" during SQLGetData even though `c.Name`
+    // is fully qualified. We remap it back to `Name` in PHP before render.
     $select_parts = [
-        "c.$char_name      AS Name",
+        "c.$char_name      AS [CharName]",
         "c.$char_account   AS AccountID",
         "c.$char_level     AS cLevel",
         "c.$char_resets    AS Resets",
@@ -113,7 +118,7 @@ if ($data === null) {
         : array_fill(0, 12, ["empty" => true]);
 
     $data = [
-        "name"         => trim((string)$row["Name"]),
+        "name"         => trim((string)($row["CharName"] ?? "")),
         "account"      => trim((string)($row["AccountID"] ?? "")),
         "level"        => (int)($row["cLevel"] ?? 0),
         "resets"       => (int)($row["Resets"] ?? 0),
