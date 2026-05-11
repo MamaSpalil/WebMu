@@ -160,7 +160,7 @@ function mu_equip_slots()
  *   - level:   item +N level (0-15)
  *   - skill:   bool — skill option
  *   - luck:    bool — luck option
- *   - opt:     additional option amount (0-7, ×4 = +N)
+ *   - opt:     additional option amount (0-3, ×4 = +N)
  *   - exc:     excellent option bitmask
  *   - raw:     12-byte hex (for debugging)
  *
