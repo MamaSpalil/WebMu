@@ -30,6 +30,10 @@ if (in_array($m, $state_changing, true) && $_SERVER["REQUEST_METHOD"] === "POST"
     }
 }
 
+// Tag all errors logged from inside the module with the route name so the
+// header notice can tell the user which page failed to read from the DB.
+err_push_context($m, "module");
+
 switch ($m) {
     case "home":            require __DIR__ . "/modules/home.php";            break;
     case "registration":    require __DIR__ . "/modules/registration.php";    break;

@@ -29,6 +29,9 @@ return [
     "form.required"    => "Заполните все обязательные поля.",
     "db.config_example"=> "Используется opt.example.php. Скопируйте его в opt.php и укажите реальные настройки удалённой базы данных.",
     "db.connection_error" => "Нет подключения к удалённой базе данных. Проверьте настройки db_host, db_port, db_user, db_upwd, db_name и odbc_driver в файле opt.php.",
+    "errors.db_failed" => "Часть данных не удалось загрузить из базы. Подробности записаны в logs/errors.log.",
+    "errors.module_failed" => "Модуль завершился с ошибкой.",
+    "errors.details" => "Показать подробности",
 
     // registration
     "reg.title"        => "Создать аккаунт",

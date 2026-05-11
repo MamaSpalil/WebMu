@@ -166,6 +166,9 @@ function db_set_error($msg)
     }
     $config["__db_connection_error"] = (string)$msg;
     db_log($config["__db_connection_error"]);
+    if (function_exists("err_db")) {
+        err_db("connection: " . $config["__db_connection_error"]);
+    }
 }
 
 /** Return the last connection error without opening a new connection. */
@@ -196,7 +199,9 @@ function db_query($sql, array $args = [])
     }
     $stmt = @odbc_prepare($c, $sql);
     if (!$stmt) {
-        db_log("prepare failed: " . odbc_errormsg($c) . " | SQL: " . $sql);
+        $msg = odbc_errormsg($c);
+        db_log("prepare failed: " . $msg . " | SQL: " . $sql);
+        if (function_exists("err_db")) err_db("prepare failed: " . $msg, $sql, $args);
         return false;
     }
     // odbc_execute requires every bound parameter to be a string —
@@ -207,7 +212,9 @@ function db_query($sql, array $args = [])
     }
     $ok = @odbc_execute($stmt, $bound);
     if (!$ok) {
-        db_log("execute failed: " . odbc_errormsg($c) . " | SQL: " . $sql);
+        $msg = odbc_errormsg($c);
+        db_log("execute failed: " . $msg . " | SQL: " . $sql);
+        if (function_exists("err_db")) err_db("execute failed: " . $msg, $sql, $args);
         return false;
     }
     return $stmt;

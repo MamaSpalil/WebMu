@@ -84,3 +84,48 @@
         </p>
     </div>
 <?php endif; ?>
+
+<?php
+// Per-module error summary — surfaces failures that happened while a
+// module/widget was trying to read data from the database. Always shows
+// a short notice; full SQL + ODBC text only when $config["debug"] = 1.
+$__err_summary = function_exists("err_summary") ? err_summary("db") : [];
+// Filter out the global connection error already shown above.
+$__err_module_groups = [];
+foreach ($__err_summary as $__k => $__g) {
+    if (($__g["type"] ?? "") === "global") continue;
+    $__err_module_groups[$__k] = $__g;
+}
+if (!empty($__err_module_groups)):
+    $__err_all = function_exists("err_collected") ? err_collected("db") : [];
+?>
+    <div class="flash-stack">
+        <p class="note warn">
+            <?= h(lang("errors.db_failed")) ?>
+            <?php
+            $__labels = [];
+            foreach ($__err_module_groups as $__g) {
+                $__labels[] = h($__g["type"] . " " . $__g["name"]) . " (" . (int)$__g["count"] . ")";
+            }
+            ?>
+            <br><small><?= implode(", ", $__labels) ?></small>
+            <?php if (!empty($config["debug"]) && !empty($__err_all)): ?>
+                <details style="margin-top:8px">
+                    <summary><?= h(lang("errors.details")) ?></summary>
+                    <ol style="margin:6px 0 0 18px;padding:0">
+                        <?php foreach ($__err_all as $__e):
+                            if (($__e["context"]["type"] ?? "") === "global") continue; ?>
+                            <li style="margin-bottom:6px">
+                                <code><?= h(($__e["context"]["type"] ?? "") . ":" . ($__e["context"]["name"] ?? "")) ?></code>
+                                — <?= h($__e["message"] ?? "") ?>
+                                <?php if (!empty($__e["extra"]["sql"])): ?>
+                                    <br><code style="display:block;white-space:pre-wrap;word-break:break-all"><?= h($__e["extra"]["sql"]) ?></code>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ol>
+                </details>
+            <?php endif; ?>
+        </p>
+    </div>
+<?php endif; ?>

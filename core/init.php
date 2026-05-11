@@ -53,6 +53,8 @@ if (session_status() === PHP_SESSION_NONE) {
 
 // ---- core modules ------------------------------------------------------
 require $config["__core"] . "/helpers.php";
+require $config["__core"] . "/errors.php";
+err_init();
 require $config["__core"] . "/lang.php";
 require $config["__core"] . "/db.php";
 require $config["__core"] . "/auth.php";
