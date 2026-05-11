@@ -443,6 +443,11 @@ function mu_slot_allowed_codes($slot, $group)
     return null;
 }
 
+/**
+ * Return whether a decoded item identity (item group + item code) can appear
+ * in the given equipped slot. Pass $expected when it is already known to avoid
+ * recomputing the slot's allowed item groups while filtering many candidates.
+ */
 function mu_slot_allows_identity($slot, $group, $code, $expected = null)
 {
     if ($expected === null) {
@@ -455,6 +460,11 @@ function mu_slot_allows_identity($slot, $group, $code, $expected = null)
     return $allowed_codes === null || in_array((int)$code, $allowed_codes, true);
 }
 
+/**
+ * Return item-code variants used by common Season 3 inventory encodings:
+ * full = byte 0 as a complete code, extended = low 5 bits plus extension flag,
+ * base = low 5-bit item code without the extension flag.
+ */
 function mu_item_code_variants($bytes)
 {
     $b0 = ord($bytes[0]);
@@ -518,7 +528,7 @@ function mu_decode_slot_item_candidates($bytes, $slot)
         if (!mu_slot_allows_identity($slot, $group, $code, $expected)) {
             continue;
         }
-        $key = ($group * 1000) + $code;
+        $key = $group . "_" . $code;
         if (isset($seen[$key])) {
             continue;
         }
