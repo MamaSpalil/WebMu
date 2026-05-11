@@ -427,7 +427,7 @@ function mu_slot_allowed_codes($slot, $group)
         return null;
     }
     if ($slot === 8) {
-        // Pet slot: Guardian Angel, Imp, Uniria, Dinorant, Dark Horse/Raven, Fenrir.
+        // Pet slot: 0 Angel, 1 Imp, 2 Uniria, 3 Dinorant, 4 Horse, 5 Raven, 37 Fenrir.
         return [0, 1, 2, 3, 4, 5, 37];
     }
     if ($slot === 9) {
@@ -455,6 +455,18 @@ function mu_slot_allows_identity($slot, $group, $code, $expected = null)
     return $allowed_codes === null || in_array((int)$code, $allowed_codes, true);
 }
 
+function mu_item_code_variants($bytes)
+{
+    $b0 = ord($bytes[0]);
+    $b9 = ord($bytes[9]);
+    $item_index = $b0 & 0x1F;
+    return [
+        "full" => $b0,
+        "extended" => $item_index + (($b9 & MU_EXTENDED_ITEM_INDEX_FLAG) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0),
+        "base" => $item_index,
+    ];
+}
+
 function mu_decode_item_candidates($bytes)
 {
     if (!is_string($bytes) || strlen($bytes) < 10) {
@@ -462,20 +474,19 @@ function mu_decode_item_candidates($bytes)
     }
     $b0 = ord($bytes[0]);
     $b9 = ord($bytes[9]);
+    $code_variants = mu_item_code_variants($bytes);
     $item_type  = ($b0 >> 5) + (($b9 & MU_ITEM_TYPE_HIGH_BIT_FLAG) ? MU_ITEM_TYPE_HIGH_BIT_OFFSET : 0);
-    $item_index = $b0 & 0x1F;
-    $extended_item_index = $item_index + (($b9 & MU_EXTENDED_ITEM_INDEX_FLAG) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0);
     return [
         // Common Season 3 layout: ItemType comes from byte 0 high bits + byte 9 high flag;
         // bit 6 of byte 9 extends ItemIndex by +32 on newer item lists.
-        ["group" => $item_type, "code" => $extended_item_index],
+        ["group" => $item_type, "code" => $code_variants["extended"]],
         // Legacy Season 3 layout without the extended ItemIndex bit.
-        ["group" => $item_type, "code" => $item_index],
+        ["group" => $item_type, "code" => $code_variants["base"]],
         // Alternate emulator layout: byte 9 stores ItemType in its high nibble and byte 0 stores the full 8-bit ItemIndex.
         // Do not add byte 9 bit 7 to ItemIndex here: in this format it is part of ItemType.
-        ["group" => ($b9 >> 4) & 0x0F, "code" => $b0],
+        ["group" => ($b9 >> 4) & 0x0F, "code" => $code_variants["full"]],
         // Same alternate layout, but capped to 5-bit ItemIndex used by older item lists.
-        ["group" => ($b9 >> 4) & 0x0F, "code" => $b0 & 0x1F],
+        ["group" => ($b9 >> 4) & 0x0F, "code" => $code_variants["base"]],
     ];
 }
 
@@ -485,16 +496,14 @@ function mu_decode_slot_item_candidates($bytes, $slot)
         return [];
     }
     $candidates = mu_decode_item_candidates($bytes);
-    $b0 = ord($bytes[0]);
-    $b9 = ord($bytes[9]);
-    $item_index = $b0 & 0x1F;
     $expected = mu_slot_expected_groups($slot);
     // Some emulators store the full item code in byte 0, while the common
     // Season 3 layout stores the low 5 bits there plus optional extension.
+    $code_variants = mu_item_code_variants($bytes);
     $code_candidates = array_unique([
-        $b0,
-        $item_index + (($b9 & MU_EXTENDED_ITEM_INDEX_FLAG) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0),
-        $item_index,
+        $code_variants["full"],
+        $code_variants["extended"],
+        $code_variants["base"],
     ]);
     foreach ($expected as $group) {
         foreach ($code_candidates as $code) {
@@ -509,10 +518,11 @@ function mu_decode_slot_item_candidates($bytes, $slot)
         if (!mu_slot_allows_identity($slot, $group, $code, $expected)) {
             continue;
         }
-        if (isset($seen[$group][$code])) {
+        $key = ($group * 1000) + $code;
+        if (isset($seen[$key])) {
             continue;
         }
-        $seen[$group][$code] = true;
+        $seen[$key] = true;
         $filtered[] = ["group" => $group, "code" => $code];
     }
     return $filtered;
