@@ -485,6 +485,9 @@ function mu_decode_slot_item_candidates($bytes, $slot)
     ]);
     foreach (mu_slot_expected_groups($slot) as $group) {
         foreach ($code_candidates as $code) {
+            if (!mu_slot_allows_identity($slot, $group, $code)) {
+                continue;
+            }
             $candidates[] = ["group" => $group, "code" => $code];
         }
     }
@@ -505,7 +508,9 @@ function mu_choose_item_identity($bytes, $slot, $level)
     foreach (mu_decode_slot_item_candidates($bytes, $slot) as $candidate) {
         $group = (int)$candidate["group"];
         $code  = (int)$candidate["code"];
-        if (!mu_slot_allows_identity($slot, $group, $code)) continue;
+        if (!mu_slot_allows_identity($slot, $group, $code)) {
+            continue;
+        }
         $name  = mu_item_name($group, $code);
         $image = mu_item_image($group, $code, $level);
         $score = 0;
