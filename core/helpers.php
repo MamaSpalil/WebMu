@@ -277,6 +277,7 @@ function mu_item_catalog()
             33 => "Wings of Illusion", 34 => "Wings of Ruin",
             35 => "Cape of Emperor",
         ],
+        // Some Season 3 item lists reuse accessory display names for different ItemIndex values.
         13 => [
             0 => "Guardian Angel", 1 => "Satan", 2 => "Horn of Uniria",
             3 => "DinoRant", 4 => "Dark Horse", 5 => "Dark Raven",
@@ -309,7 +310,7 @@ function mu_item_image($item_type, $item_index, $level = 0)
     $item_type  = (int)$item_type;
     $item_index = (int)$item_index;
     $level = max(0, (int)$level);
-    // The bundled item sprites mostly use level bucket 0 or 10 for glowing gear.
+    // The bundled item sprites mostly use +0 sprites and a +10 glow bucket for levels 10-15.
     $fallback_level = $level >= MU_ITEM_GLOW_LEVEL_THRESHOLD ? MU_ITEM_GLOW_LEVEL_THRESHOLD : 0;
     $dir = dirname(__DIR__) . "/assets/images/items";
     // Keep the client filename convention: <ItemType><ItemIndex><level>.gif
@@ -452,7 +453,7 @@ function mu_parse_equipped_inventory($blob)
         if ($all_ff) continue;
 
         $b1 = ord($bytes[1]);             // level / luck / skill / option
-        $b7 = ord($bytes[7]);             // excellent option bitmask in common MU item codes
+        $excellent_mask = ord($bytes[7]); // excellent option bitmask in common MU item codes
 
         $level = ($b1 >> 3) & 0x0F;
         $skill = (bool)($b1 & 0x80);
@@ -470,7 +471,7 @@ function mu_parse_equipped_inventory($blob)
             "skill" => $skill,
             "luck"  => $luck,
             "opt"   => $opt,
-            "exc"   => $b7,
+            "exc"   => $excellent_mask,
             "raw"   => strtoupper(bin2hex($bytes)),
         ];
     }
