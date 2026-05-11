@@ -447,6 +447,11 @@ function mu_slot_allowed_codes($slot, $group)
  * Return whether a decoded item identity (item group + item code) can appear
  * in the given equipped slot. Pass $expected when it is already known to avoid
  * recomputing the slot's allowed item groups while filtering many candidates.
+ *
+ * @param int $slot Equipped slot index from Character.Inventory.
+ * @param int $group MU item group/type.
+ * @param int $code MU item code/index within the group.
+ * @param int[]|null $expected Allowed groups for the slot, or null to load them.
  */
 function mu_slot_allows_identity($slot, $group, $code, $expected = null)
 {
@@ -464,6 +469,9 @@ function mu_slot_allows_identity($slot, $group, $code, $expected = null)
  * Return item-code variants used by common Season 3 inventory encodings:
  * full = byte 0 as a complete code, extended = low 5 bits plus extension flag,
  * base = low 5-bit item code without the extension flag.
+ *
+ * @param string $bytes 12-byte packed item record.
+ * @return array{full:int,extended:int,base:int}
  */
 function mu_item_code_variants($bytes)
 {
