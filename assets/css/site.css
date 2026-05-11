@@ -325,6 +325,7 @@ a:hover { color: var(--gold-light); }
     border-radius: 3px;
     cursor: pointer;
     pointer-events: auto;
+    touch-action: manipulation;
     transition: all 0.25s ease;
     box-shadow:
         inset 0 1px 0 rgba(255,240,168,0.2),
@@ -1050,8 +1051,9 @@ body { perspective: 1400px; perspective-origin: 50% 0%; }
 
 /* Keep real controls fixed under the cursor.  The 3D hover lifts are
    decorative, but changing the hit box during mouse down/up made module
-   buttons (notably "Forge Account") feel unclickable near their edges. */
-.btn,
+   buttons (notably "Forge Account") feel unclickable near their edges.
+   Panel tilt is disabled below for the same reason: it moves every child
+   control while the pointer is already over it. */
 .btn-major,
 .nav-btn,
 .tab,
