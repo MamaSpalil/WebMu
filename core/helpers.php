@@ -422,7 +422,7 @@ function mu_slot_allowed_codes($slot, $group)
     if ($slot === 7 && $group === 12) {
         // Wings slot: 1st/2nd/3rd wings, cloaks and mantles from group 12.
         return array_merge(
-            range(0, 6),   // Wing codes used by the bundled Season 3 catalog.
+            range(0, 6),   // Elf, Heaven, Satan, Spirits, Soul, Dragon, Darkness.
             range(36, 45)  // 3rd generation wings, cloaks and mantles.
         );
     }
@@ -430,7 +430,7 @@ function mu_slot_allowed_codes($slot, $group)
         return null;
     }
     if ($slot === 8) {
-        // Pet slot: 0 Angel, 1 Imp, 2 Uniria, 3 Dinorant, 4 Horse, 5 Raven, 37 Fenrir.
+        // Pet slot: 0 Angel, 1 Imp, 2 Uniria, 3 Dinorant, 4 Horse, 5 Dark Raven, 37 Fenrir.
         return [0, 1, 2, 3, 4, 5, 37]; // Guardian Angel through Dark Raven, plus Fenrir.
     }
     if ($slot === 9) {
@@ -522,11 +522,11 @@ function mu_decode_slot_item_candidates($bytes, $slot)
     // Some emulators store the full item code in byte 0, while the common
     // Season 3 layout stores the low 5 bits there plus optional extension.
     $code_variants = mu_item_code_variants($bytes);
-    $code_candidates = array_unique([
+    $code_candidates = [
         $code_variants["full"],
         $code_variants["extended"],
         $code_variants["base"],
-    ]);
+    ];
     foreach ($expected as $group) {
         foreach ($code_candidates as $code) {
             $candidates[] = ["group" => $group, "code" => $code];
@@ -540,11 +540,10 @@ function mu_decode_slot_item_candidates($bytes, $slot)
         if (!mu_slot_allows_identity($slot, $group, $code, $expected)) {
             continue;
         }
-        $key = $group . "|" . $code;
-        if (isset($seen[$key])) {
+        if (isset($seen[$group][$code])) {
             continue;
         }
-        $seen[$key] = true;
+        $seen[$group][$code] = true;
         $filtered[] = ["group" => $group, "code" => $code];
     }
     return $filtered;
