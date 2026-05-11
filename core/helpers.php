@@ -438,8 +438,8 @@ function mu_slot_allowed_codes($slot, $group)
         // Ring slots: ice/poison and elemental/transformation event rings.
         return [8, 9, 10, 20, 21, 22, 23, 24, 38, 39, 40, 41, 42];
     }
-    // Null means this slot/group has no item-code restriction: every code
-    // within the expected item group is valid.
+    // Null means no item-code restriction is configured for this slot/group;
+    // group-level validation still happens in mu_slot_allows_identity().
     return null;
 }
 
