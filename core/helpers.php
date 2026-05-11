@@ -487,6 +487,8 @@ function mu_decode_slot_item_candidates($bytes, $slot)
     $b9 = ord($bytes[9]);
     $item_index = $b0 & 0x1F;
     $expected = mu_slot_expected_groups($slot);
+    // Some emulators store the full item code in byte 0, while the common
+    // Season 3 layout stores the low 5 bits there plus optional extension.
     $code_candidates = array_unique([
         $b0,
         $item_index + (($b9 & 0x40) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0),
