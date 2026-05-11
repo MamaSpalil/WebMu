@@ -7,6 +7,8 @@ if (!defined("MU_EQUIPPED_SLOTS")) define("MU_EQUIPPED_SLOTS", 12);
 if (!defined("MU_ITEM_BYTES")) define("MU_ITEM_BYTES", 12);
 if (!defined("MU_ITEM_TYPE_HIGH_BIT_OFFSET")) define("MU_ITEM_TYPE_HIGH_BIT_OFFSET", 8);
 if (!defined("MU_EXTENDED_ITEM_INDEX_OFFSET")) define("MU_EXTENDED_ITEM_INDEX_OFFSET", 32);
+if (!defined("MU_ITEM_TYPE_HIGH_BIT_FLAG")) define("MU_ITEM_TYPE_HIGH_BIT_FLAG", 0x80);
+if (!defined("MU_EXTENDED_ITEM_INDEX_FLAG")) define("MU_EXTENDED_ITEM_INDEX_FLAG", 0x40);
 if (!defined("MU_ITEM_GLOW_LEVEL_THRESHOLD")) define("MU_ITEM_GLOW_LEVEL_THRESHOLD", 10);
 if (!defined("MU_HEX_FORMATTED_MIN_ITEM_CHARS")) define("MU_HEX_FORMATTED_MIN_ITEM_CHARS", MU_ITEM_BYTES * 2);
 if (!defined("MU_ITEM_SCORE_EXPECTED_SLOT")) define("MU_ITEM_SCORE_EXPECTED_SLOT", 4);
@@ -413,6 +415,80 @@ function mu_slot_expected_groups($slot)
     return $map[(int)$slot] ?? [];
 }
 
+function mu_slot_allowed_codes($slot, $group)
+{
+    $slot = (int)$slot;
+    $group = (int)$group;
+    if ($slot === 7 && $group === 12) {
+        // Wings slot: 1st/2nd/3rd wings, cloaks and mantles from group 12.
+        return array_merge(
+            range(0, 6),   // Elf, Heaven, Satan, Spirits, Soul, Dragon, Darkness.
+            range(36, 45)  // 3rd generation wings, cloaks and mantles.
+        );
+    }
+    if ($group !== 13) {
+        return null;
+    }
+    if ($slot === 8) {
+        // Pet slot: 0 Angel, 1 Imp, 2 Uniria, 3 Dinorant, 4 Horse, 5 Dark Raven, 37 Fenrir.
+        return [0, 1, 2, 3, 4, 5, 37]; // Guardian Angel through Dark Raven, plus Fenrir.
+    }
+    if ($slot === 9) {
+        // Pendant slot: lightning/fire/ice/wind/water/ability pendants.
+        return [12, 13, 25, 26, 27, 28]; // Lightning, Fire, Ice, Wind, Water, Ability.
+    }
+    if ($slot === 10 || $slot === 11) {
+        // Ring slots: ice/poison and elemental/transformation event rings.
+        return [8, 9, 10, 20, 21, 22, 23, 24, 38, 39, 40, 41, 42]; // Ice/Poison/transform rings.
+    }
+    // Null means no item-code restriction is configured for this slot/group;
+    // group-level validation still happens in mu_slot_allows_identity().
+    return null;
+}
+
+/**
+ * Return whether a decoded item identity (item group + item code) can appear
+ * in the given equipped slot. Pass $expected when it is already known to avoid
+ * recomputing the slot's allowed item groups while filtering many candidates.
+ *
+ * @param int $slot Equipped slot index from Character.Inventory.
+ * @param int $group MU item group/type.
+ * @param int $code MU item code/index within the group.
+ * @param int[]|null $expected Allowed groups for the slot (computed via mu_slot_expected_groups() if null).
+ */
+function mu_slot_allows_identity($slot, $group, $code, $expected = null)
+{
+    if ($expected === null) {
+        $expected = mu_slot_expected_groups($slot);
+    }
+    if ($expected && !in_array((int)$group, $expected, true)) {
+        return false;
+    }
+    $allowed_codes = mu_slot_allowed_codes($slot, $group);
+    return $allowed_codes === null || in_array((int)$code, $allowed_codes, true);
+}
+
+/**
+ * Return item-code variants used by common Season 3 inventory encodings:
+ * full = byte 0 as a complete code, extended = low 5 bits plus extension flag,
+ * base = low 5-bit item code without the extension flag.
+ *
+ * @param string $bytes 12-byte packed item record.
+ * @return array{full:int,extended:int,base:int}
+ */
+function mu_item_code_variants($bytes)
+{
+    $b0 = ord($bytes[0]);
+    $b9 = ord($bytes[9]);
+    $item_index = $b0 & 0x1F;
+    $extended_item_index = $item_index + (($b9 & MU_EXTENDED_ITEM_INDEX_FLAG) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0);
+    return [
+        "full" => $b0,
+        "extended" => $extended_item_index,
+        "base" => $item_index,
+    ];
+}
+
 function mu_decode_item_candidates($bytes)
 {
     if (!is_string($bytes) || strlen($bytes) < 10) {
@@ -420,21 +496,57 @@ function mu_decode_item_candidates($bytes)
     }
     $b0 = ord($bytes[0]);
     $b9 = ord($bytes[9]);
-    $item_type  = ($b0 >> 5) + (($b9 & 0x80) ? MU_ITEM_TYPE_HIGH_BIT_OFFSET : 0);
-    $item_index = $b0 & 0x1F;
-    $extended_item_index = $item_index + (($b9 & 0x40) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0);
+    $code_variants = mu_item_code_variants($bytes);
+    $item_type  = ($b0 >> 5) + (($b9 & MU_ITEM_TYPE_HIGH_BIT_FLAG) ? MU_ITEM_TYPE_HIGH_BIT_OFFSET : 0);
     return [
         // Common Season 3 layout: ItemType comes from byte 0 high bits + byte 9 high flag;
         // bit 6 of byte 9 extends ItemIndex by +32 on newer item lists.
-        ["group" => $item_type, "code" => $extended_item_index],
+        ["group" => $item_type, "code" => $code_variants["extended"]],
         // Legacy Season 3 layout without the extended ItemIndex bit.
-        ["group" => $item_type, "code" => $item_index],
+        ["group" => $item_type, "code" => $code_variants["base"]],
         // Alternate emulator layout: byte 9 stores ItemType in its high nibble and byte 0 stores the full 8-bit ItemIndex.
         // Do not add byte 9 bit 7 to ItemIndex here: in this format it is part of ItemType.
-        ["group" => ($b9 >> 4) & 0x0F, "code" => $b0],
+        ["group" => ($b9 >> 4) & 0x0F, "code" => $code_variants["full"]],
         // Same alternate layout, but capped to 5-bit ItemIndex used by older item lists.
-        ["group" => ($b9 >> 4) & 0x0F, "code" => $b0 & 0x1F],
+        ["group" => ($b9 >> 4) & 0x0F, "code" => $code_variants["base"]],
     ];
+}
+
+function mu_decode_slot_item_candidates($bytes, $slot)
+{
+    if (!is_string($bytes) || strlen($bytes) < 10) {
+        return [];
+    }
+    $candidates = mu_decode_item_candidates($bytes);
+    $expected = mu_slot_expected_groups($slot);
+    // Some emulators store the full item code in byte 0, while the common
+    // Season 3 layout stores the low 5 bits there plus optional extension.
+    $code_variants = mu_item_code_variants($bytes);
+    $code_candidates = [
+        $code_variants["full"],
+        $code_variants["extended"],
+        $code_variants["base"],
+    ];
+    foreach ($expected as $group) {
+        foreach ($code_candidates as $code) {
+            $candidates[] = ["group" => $group, "code" => $code];
+        }
+    }
+    $filtered = [];
+    $seen = [];
+    foreach ($candidates as $candidate) {
+        $group = (int)$candidate["group"];
+        $code = (int)$candidate["code"];
+        if (!mu_slot_allows_identity($slot, $group, $code, $expected)) {
+            continue;
+        }
+        if (isset($seen[$group][$code])) {
+            continue;
+        }
+        $seen[$group][$code] = true;
+        $filtered[] = ["group" => $group, "code" => $code];
+    }
+    return $filtered;
 }
 
 function mu_is_hex_inventory($value, $min_chars)
@@ -448,7 +560,7 @@ function mu_choose_item_identity($bytes, $slot, $level)
     $expected = mu_slot_expected_groups($slot);
     $best = null;
     $best_score = -1;
-    foreach (mu_decode_item_candidates($bytes) as $candidate) {
+    foreach (mu_decode_slot_item_candidates($bytes, $slot) as $candidate) {
         $group = (int)$candidate["group"];
         $code  = (int)$candidate["code"];
         $name  = mu_item_name($group, $code);
