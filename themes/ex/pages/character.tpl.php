@@ -37,7 +37,7 @@ $map_name = $map_number !== null ? mu_map($map_number) : null;
     .equip-cell .slot-box { width:78px; height:78px; border-radius:5px;
         background:rgba(34,48,65,.78); border:1px solid rgba(140,160,184,.28);
         display:flex; align-items:center; justify-content:center; position:relative;
-        box-shadow:inset 0 0 0 1px rgba(255,255,255,.03); }
+        overflow:visible; box-shadow:inset 0 0 0 1px rgba(255,255,255,.03); }
     .equip-cell .slot-box img { max-width:70px; max-height:70px; object-fit:contain; }
     .equip-cell .slot-box .lvl { position:absolute; top:-10px; right:-10px;
         padding:2px 6px; border-radius:4px; background:#ff4d55; color:#fff;
