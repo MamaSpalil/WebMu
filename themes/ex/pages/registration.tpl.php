@@ -9,6 +9,10 @@
     .perks li strong { color: var(--gold); display: block; font-family: 'Cinzel Decorative',serif; letter-spacing: 1.5px; margin-bottom: 2px; }
     .perks li span { color: #c8b890; font-size: 13.5px; line-height: 1.5; }
     .submit-row { display: flex; justify-content: space-between; align-items: center; margin-top: 22px; gap: 18px; flex-wrap: wrap; }
+    /* Belt-and-braces fix for the "Forge Account" button:
+       even if a future stylesheet introduces an absolutely-positioned
+       overlay inside .panel, the button stays on top and clickable. */
+    .submit-row .btn { position: relative; z-index: 2; }
 </style>
 
 <main class="page">

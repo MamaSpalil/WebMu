@@ -152,7 +152,7 @@ $baners  = $widget_data["baners"]    ?? [];
         <article class="panel panel-corner">
             <h2 class="panel-title left">Strongest Hero</h2>
             <p style="text-align:center;font-family:'Cinzel Decorative',serif;font-size:24px;color:var(--gold-light)">
-                <?= h($strongest["name"]) ?>
+                <a class="char-link" href="index.php?m=character&amp;name=<?= h(urlencode($strongest["name"])) ?>"><?= h($strongest["name"]) ?></a>
             </p>
             <p style="text-align:center;color:#c8b890;font-size:13px">
                 <?= h($strongest["class"][0]) ?> · Lv <?= (int)$strongest["level"] ?>
@@ -170,7 +170,7 @@ $baners  = $widget_data["baners"]    ?? [];
             <table class="rank">
                 <?php foreach ($qtop as $i => $q): ?>
                 <tr><td class="rank-pos"><?= $i+1 ?></td>
-                    <td><?= h($q["name"]) ?></td>
+                    <td><a class="char-link" href="index.php?m=character&amp;name=<?= h(urlencode($q["name"])) ?>"><?= h($q["name"]) ?></a></td>
                     <td><span class="cls-tag cls-<?= h($q["class"][1]) ?>"><?= h($q["class"][0]) ?></span></td>
                     <td><?= fmt_int($q["quests"]) ?></td></tr>
                 <?php endforeach; ?>

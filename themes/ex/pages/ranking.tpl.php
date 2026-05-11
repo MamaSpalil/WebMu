@@ -1,9 +1,10 @@
 <?php if (!defined("insite")) die("no access");
 $show_master = isset($players[0]["MasterLevel"]) && trim((string)($config["char_master_col"] ?? "")) !== "";
+$has_greset  = isset($players[0]["GReset"]);
 $has_stats   = isset($players[0]["Strength"]) || isset($players[0]["Energy"]);
 $has_zen     = isset($players[0]["Money"]);
 $has_quest   = isset($players[0]["Quest"]);
-$player_cols = 5 + ($show_master ? 1 : 0) + 1 /*Guild*/ + ($has_stats ? 1 : 0) + ($has_zen ? 1 : 0) + ($has_quest ? 1 : 0);
+$player_cols = 5 + ($has_greset ? 1 : 0) + ($show_master ? 1 : 0) + 1 /*Guild*/ + ($has_stats ? 1 : 0) + ($has_zen ? 1 : 0) + ($has_quest ? 1 : 0);
 $has_guild_mark   = isset($guilds[0]["G_Mark"]);
 $has_guild_notice = isset($guilds[0]["G_Notice"]);
 $guild_cols = 5 + ($has_guild_mark ? 1 : 0) + ($has_guild_notice ? 1 : 0);
@@ -38,6 +39,7 @@ $has_online_map = isset($online[0]["map_h"]);
             <table class="rank">
                 <thead><tr>
                     <th>#</th><th>Character</th><th>Class</th><th>Level</th><th>Resets</th>
+                    <?php if ($has_greset): ?><th title="Grand Reset">GR</th><?php endif; ?>
                     <?php if ($show_master): ?><th>Master Lv</th><?php endif; ?>
                     <?php if ($has_stats): ?><th title="Strength / Agility / Vitality / Energy / Command">Stats</th><?php endif; ?>
                     <?php if ($has_zen): ?><th>Zen</th><?php endif; ?>
@@ -48,10 +50,11 @@ $has_online_map = isset($online[0]["map_h"]);
                 <?php foreach ($players as $i => $p): ?>
                 <tr<?= $i<3 ? ' class="top-'.($i+1).'"' : '' ?>>
                     <td class="rank-pos"><?= $i+1 ?></td>
-                    <td><?= h($p["Name"]) ?></td>
+                    <td><a class="char-link" href="index.php?m=character&amp;name=<?= h(urlencode($p["Name"])) ?>"><?= h($p["Name"]) ?></a></td>
                     <td><span class="cls-tag cls-<?= h($p["class_h"][1]) ?>"><?= h($p["class_h"][0]) ?></span></td>
                     <td><?= (int)$p["cLevel"] ?></td>
                     <td><?= (int)$p["Resets"] ?></td>
+                    <?php if ($has_greset): ?><td><?= (int)($p["GReset"] ?? 0) ?></td><?php endif; ?>
                     <?php if ($show_master): ?><td><?= (int)$p["MasterLevel"] ?></td><?php endif; ?>
                     <?php if ($has_stats): ?>
                         <td class="text-mute" title="STR / AGI / VIT / ENE / CMD">
@@ -111,7 +114,7 @@ $has_online_map = isset($online[0]["map_h"]);
                 <?php foreach ($kills as $i => $k): ?>
                 <tr<?= $i<3 ? ' class="top-'.($i+1).'"' : '' ?>>
                     <td class="rank-pos"><?= $i+1 ?></td>
-                    <td><?= h($k["Name"]) ?></td>
+                    <td><a class="char-link" href="index.php?m=character&amp;name=<?= h(urlencode($k["Name"])) ?>"><?= h($k["Name"]) ?></a></td>
                     <td><span class="cls-tag cls-<?= h($k["class_h"][1]) ?>"><?= h($k["class_h"][0]) ?></span></td>
                     <td><?= (int)$k["cLevel"] ?></td>
                     <td><?= (int)$k["PkCount"] ?></td>
@@ -136,7 +139,9 @@ $has_online_map = isset($online[0]["map_h"]);
                 <?php foreach ($online as $i => $o): ?>
                 <tr><td class="rank-pos"><?= $i+1 ?></td>
                     <td><?= h($o["memb___id"]) ?></td>
-                    <td><?= h($o["Name"] ?? "—") ?></td>
+                    <td><?php if (isset($o["Name"])): ?>
+                        <a class="char-link" href="index.php?m=character&amp;name=<?= h(urlencode($o["Name"])) ?>"><?= h($o["Name"]) ?></a>
+                    <?php else: ?>—<?php endif; ?></td>
                     <td><?php if (isset($o["Name"])): ?><span class="cls-tag cls-<?= h($o["class_h"][1]) ?>"><?= h($o["class_h"][0]) ?></span><?php endif; ?></td>
                     <td><?= (int)($o["cLevel"] ?? 0) ?></td>
                     <td><?= (int)($o["Resets"] ?? 0) ?></td>

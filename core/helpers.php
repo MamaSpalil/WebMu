@@ -126,6 +126,99 @@ function mu_map($id)
     return $map[$id] ?? ("Map #" . $id);
 }
 
+/**
+ * Names of the 12 equipped inventory slots in Season 3 (in display order).
+ * Index → slot label. Matches the in-game layout.
+ */
+function mu_equip_slots()
+{
+    return [
+        0  => "Helm",
+        1  => "Armor",
+        2  => "Pants",
+        3  => "Gloves",
+        4  => "Boots",
+        5  => "Right Hand",
+        6  => "Left Hand",
+        7  => "Wings",
+        8  => "Pet",
+        9  => "Ring 1",
+        10 => "Ring 2",
+        11 => "Pendant",
+    ];
+}
+
+/**
+ * Decode the 12 equipped slots from a MuOnline Character.Inventory blob.
+ *
+ * In Season 3 the inventory is a packed varbinary; slots 0–11 are equipped,
+ * each record is 12 bytes long, and an empty slot is filled with 0xFF.
+ * We return an array of 12 entries with:
+ *   - empty:   true/false
+ *   - group:   item-group id (0-15)  — high nibble of byte 9
+ *   - code:    item code     (0-511) — byte 0 + bit 7 of byte 9
+ *   - level:   item +N level (0-15)
+ *   - skill:   bool — skill option
+ *   - luck:    bool — luck option
+ *   - opt:     additional option amount (0-7, ×4 = +N)
+ *   - exc:     excellent option bitmask
+ *   - raw:     12-byte hex (for debugging)
+ *
+ * The exact bit layout is emulator-specific, but the format below is the
+ * most common Season 3 layout. Callers should treat the decoded fields as
+ * best-effort and fall back to "—" when group/code can't be looked up.
+ */
+function mu_parse_equipped_inventory($blob)
+{
+    $slots = array_fill(0, 12, [
+        "empty" => true, "group" => 0, "code" => 0, "level" => 0,
+        "skill" => false, "luck" => false, "opt" => 0, "exc" => 0,
+        "raw" => "",
+    ]);
+    if ($blob === null || $blob === "" || !is_string($blob)) {
+        return $slots;
+    }
+    $len = strlen($blob);
+    // Each item slot occupies 12 bytes; equipped block = 144 bytes minimum.
+    $slot_size = 12;
+    for ($i = 0; $i < 12; $i++) {
+        $off = $i * $slot_size;
+        if ($off + $slot_size > $len) break;
+        $bytes = substr($blob, $off, $slot_size);
+        // Empty slot = all 0xFF.
+        $all_ff = true;
+        for ($b = 0; $b < $slot_size; $b++) {
+            if (ord($bytes[$b]) !== 0xFF) { $all_ff = false; break; }
+        }
+        if ($all_ff) continue;
+
+        $b0 = ord($bytes[0]);             // item code (low byte)
+        $b1 = ord($bytes[1]);             // level / luck / skill / option
+        $b3 = ord($bytes[3]);             // excellent bitmask (low bits)
+        $b9 = ord($bytes[9]);             // group (high nibble) + code high bit (bit 7)
+
+        $group = ($b9 >> 4) & 0x0F;
+        $code  = $b0 | ((($b9 >> 7) & 0x01) << 8); // 9-bit item code
+        $level = ($b1 >> 3) & 0x0F;
+        $skill = (bool)($b1 & 0x80);
+        $luck  = (bool)($b1 & 0x04);
+        $opt   = $b1 & 0x03;              // ×4 = visible +N option
+
+        $slots[$i] = [
+            "empty" => false,
+            "group" => $group,
+            "code"  => $code,
+            "level" => $level,
+            "skill" => $skill,
+            "luck"  => $luck,
+            "opt"   => $opt,
+            "exc"   => $b3,
+            "raw"   => strtoupper(bin2hex($bytes)),
+        ];
+    }
+    return $slots;
+}
+
 /** ---- file cache (used by ranking/widgets) ---- */
 function cache_get($key, $ttl)
 {
