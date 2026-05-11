@@ -7,6 +7,8 @@ if (!defined("MU_EQUIPPED_SLOTS")) define("MU_EQUIPPED_SLOTS", 12);
 if (!defined("MU_ITEM_BYTES")) define("MU_ITEM_BYTES", 12);
 if (!defined("MU_ITEM_TYPE_HIGH_BIT_OFFSET")) define("MU_ITEM_TYPE_HIGH_BIT_OFFSET", 8);
 if (!defined("MU_EXTENDED_ITEM_INDEX_OFFSET")) define("MU_EXTENDED_ITEM_INDEX_OFFSET", 32);
+if (!defined("MU_ITEM_TYPE_HIGH_BIT_FLAG")) define("MU_ITEM_TYPE_HIGH_BIT_FLAG", 0x80);
+if (!defined("MU_EXTENDED_ITEM_INDEX_FLAG")) define("MU_EXTENDED_ITEM_INDEX_FLAG", 0x40);
 if (!defined("MU_ITEM_GLOW_LEVEL_THRESHOLD")) define("MU_ITEM_GLOW_LEVEL_THRESHOLD", 10);
 if (!defined("MU_HEX_FORMATTED_MIN_ITEM_CHARS")) define("MU_HEX_FORMATTED_MIN_ITEM_CHARS", MU_ITEM_BYTES * 2);
 if (!defined("MU_ITEM_SCORE_EXPECTED_SLOT")) define("MU_ITEM_SCORE_EXPECTED_SLOT", 4);
@@ -418,22 +420,22 @@ function mu_slot_allowed_codes($slot, $group)
     $slot = (int)$slot;
     $group = (int)$group;
     if ($slot === 7 && $group === 12) {
-        // Wings slot: wings, cloaks and mantles from item group 12.
+        // Wings slot: 1st/2nd/3rd wings, cloaks and mantles from group 12.
         return [0, 1, 2, 3, 4, 5, 6, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45];
     }
     if ($group !== 13) {
         return null;
     }
     if ($slot === 8) {
-        // Pet slot: pets, mounts and companion items.
+        // Pet slot: Guardian Angel, Imp, Uniria, Dinorant, Dark Horse/Raven, Fenrir.
         return [0, 1, 2, 3, 4, 5, 37];
     }
     if ($slot === 9) {
-        // Pendant slot: pendant item codes only.
+        // Pendant slot: lightning/fire/ice/wind/water/ability pendants.
         return [12, 13, 25, 26, 27, 28];
     }
     if ($slot === 10 || $slot === 11) {
-        // Ring slots: elemental and transformation rings only.
+        // Ring slots: ice/poison and elemental/transformation event rings.
         return [8, 9, 10, 20, 21, 22, 23, 24, 38, 39, 40, 41, 42];
     }
     // Null means this slot/group has no item-code restriction: every code
@@ -460,9 +462,9 @@ function mu_decode_item_candidates($bytes)
     }
     $b0 = ord($bytes[0]);
     $b9 = ord($bytes[9]);
-    $item_type  = ($b0 >> 5) + (($b9 & 0x80) ? MU_ITEM_TYPE_HIGH_BIT_OFFSET : 0);
+    $item_type  = ($b0 >> 5) + (($b9 & MU_ITEM_TYPE_HIGH_BIT_FLAG) ? MU_ITEM_TYPE_HIGH_BIT_OFFSET : 0);
     $item_index = $b0 & 0x1F;
-    $extended_item_index = $item_index + (($b9 & 0x40) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0);
+    $extended_item_index = $item_index + (($b9 & MU_EXTENDED_ITEM_INDEX_FLAG) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0);
     return [
         // Common Season 3 layout: ItemType comes from byte 0 high bits + byte 9 high flag;
         // bit 6 of byte 9 extends ItemIndex by +32 on newer item lists.
@@ -491,7 +493,7 @@ function mu_decode_slot_item_candidates($bytes, $slot)
     // Season 3 layout stores the low 5 bits there plus optional extension.
     $code_candidates = array_unique([
         $b0,
-        $item_index + (($b9 & 0x40) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0),
+        $item_index + (($b9 & MU_EXTENDED_ITEM_INDEX_FLAG) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0),
         $item_index,
     ]);
     foreach ($expected as $group) {
@@ -507,11 +509,10 @@ function mu_decode_slot_item_candidates($bytes, $slot)
         if (!mu_slot_allows_identity($slot, $group, $code, $expected)) {
             continue;
         }
-        $key = $group . ":" . $code;
-        if (isset($seen[$key])) {
+        if (isset($seen[$group][$code])) {
             continue;
         }
-        $seen[$key] = true;
+        $seen[$group][$code] = true;
         $filtered[] = ["group" => $group, "code" => $code];
     }
     return $filtered;
