@@ -117,6 +117,22 @@ $config["char_master_col"]    = "";           // Season 3 backups often do not h
 $config["char_class_col"]     = "Class";
 $config["char_pk_count_col"]  = "PkCount";
 $config["char_pk_level_col"]  = "PkLevel";
+// Grand-reset column on Character. Many custom Season 3 schemas use
+// `gr_res`; stock MuOnline calls it `GReset`. Auto-detected at runtime
+// (db_column_exists), so this is just the preferred name to look up first.
+$config["char_greset_col"]    = "gr_res";
+// Account access-control flag on Character. On stock MuOnline, CtlCode = 1
+// means a banned/blocked character and CtlCode = 17 marks a hidden GM —
+// neither should appear in public rankings. Leave empty to disable filter.
+$config["char_ctl_col"]       = "CtlCode";
+// Optional AccountCharacter table — used to identify the *currently
+// connected* character on an account for the Online tab. When the table
+// exists, `AccountCharacter.GameIDC` holds the in-game character name
+// the account is logged in as, which is the only reliable way to pick a
+// single character out of the (up to 5) characters owned by an account.
+$config["account_char_table"] = "AccountCharacter";
+$config["account_char_acc_col"]  = "Id";
+$config["account_char_name_col"] = "GameIDC";
 $config["guild_table"]        = "Guild";
 $config["guild_member_table"] = "GuildMember";
 $config["guild_name_col"]     = "G_Name";
