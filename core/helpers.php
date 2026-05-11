@@ -218,7 +218,7 @@ function mu_item_catalog()
         1 => [
             0 => "Small Axe", 1 => "Hand Axe", 2 => "Double Axe", 3 => "Tomahawk",
             4 => "Elven Axe", 5 => "Battle Axe", 6 => "Nikea Axe", 7 => "Larkan Axe",
-            8 => "Crescent Axe", 9 => "Bill of Balrog", 11 => "Bloodangel Axe",
+            8 => "Crescent Axe", 11 => "Bloodangel Axe",
         ],
         2 => [
             0 => "Mace", 1 => "Morning Star", 2 => "Flail", 3 => "Great Hammer",
@@ -414,6 +414,7 @@ function mu_decode_item_candidates($bytes)
         // Legacy Season 3 layout without the extended ItemIndex bit.
         ["group" => $item_type, "code" => $item_index],
         // Alternate emulator layout: byte 9 stores ItemType in its high nibble and byte 0 stores the full 8-bit ItemIndex.
+        // Do not add byte 9 bit 7 to ItemIndex here: in this format it is part of ItemType.
         ["group" => ($b9 >> 4) & 0x0F, "code" => $b0],
         // Same alternate layout, but capped to 5-bit ItemIndex used by older item lists.
         ["group" => ($b9 >> 4) & 0x0F, "code" => $b0 & 0x1F],
