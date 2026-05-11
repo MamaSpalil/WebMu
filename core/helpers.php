@@ -6,6 +6,7 @@ if (!defined("insite")) die("no access");
 if (!defined("MU_EQUIPPED_SLOTS")) define("MU_EQUIPPED_SLOTS", 12);
 if (!defined("MU_ITEM_BYTES")) define("MU_ITEM_BYTES", 12);
 if (!defined("MU_ITEM_TYPE_HIGH_BIT_OFFSET")) define("MU_ITEM_TYPE_HIGH_BIT_OFFSET", 8);
+if (!defined("MU_ITEM_INDEX_HIGH_BIT_OFFSET")) define("MU_ITEM_INDEX_HIGH_BIT_OFFSET", 32);
 if (!defined("MU_ITEM_GLOW_LEVEL_THRESHOLD")) define("MU_ITEM_GLOW_LEVEL_THRESHOLD", 10);
 if (!defined("MU_HEX_FORMATTED_MIN_ITEM_CHARS")) define("MU_HEX_FORMATTED_MIN_ITEM_CHARS", MU_ITEM_BYTES * 2);
 if (!defined("MU_ITEM_SCORE_EXPECTED_SLOT")) define("MU_ITEM_SCORE_EXPECTED_SLOT", 4);
@@ -211,24 +212,28 @@ function mu_item_catalog()
             16 => "Sword of Destruction", 17 => "Dark Breaker", 18 => "Thunder Blade",
             19 => "Dragon Slayer", 20 => "Sword of Archangel", 21 => "Knight Blade",
             22 => "Dark Reign Blade", 23 => "Flamberge", 24 => "Daybreak",
-            25 => "Sword Dancer", 26 => "Bloodangel Blade",
+            25 => "Sword Dancer", 26 => "Bloodangel Blade", 27 => "Sword Breaker",
+            28 => "Imperial Sword", 31 => "Rune Bastard Sword",
         ],
         1 => [
             0 => "Small Axe", 1 => "Hand Axe", 2 => "Double Axe", 3 => "Tomahawk",
             4 => "Elven Axe", 5 => "Battle Axe", 6 => "Nikea Axe", 7 => "Larkan Axe",
-            8 => "Crescent Axe",
+            8 => "Crescent Axe", 9 => "Bill of Balrog", 10 => "Chaos Dragon Axe",
+            11 => "Bloodangel Axe",
         ],
         2 => [
             0 => "Mace", 1 => "Morning Star", 2 => "Flail", 3 => "Great Hammer",
             4 => "Crystal Morning Star", 5 => "Crystal Sword", 6 => "Chaos Dragon Axe",
             7 => "Elemental Mace", 8 => "Battle Scepter", 9 => "Master Scepter",
             10 => "Great Scepter", 11 => "Lord Scepter", 12 => "Great Lord Scepter",
-            13 => "Soleil Scepter",
+            13 => "Soleil Scepter", 14 => "Shining Scepter", 15 => "Frost Mace",
+            16 => "Absolute Scepter", 17 => "Bloodangel Mace",
         ],
         3 => [
             0 => "Light Spear", 1 => "Spear", 2 => "Dragon Lance", 3 => "Giant Trident",
             4 => "Serpent Spear", 5 => "Double Poleaxe", 6 => "Halberd", 7 => "Berdysh",
             8 => "Great Scythe", 9 => "Bill of Balrog", 10 => "Dragon Spear",
+            11 => "Beuroba", 12 => "Bloodangel Spear",
         ],
         4 => [
             0 => "Short Bow", 1 => "Bow", 2 => "Elven Bow", 3 => "Battle Bow",
@@ -247,6 +252,9 @@ function mu_item_catalog()
             10 => "Divine Staff of Archangel", 11 => "Kundun Staff",
             12 => "Grand Viper Staff", 13 => "Platina Staff", 14 => "Mystery Staff",
             15 => "Violent Wind Staff", 16 => "Red Wing Staff", 17 => "Ancient Staff",
+            18 => "Black Rose Staff", 19 => "Aura Staff", 20 => "Lilium Staff",
+            21 => "Book of Samut", 22 => "Book of Neil", 23 => "Book of Ghost Phantom",
+            30 => "Stick of Archangel", 31 => "Imperial Staff",
         ],
         6 => [
             0 => "Small Shield", 1 => "Horn Shield", 2 => "Kite Shield",
@@ -258,6 +266,7 @@ function mu_item_catalog()
             18 => "Spiked Shield of Honor", 19 => "Crimson Glory Shield",
             20 => "Salamander Shield", 21 => "Frost Barrier Shield",
             22 => "Guardian Shield", 23 => "Cross Shield",
+            24 => "Magic Knight Shield", 25 => "Bloodangel Shield",
         ],
         12 => [
             0 => "Wings of Elf", 1 => "Wings of Heaven", 2 => "Wings of Satan",
@@ -275,19 +284,63 @@ function mu_item_catalog()
             26 => "Scroll of Lightning Shock", 30 => "Cape of Lord",
             31 => "Wings of Storm", 32 => "Wings of Eternal",
             33 => "Wings of Illusion", 34 => "Wings of Ruin",
-            35 => "Cape of Emperor",
+            35 => "Cape of Emperor", 36 => "Wings of Dimension",
+            37 => "Cape of Overrule", 38 => "Cape of Fighter",
+            39 => "Wings of Conqueror", 40 => "Wings of Angel and Devil",
         ],
         // Some Season 3 item lists reuse accessory display names for different ItemIndex values.
         13 => [
             0 => "Guardian Angel", 1 => "Satan", 2 => "Horn of Uniria",
             3 => "DinoRant", 4 => "Dark Horse", 5 => "Dark Raven",
+            6 => "Scroll of Archangel", 7 => "Archangel's Absolute Weapon",
             8 => "Ring of Ice", 9 => "Ring of Poison", 10 => "Ring of Transformation",
+            11 => "Ring of Wizardry",
             12 => "Pendant of Lightning", 13 => "Pendant of Fire",
             14 => "Pendant of Ice", 16 => "Ring of Earth", 20 => "Pendant of Wind",
             21 => "Pendant of Water", 22 => "Ring of Magic", 23 => "Ring of Fire",
             24 => "Ring of Wind", 25 => "Ring of Magic", 26 => "Pendant of Ability",
             27 => "Pendant of Water", 28 => "Pendant of Earth",
-            29 => "Pendant of Wind", 30 => "Pendant of Magic",
+            29 => "Pendant of Wind", 30 => "Pendant of Magic", 31 => "Ring of Warrior",
+            32 => "Ring of Wizard", 33 => "Ring of Fire", 34 => "Ring of Earth",
+            35 => "Ring of Wind", 36 => "Ring of Magic", 37 => "Pendant of Ice",
+            38 => "Pendant of Poison", 39 => "Pendant of Wind", 40 => "Pendant of Water",
+            41 => "Pendant of Ability",
+        ],
+        14 => [
+            0 => "Apple", 1 => "Small Healing Potion", 2 => "Healing Potion",
+            3 => "Large Healing Potion", 4 => "Small Mana Potion", 5 => "Mana Potion",
+            6 => "Large Mana Potion", 7 => "Siege Potion", 8 => "Antidote",
+            9 => "Ale", 10 => "Town Portal Scroll", 11 => "Box of Luck",
+            12 => "Heart of Love", 13 => "Jewel of Chaos", 14 => "Jewel of Bless",
+            15 => "Jewel of Soul", 16 => "Jewel of Life", 17 => "Devil's Eye",
+            18 => "Devil's Key", 19 => "Devil's Invitation", 20 => "Remedy of Love",
+            21 => "Rena", 22 => "Jewel of Creation", 23 => "Scroll of Emperor",
+            24 => "Broken Sword", 25 => "Tear of Elf", 26 => "Soul of Wizard",
+            27 => "Bless of Light", 28 => "Soul of Dark Horse", 29 => "Soul of Dark Raven",
+            31 => "Jewel of Guardian", 32 => "Pink Chocolate Box", 33 => "Red Chocolate Box",
+            34 => "Blue Chocolate Box", 35 => "Small SD Potion", 36 => "SD Potion",
+            37 => "Large SD Potion", 38 => "Small Complex Potion", 39 => "Complex Potion",
+            40 => "Large Complex Potion", 41 => "Gemstone", 42 => "Jewel of Harmony",
+            43 => "Lower Refining Stone", 44 => "Higher Refining Stone", 45 => "Lord's Mix",
+            46 => "Splinter of Armor", 47 => "Bless of Guardian", 48 => "Claw of Beast",
+            49 => "Fragment of Horn", 50 => "Broken Horn", 51 => "Horn of Fenrir",
+            52 => "Jewel of Chaos Bundle", 53 => "Jewel of Bless Bundle",
+            54 => "Jewel of Soul Bundle", 55 => "Jewel of Life Bundle",
+            56 => "Jewel of Creation Bundle", 57 => "Jewel of Guardian Bundle",
+            58 => "Jewel of Harmony Bundle",
+        ],
+        15 => [
+            0 => "Scroll of Poison", 1 => "Scroll of Meteorite", 2 => "Scroll of Lightning",
+            3 => "Scroll of Fire Ball", 4 => "Scroll of Flame", 5 => "Scroll of Teleport",
+            6 => "Scroll of Ice", 7 => "Scroll of Twister", 8 => "Scroll of Evil Spirit",
+            9 => "Scroll of Hellfire", 10 => "Scroll of Power Wave", 11 => "Scroll of Aqua Beam",
+            12 => "Scroll of Cometfall", 13 => "Scroll of Inferno", 14 => "Scroll of Teleport Ally",
+            15 => "Scroll of Soul Barrier", 16 => "Scroll of Decay", 17 => "Scroll of Ice Storm",
+            18 => "Scroll of Nova", 19 => "Scroll of Wizardry Enhance", 20 => "Scroll of Wizardry Enhance",
+            21 => "Scroll of Sleep", 22 => "Scroll of Chain Lightning", 23 => "Scroll of Drain Life",
+            24 => "Scroll of Lightning Shock", 26 => "Scroll of Weakness", 27 => "Scroll of Innovation",
+            28 => "Scroll of Berserker", 29 => "Scroll of Expansion of Wizardry",
+            30 => "Scroll of Fire Scream",
         ],
     ];
 
@@ -354,11 +407,15 @@ function mu_decode_item_candidates($bytes)
     $b9 = ord($bytes[9]);
     $item_type  = ($b0 >> 5) + (($b9 & 0x80) ? MU_ITEM_TYPE_HIGH_BIT_OFFSET : 0);
     $item_index = $b0 & 0x1F;
+    $item_index_ext = $item_index + (($b9 & 0x40) ? MU_ITEM_INDEX_HIGH_BIT_OFFSET : 0);
     return [
-        // Common Season 3 layout: ItemType comes from byte 0 high bits + byte 9 high flag.
+        // Common Season 3 layout: ItemType comes from byte 0 high bits + byte 9 high flag;
+        // bit 6 of byte 9 extends ItemIndex by +32 on newer item lists.
+        ["group" => $item_type, "code" => $item_index_ext],
+        // Legacy Season 3 layout without the extended ItemIndex bit.
         ["group" => $item_type, "code" => $item_index],
-        // Alternate emulator layout: byte 9 stores ItemType in its high nibble and ItemIndex high bit.
-        ["group" => ($b9 >> 4) & 0x0F, "code" => $b0 | ((($b9 >> 7) & 0x01) << 8)],
+        // Alternate emulator layout: byte 9 stores ItemType in its high nibble and byte 0 stores ItemIndex.
+        ["group" => ($b9 >> 4) & 0x0F, "code" => $b0],
         // Same alternate layout, but capped to 5-bit ItemIndex used by older item lists.
         ["group" => ($b9 >> 4) & 0x0F, "code" => $b0 & 0x1F],
     ];
