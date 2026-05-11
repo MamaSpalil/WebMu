@@ -307,7 +307,7 @@ a:hover { color: var(--gold-light); }
 /* ====================== BUTTONS ====================== */
 .btn {
     position: relative;
-    z-index: 2;
+    z-index: 10;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -330,6 +330,13 @@ a:hover { color: var(--gold-light); }
         inset 0 1px 0 rgba(255,240,168,0.2),
         inset 0 -2px 0 rgba(0,0,0,0.5),
         0 4px 14px rgba(0,0,0,0.6);
+}
+
+.btn > *,
+.btn-major > *,
+.nav-btn > *,
+.social-btn > * {
+    pointer-events: none;
 }
 
 .btn:hover {
@@ -1041,6 +1048,33 @@ body { perspective: 1400px; perspective-origin: 50% 0%; }
         0 3px 8px rgba(0,0,0,0.6);
 }
 
+/* Keep real controls fixed under the cursor.  The 3D hover lifts are
+   decorative, but changing the hit box during mouse down/up made module
+   buttons (notably "Forge Account") feel unclickable near their edges. */
+.btn,
+.btn-major,
+.nav-btn,
+.tab,
+.social-btn {
+    position: relative;
+    z-index: 10;
+    pointer-events: auto;
+    touch-action: manipulation;
+}
+
+.btn:hover,
+.btn:active,
+.btn-major:hover,
+.btn-major:active,
+.site-header.header-3d .nav-btn:hover,
+.site-header.header-3d .nav-btn.active,
+.site-header.header-3d .nav-btn:active,
+.tab:hover,
+.tab.active,
+.social-btn:hover {
+    transform: none;
+}
+
 /* ---------- Panels & cards — perspective tilt on hover ---------- */
 .panel-corner {
     transform-style: preserve-3d;
@@ -1051,7 +1085,7 @@ body { perspective: 1400px; perspective-origin: 50% 0%; }
         0 0 30px rgba(230, 195, 74, 0.05) inset;
 }
 .panel-corner:hover {
-    transform: translateY(-2px) rotateX(1.6deg);
+    transform: none;
     box-shadow:
         0 18px 38px rgba(0, 0, 0, 0.78),
         0 0 0 1px rgba(230, 195, 74, 0.3) inset,
