@@ -25,6 +25,9 @@ return [
     "form.required"    => "Please fill in every required field.",
     "db.config_example"=> "opt.example.php is being used. Copy it to opt.php and enter the real remote database settings.",
     "db.connection_error" => "No connection to the remote database. Check db_host, db_port, db_user, db_upwd, db_name and odbc_driver in opt.php.",
+    "errors.db_failed" => "Some data could not be loaded from the database. See logs/errors.log for details.",
+    "errors.module_failed" => "Module finished with an error.",
+    "errors.details" => "Show details",
 
     "reg.title"        => "Create Account",
     "reg.success"      => "Account created! Welcome to the continent.",
