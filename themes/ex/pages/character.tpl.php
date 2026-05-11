@@ -122,12 +122,15 @@ $map_name = $map_number !== null ? mu_map($map_number) : null;
             <div class="equip-grid">
                 <?php foreach ($layout as $cell):
                     $idx = (int)$cell["slot"];
-                    $s = $equipped[$idx] ?? ["empty" => true, "name" => "Empty", "image" => ""]; ?>
+                    $s = $equipped[$idx] ?? ["empty" => true, "name" => "Empty", "image" => ""];
+                    $image = (string)($s["image"] ?? "");
+                    if (!preg_match('~^[A-Za-z0-9_.-]+\.gif$~', $image)) $image = "";
+                    ?>
                     <div class="equip-cell<?= empty($s["empty"]) ? "" : " empty" ?>">
                         <div class="slot-box" title="<?= h($cell["label"]) ?>">
                         <?php if (empty($s["empty"])): ?>
-                            <?php if (!empty($s["image"])): ?>
-                                <img src="assets/images/items/<?= h($s["image"]) ?>" alt="<?= h($s["name"] ?? "Unknown") ?>">
+                            <?php if ($image !== ""): ?>
+                                <img src="assets/images/items/<?= h($image) ?>" alt="<?= h($s["name"] ?? "Unknown") ?>">
                             <?php endif; ?>
                             <?php if (!empty($s["level"])): ?>
                                 <span class="lvl">+<?= (int)$s["level"] ?></span>

@@ -7,7 +7,7 @@ if (!defined("MU_EQUIPPED_SLOTS")) define("MU_EQUIPPED_SLOTS", 12);
 if (!defined("MU_ITEM_BYTES")) define("MU_ITEM_BYTES", 12);
 if (!defined("MU_ITEM_TYPE_HIGH_BIT_OFFSET")) define("MU_ITEM_TYPE_HIGH_BIT_OFFSET", 8);
 if (!defined("MU_ITEM_GLOW_LEVEL_THRESHOLD")) define("MU_ITEM_GLOW_LEVEL_THRESHOLD", 10);
-if (!defined("MU_HEX_FORMATTED_MIN_CHARS")) define("MU_HEX_FORMATTED_MIN_CHARS", 24);
+if (!defined("MU_HEX_FORMATTED_MIN_ITEM_CHARS")) define("MU_HEX_FORMATTED_MIN_ITEM_CHARS", MU_ITEM_BYTES * 2);
 if (!defined("MU_ITEM_SCORE_EXPECTED_SLOT")) define("MU_ITEM_SCORE_EXPECTED_SLOT", 4);
 if (!defined("MU_ITEM_SCORE_KNOWN_NAME")) define("MU_ITEM_SCORE_KNOWN_NAME", 2);
 if (!defined("MU_ITEM_SCORE_HAS_IMAGE")) define("MU_ITEM_SCORE_HAS_IMAGE", 1);
@@ -400,12 +400,12 @@ function mu_inventory_bytes($blob)
     if ($has_hex_prefix) $trimmed = substr($trimmed, 2);
     $has_hex_formatting = $has_hex_prefix || preg_match('/\s/', $trimmed) > 0;
     $compact = preg_replace('/\s+/', '', $trimmed);
-    if ($has_hex_formatting && mu_is_hex_inventory($compact, MU_HEX_FORMATTED_MIN_CHARS)) {
-        $packed = @hex2bin($compact);
+    if ($has_hex_formatting && mu_is_hex_inventory($compact, MU_HEX_FORMATTED_MIN_ITEM_CHARS)) {
+        $packed = hex2bin($compact);
         if ($packed !== false) return $packed;
     }
     if (mu_is_hex_inventory($compact, MU_EQUIPPED_SLOTS * MU_ITEM_BYTES * 2)) {
-        $packed = @hex2bin($compact);
+        $packed = hex2bin($compact);
         if ($packed !== false) return $packed;
     }
     return $blob;
