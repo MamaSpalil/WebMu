@@ -43,6 +43,7 @@ switch ($m) {
     case "account":         require __DIR__ . "/modules/account.php";         break;
     case "change_password": require __DIR__ . "/modules/change_password.php"; break;
     case "ranking":         require __DIR__ . "/modules/ranking.php";         break;
+    case "character":       require __DIR__ . "/modules/character.php";       break;
     case "market":          require __DIR__ . "/modules/market.php";          break;
     case "vote":            require __DIR__ . "/modules/vote.php";            break;
     case "vote_callback":   require __DIR__ . "/modules/vote_callback.php";   break;

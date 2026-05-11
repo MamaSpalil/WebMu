@@ -33,6 +33,7 @@ if ($data === null) {
         "Money"      => "Money",
         "MapNumber"  => "MapNumber",
         "Quest"      => "Quest",
+        "GReset"     => "GReset",
     ];
     $extra_select = [];
     foreach ($opt_cols as $alias => $col) {
@@ -69,6 +70,9 @@ if ($data === null) {
     // COLLATE DATABASE_DEFAULT eliminates collation conflicts between
     // Character / GuildMember / MEMB_INFO (often "SQL_Latin1_General_CP1_CI_AS"
     // vs "Latin1_General_CI_AS") when joining on varchar keys.
+    $has_greset = isset($extra_select["GReset"]);
+    $players_order = ($has_greset ? "GReset DESC, " : "")
+                   . "c.$char_resets DESC, c.$char_level DESC, MasterLevel DESC";
     $players = db_all(
         "SELECT TOP 100 c.$char_name AS Name, c.$char_level AS cLevel,
                 c.$char_resets AS Resets, $char_master AS MasterLevel,
@@ -77,7 +81,7 @@ if ($data === null) {
          LEFT JOIN $guild_member_t gm
               ON gm.$gm_char_name COLLATE DATABASE_DEFAULT
                = c.$char_name      COLLATE DATABASE_DEFAULT
-         ORDER BY c.$char_resets DESC, c.$char_level DESC, MasterLevel DESC"
+         ORDER BY $players_order"
     );
     foreach ($players as &$p) { $p["class_h"] = mu_class($p["Class"] ?? 0); }
     unset($p);
