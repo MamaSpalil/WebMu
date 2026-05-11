@@ -6,7 +6,7 @@ if (!defined("insite")) die("no access");
 if (!defined("MU_EQUIPPED_SLOTS")) define("MU_EQUIPPED_SLOTS", 12);
 if (!defined("MU_ITEM_BYTES")) define("MU_ITEM_BYTES", 12);
 if (!defined("MU_ITEM_TYPE_HIGH_BIT_OFFSET")) define("MU_ITEM_TYPE_HIGH_BIT_OFFSET", 8);
-if (!defined("MU_ITEM_INDEX_HIGH_BIT_OFFSET")) define("MU_ITEM_INDEX_HIGH_BIT_OFFSET", 32);
+if (!defined("MU_EXTENDED_ITEM_INDEX_OFFSET")) define("MU_EXTENDED_ITEM_INDEX_OFFSET", 32);
 if (!defined("MU_ITEM_GLOW_LEVEL_THRESHOLD")) define("MU_ITEM_GLOW_LEVEL_THRESHOLD", 10);
 if (!defined("MU_HEX_FORMATTED_MIN_ITEM_CHARS")) define("MU_HEX_FORMATTED_MIN_ITEM_CHARS", MU_ITEM_BYTES * 2);
 if (!defined("MU_ITEM_SCORE_EXPECTED_SLOT")) define("MU_ITEM_SCORE_EXPECTED_SLOT", 4);
@@ -407,11 +407,11 @@ function mu_decode_item_candidates($bytes)
     $b9 = ord($bytes[9]);
     $item_type  = ($b0 >> 5) + (($b9 & 0x80) ? MU_ITEM_TYPE_HIGH_BIT_OFFSET : 0);
     $item_index = $b0 & 0x1F;
-    $item_index_ext = $item_index + (($b9 & 0x40) ? MU_ITEM_INDEX_HIGH_BIT_OFFSET : 0);
+    $extended_item_index = $item_index + (($b9 & 0x40) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0);
     return [
         // Common Season 3 layout: ItemType comes from byte 0 high bits + byte 9 high flag;
         // bit 6 of byte 9 extends ItemIndex by +32 on newer item lists.
-        ["group" => $item_type, "code" => $item_index_ext],
+        ["group" => $item_type, "code" => $extended_item_index],
         // Legacy Season 3 layout without the extended ItemIndex bit.
         ["group" => $item_type, "code" => $item_index],
         // Alternate emulator layout: byte 9 stores ItemType in its high nibble and byte 0 stores ItemIndex.
