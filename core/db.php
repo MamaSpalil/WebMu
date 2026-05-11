@@ -126,7 +126,12 @@ function db()
     }
 
     $persistent = !empty($config["db_persistent"]);
-    $cursorType = defined("SQL_CUR_USE_ODBC") ? SQL_CUR_USE_ODBC : 2;
+    // Prefer driver cursors: the ODBC cursor library can re-query result
+    // columns by alias during SQLGetData, which breaks SELECT aliases such as
+    // CharName/total_resets on SQL Server.
+    $cursorType = isset($config["odbc_cursor_type"])
+        ? (int)$config["odbc_cursor_type"]
+        : (defined("SQL_CUR_USE_DRIVER") ? SQL_CUR_USE_DRIVER : 2);
     $c = $persistent
         ? @odbc_pconnect($dsn, $user, $pwd, $cursorType)
         : @odbc_connect($dsn, $user, $pwd, $cursorType);

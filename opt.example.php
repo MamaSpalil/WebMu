@@ -33,6 +33,7 @@ $config["db_appname"]    = "WebMu";           // application name reported to SQ
 $config["db_charset"]    = "";                // e.g. "UTF-8" with MSODBCSQL; leave empty for driver default
 $config["db_timeout"]    = 5;                 // connection / login timeout in seconds (0 = driver default)
 $config["db_persistent"] = 0;                 // 1 = use odbc_pconnect (pooled), 0 = fresh connection per request
+$config["odbc_cursor_type"] = 2;              // 2 = SQL_CUR_USE_DRIVER; avoids SQLGetData errors on SELECT aliases
 
 // ---- Site addresses ----
 $config["siteaddress"]  = "http://localhost/";
