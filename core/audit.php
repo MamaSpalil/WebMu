@@ -2,7 +2,8 @@
 // =====================================================================
 //  Lightweight per-account action log (§3.2 of docs/IMPROVEMENT_PROMPT.md).
 //
-//  audit_log("login_ok", ["user" => "..."])
+//  audit_log("login_ok")
+//  audit_log("login_fail", ["account" => $attempted_login, "reason" => "bad_pwd"])
 //
 //  Backed by the optional `webmu_log` table (see docs/schema_addons.sql).
 //  Every call site is gated by db_table_exists() so the site keeps working

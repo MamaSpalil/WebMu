@@ -15,4 +15,4 @@ Disallow: /core/
 Disallow: /opt.php
 Disallow: /opt.example.php
 
-Sitemap: /sitemap.xml
+Sitemap: https://example.com/sitemap.xml
