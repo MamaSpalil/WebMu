@@ -519,6 +519,73 @@ function mu_slot_allows($slot, $group, $code)
     return false;
 }
 
+/**
+ * Per-attribute capability table for a decoded item under stock MuOnline
+ * Season 2 / Season 3 Episode 1 (1.02.19) rules. Used to suppress badges
+ * that decoded bytes can never legally carry for that item class:
+ *
+ *   level  — only weapons (groups 0..5), shields (group 6), armor parts
+ *            (groups 7..11) and wings/capes (group 12, codes 0..6) can
+ *            be upgraded with Jewel of Bless / Soul.
+ *   skill  — only weapons and shields can hold a Skill option.
+ *   luck   — only weapons, shields, armor parts and wings/capes accept
+ *            a Luck option (Jewel of Luck).
+ *   exc    — Excellent options exist on weapons, shields, armor parts
+ *            and wings/capes.
+ *
+ * Pets, pendants, rings and consumables (groups 13..15, plus the
+ * orb / scroll / box codes of group 12) do not support any of these.
+ */
+function mu_item_supports($attr, $group, $code)
+{
+    $g = (int)$group;
+    $c = (int)$code;
+
+    $is_weapon  = ($g >= 0 && $g <= 5);
+    $is_shield  = ($g === 6);
+    $is_armor   = ($g >= 7 && $g <= 11);
+    $is_wing    = ($g === 12 && $c >= 0 && $c <= 6);
+
+    switch ($attr) {
+        case "level":
+            return $is_weapon || $is_shield || $is_armor || $is_wing;
+        case "skill":
+            return $is_weapon || $is_shield;
+        case "luck":
+        case "exc":
+            return $is_weapon || $is_shield || $is_armor || $is_wing;
+    }
+    return false;
+}
+
+/**
+ * True iff (group, code) is present in the S2/S3 Ep.1 item catalog.
+ * Used to drop bogus warehouse slots whose decoded identity points at
+ * items that don't exist on this server version.
+ */
+function mu_item_exists($group, $code)
+{
+    $catalog = mu_item_catalog();
+    return isset($catalog[(int)$group][(int)$code]);
+}
+
+/**
+ * Clamp a decoded slot's optional badges (`level`, `skill`, `luck`, `exc`)
+ * to what the S2/S3 Ep.1 item class can legally carry. Mutates the slot
+ * array in place. Used by both the equipped and warehouse decoders to
+ * avoid surfacing bogus byte-1 / byte-7 flags on jewels, potions,
+ * scrolls, pets, pendants and rings.
+ */
+function mu_clamp_item_badges(array &$slot)
+{
+    $g = (int)($slot["group"] ?? 0);
+    $c = (int)($slot["code"]  ?? 0);
+    if (!mu_item_supports("level", $g, $c)) $slot["level"] = 0;
+    if (!mu_item_supports("skill", $g, $c)) $slot["skill"] = false;
+    if (!mu_item_supports("luck",  $g, $c)) $slot["luck"]  = false;
+    if (!mu_item_supports("exc",   $g, $c)) $slot["exc"]   = 0;
+}
+
 function mu_is_hex_inventory($value, $min_chars)
 {
     return $value !== "" && (strlen($value) % 2) === 0
@@ -647,6 +714,9 @@ function mu_parse_equipped_inventory($blob)
             "exc"   => $excellent_mask,
             "raw"   => strtoupper(bin2hex($bytes)),
         ];
+        // Clamp +N / Skill / Luck / Exc badges to what this item class
+        // can legally carry under S2/S3 Ep.1.
+        mu_clamp_item_badges($slots[$i]);
     }
     return $slots;
 }
@@ -692,6 +762,14 @@ function mu_parse_warehouse_blob($blob, $slots = 120)
         $opt   = $b1 & 0x03;
         $identity = mu_choose_item_identity($bytes, $i, $level);
 
+        // Strict S2/S3 Ep.1 catalog filter: anything that decodes to an
+        // item this server version doesn't know about (e.g. a stray
+        // group 16+ byte from a corrupt or wrong-season blob) is dropped
+        // to Empty rather than rendered as a nameless tile.
+        if (!mu_item_exists($identity["group"], $identity["code"])) {
+            continue;
+        }
+
         $out[$i] = [
             "empty" => false,
             "group" => $identity["group"],
@@ -705,6 +783,10 @@ function mu_parse_warehouse_blob($blob, $slots = 120)
             "exc"   => $excellent_mask,
             "raw"   => strtoupper(bin2hex($bytes)),
         ];
+        // Clamp +N / Skill / Luck / Exc badges to what this item class
+        // can legally carry under S2/S3 Ep.1 — jewels / potions /
+        // scrolls / pets / pendants / rings cannot carry any of them.
+        mu_clamp_item_badges($out[$i]);
     }
     return $out;
 }
