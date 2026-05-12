@@ -1430,3 +1430,187 @@ body { perspective: 1400px; perspective-origin: 50% 0%; }
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* =====================================================================
+ * Vote page — voting-site rows
+ * The SVG icons in assets/icons/*.svg only carry a viewBox (no width or
+ * height attributes), so without these rules the browser falls back to
+ * its default ~300×150 SVG size and the row blows up — see the layout
+ * problem on themes/ex/pages/vote.tpl.php.
+ * ===================================================================== */
+.vote-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    margin-top: 12px;
+    border: 1px solid var(--border-gold);
+    border-radius: 3px;
+    background: linear-gradient(180deg, rgba(28,18,6,0.7) 0%, rgba(10,6,2,0.85) 100%);
+    box-shadow: inset 0 1px 0 rgba(255,240,168,.06), 0 4px 10px rgba(0,0,0,.35);
+}
+.vote-row .site-icon {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(230,195,74,.4));
+}
+.vote-row > div {
+    flex: 1 1 180px;
+    min-width: 0;
+}
+.vote-row .name {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--gold);
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+.vote-row .desc {
+    color: #b89968;
+    font-size: 12px;
+    margin-top: 2px;
+}
+.vote-row .reward {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #fff5b8;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+}
+.vote-row .reward img { width: 18px; height: 18px; }
+.vote-row .status {
+    font-size: 12px;
+    color: #b89968;
+    letter-spacing: 1px;
+    flex: 0 0 auto;
+}
+.vote-row .status.cd { color: #c8923a; }
+.vote-row form { margin: 0; flex: 0 0 auto; }
+
+/* =====================================================================
+ * Download page — client/patch rows + system-requirements grid
+ * ===================================================================== */
+.dl-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px;
+    padding: 14px;
+    margin-top: 12px;
+    border: 1px solid var(--border-gold);
+    border-radius: 3px;
+    background: linear-gradient(180deg, rgba(28,18,6,0.7) 0%, rgba(10,6,2,0.85) 100%);
+    box-shadow: inset 0 1px 0 rgba(255,240,168,.06), 0 4px 10px rgba(0,0,0,.35);
+}
+.dl-row > img {
+    flex: 0 0 56px;
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 8px rgba(230,195,74,.4));
+}
+.dl-row .meta {
+    flex: 1 1 220px;
+    min-width: 0;
+}
+.dl-row .meta h3 {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--gold);
+    font-size: 16px;
+    letter-spacing: 1px;
+    margin: 0 0 4px 0;
+}
+.dl-row .meta p {
+    color: #c8b890;
+    font-size: 13px;
+    line-height: 1.5;
+    margin: 0 0 6px 0;
+}
+.dl-row .tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.dl-row .btn { flex: 0 0 auto; }
+
+.req-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+@media (max-width: 720px) {
+    .req-grid { grid-template-columns: 1fr; }
+}
+.req-grid h4 {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--gold);
+    margin: 0 0 8px 0;
+    letter-spacing: 2px;
+    font-size: 14px;
+}
+.req-grid table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.req-grid th {
+    text-align: left;
+    color: #b89968;
+    font-weight: normal;
+    font-size: 12px;
+    padding: 4px 8px 4px 0;
+    width: 38%;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.req-grid td {
+    color: #ddc89a;
+    font-size: 13px;
+    padding: 4px 0;
+}
+
+/* =====================================================================
+ * Donate page — credits / WCoin / account balance bar
+ * ===================================================================== */
+.balance-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+.balance-bar .bal {
+    flex: 1 1 140px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, rgba(28,18,6,0.85) 0%, rgba(10,6,2,0.92) 100%);
+    border: 1px solid var(--border-gold);
+    border-radius: 3px;
+    box-shadow: inset 0 1px 0 rgba(255,240,168,.08), 0 4px 10px rgba(0,0,0,.35);
+}
+.balance-bar .bal > img {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px rgba(230,195,74,.4));
+}
+.balance-bar .bal > div { min-width: 0; }
+.balance-bar .bal .v {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--gold-light);
+    font-size: 18px;
+    line-height: 1.1;
+}
+.balance-bar .bal .l {
+    color: #b89968;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
