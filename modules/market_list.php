@@ -11,7 +11,7 @@
 //    4. Extract the 16 bytes for the slot — refuse if empty.
 //    5. INSERT into WebMarketItems (item_blob = those 16 bytes + decoded
 //       name/level/exc/luck/skill/opt for display).
-//    6. UPDATE the warehouse blob with that slot zeroed (12 × 0xFF).
+//    6. UPDATE the warehouse blob with that slot zeroed (16 × 0xFF).
 //    7. COMMIT — or ROLLBACK on any failure.
 // =====================================================================
 if (!defined("insite")) die("no access");
