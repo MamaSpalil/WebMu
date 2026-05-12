@@ -549,6 +549,142 @@ function mu_parse_equipped_inventory($blob)
     return $slots;
 }
 
+/**
+ * Decode N slots from a packed MuOnline warehouse / inventory blob using
+ * the same per-slot byte layout as mu_parse_equipped_inventory(): each
+ * slot is MU_ITEM_BYTES (12) bytes, empty slot = 12 × 0xFF.
+ *
+ * Used by the Web-Сундук page and the admin "view warehouse" tool.
+ *
+ * @param string $blob Raw varbinary from `warehouse.Items` (or hex string).
+ * @param int    $slots Maximum slot count to decode (default 120 = 8×15).
+ * @return array<int,array> Same per-slot shape as mu_parse_equipped_inventory().
+ */
+function mu_parse_warehouse_blob($blob, $slots = 120)
+{
+    $slots = max(1, (int)$slots);
+    $out = array_fill(0, $slots, [
+        "empty" => true, "group" => 0, "code" => 0, "level" => 0,
+        "skill" => false, "luck" => false, "opt" => 0, "exc" => 0,
+        "raw" => "", "name" => "Empty", "image" => "",
+    ]);
+    $blob = mu_inventory_bytes($blob);
+    if ($blob === "") return $out;
+    $len = strlen($blob);
+    $slot_size = MU_ITEM_BYTES;
+    for ($i = 0; $i < $slots; $i++) {
+        $off = $i * $slot_size;
+        if ($off + $slot_size > $len) break;
+        $bytes = substr($blob, $off, $slot_size);
+        $all_ff = true;
+        for ($b = 0; $b < $slot_size; $b++) {
+            if (ord($bytes[$b]) !== 0xFF) { $all_ff = false; break; }
+        }
+        if ($all_ff) continue;
+
+        $b1 = ord($bytes[1]);
+        $excellent_mask = ord($bytes[7]) & MU_EXCELLENT_OPTION_MASK;
+        $level = ($b1 >> 3) & 0x0F;
+        $skill = (bool)($b1 & 0x80);
+        $luck  = (bool)($b1 & 0x04);
+        $opt   = $b1 & 0x03;
+        $identity = mu_choose_item_identity($bytes, $i, $level);
+
+        $out[$i] = [
+            "empty" => false,
+            "group" => $identity["group"],
+            "code"  => $identity["code"],
+            "name"  => $identity["name"],
+            "image" => $identity["image"],
+            "level" => $level,
+            "skill" => $skill,
+            "luck"  => $luck,
+            "opt"   => $opt,
+            "exc"   => $excellent_mask,
+            "raw"   => strtoupper(bin2hex($bytes)),
+        ];
+    }
+    return $out;
+}
+
+/**
+ * Pack a single decoded slot back into the warehouse blob, replacing the
+ * 12 bytes at `slot` with `bytes` (or 12 × 0xFF when $bytes is "").
+ * Returns the new full blob (same length as input or extended with 0xFF
+ * up to ($slot+1)*12 bytes).
+ */
+function mu_warehouse_set_slot($blob, $slot, $bytes, $total_slots = 120)
+{
+    $slot = (int)$slot;
+    $total_slots = max(1, (int)$total_slots);
+    if ($slot < 0 || $slot >= $total_slots) return $blob;
+    $packed = mu_inventory_bytes($blob);
+    $expected = $total_slots * MU_ITEM_BYTES;
+    if (strlen($packed) < $expected) {
+        $packed .= str_repeat("\xFF", $expected - strlen($packed));
+    }
+    if ($bytes === "" || $bytes === null) {
+        $bytes = str_repeat("\xFF", MU_ITEM_BYTES);
+    } elseif (strlen($bytes) !== MU_ITEM_BYTES) {
+        return $blob; // refuse malformed input
+    }
+    return substr($packed, 0, $slot * MU_ITEM_BYTES)
+         . $bytes
+         . substr($packed, ($slot + 1) * MU_ITEM_BYTES);
+}
+
+/**
+ * Find the index of the first empty (12 × 0xFF) slot in a warehouse blob.
+ * Returns -1 if all $total_slots are occupied.
+ */
+function mu_warehouse_first_empty_slot($blob, $total_slots = 120)
+{
+    $total_slots = max(1, (int)$total_slots);
+    $packed = mu_inventory_bytes($blob);
+    $expected = $total_slots * MU_ITEM_BYTES;
+    if (strlen($packed) < $expected) {
+        // Whatever's missing at the end is implicitly empty.
+        return (int)floor(strlen($packed) / MU_ITEM_BYTES);
+    }
+    for ($i = 0; $i < $total_slots; $i++) {
+        $off = $i * MU_ITEM_BYTES;
+        $all_ff = true;
+        for ($b = 0; $b < MU_ITEM_BYTES; $b++) {
+            if (ord($packed[$off + $b]) !== 0xFF) { $all_ff = false; break; }
+        }
+        if ($all_ff) return $i;
+    }
+    return -1;
+}
+
+/**
+ * Get the raw 12 bytes of a warehouse slot; returns "" if slot is empty
+ * (all 0xFF) or out of range.
+ */
+function mu_warehouse_get_slot($blob, $slot, $total_slots = 120)
+{
+    $slot = (int)$slot;
+    $total_slots = max(1, (int)$total_slots);
+    if ($slot < 0 || $slot >= $total_slots) return "";
+    $packed = mu_inventory_bytes($blob);
+    $off = $slot * MU_ITEM_BYTES;
+    if ($off + MU_ITEM_BYTES > strlen($packed)) return "";
+    $bytes = substr($packed, $off, MU_ITEM_BYTES);
+    $all_ff = true;
+    for ($b = 0; $b < MU_ITEM_BYTES; $b++) {
+        if (ord($bytes[$b]) !== 0xFF) { $all_ff = false; break; }
+    }
+    return $all_ff ? "" : $bytes;
+}
+
+/** Delete a cached entry created with cache_set(). */
+function cache_del($key)
+{
+    global $config;
+    $f = ($config["__cache"] ?? sys_get_temp_dir()) . "/" . md5($key) . ".cache";
+    if (is_file($f)) @unlink($f);
+}
+
 /** ---- file cache (used by ranking/widgets) ---- */
 function cache_get($key, $ttl)
 {

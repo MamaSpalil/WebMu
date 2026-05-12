@@ -41,8 +41,16 @@
                 <a class="<?= $cls ?>" href="index.php?m=<?= $k ?>"><?= h(lang($lk)) ?></a>
             <?php endforeach; ?>
             <?php if ($user): ?>
+                <a class="nav-btn<?= $page_id === "warehouse" ? " active" : "" ?>"
+                   href="index.php?m=warehouse"><?= h(lang("nav.warehouse")) ?></a>
+                <a class="nav-btn<?= $page_id === "vip" ? " active" : "" ?>"
+                   href="index.php?m=vip"><?= h(lang("nav.vip")) ?></a>
                 <a class="nav-btn<?= $page_id === "account" ? " active" : "" ?>"
                    href="index.php?m=account"><?= h(lang("nav.account")) ?> (<?= h($user["id"]) ?>)</a>
+                <?php if (function_exists("is_admin") && is_admin()): ?>
+                    <a class="nav-btn<?= $page_id === "admin" ? " active" : "" ?>"
+                       href="index.php?m=admin"><?= h(lang("nav.admin")) ?></a>
+                <?php endif; ?>
                 <a class="nav-btn" href="index.php?m=logout"><?= h(lang("nav.logout")) ?></a>
             <?php else: ?>
                 <a class="nav-btn<?= $page_id === "login" ? " active" : "" ?>"

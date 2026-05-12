@@ -18,6 +18,18 @@ while (ob_get_level() > 0) { @ob_end_clean(); }
 // Required core tables for the site to be useful at all.
 $required = ["MEMB_INFO", "Character"];
 
+// Optional WebMu add-on tables (idempotent, see docs/schema_addons.sql).
+// They are reported in the JSON payload so admins can confirm their
+// schema migration ran, but their absence does not flip overall status.
+$optional = [
+    "webmu_log",
+    "WebDonateItems", "WebDonateLog",
+    "WebMarketItems", "WebMarketLog",
+    "WebOnlineHours",
+    (string)($config["vip_table"] ?? "VipList"),
+    (string)($config["wh_table"]  ?? "warehouse"),
+];
+
 $db_ok = false;
 $db_error = "";
 $tables = [];
@@ -33,9 +45,16 @@ if ($db_ok) {
     foreach ($required as $t) {
         $tables[$t] = (bool)db_table_exists($t);
     }
+    foreach ($optional as $t) {
+        if ($t === "" || isset($tables[$t])) continue;
+        $tables[$t] = (bool)db_table_exists($t);
+    }
 }
 
-$tables_ok = $db_ok && !in_array(false, $tables, true);
+$tables_ok = $db_ok;
+foreach ($required as $t) {
+    if (empty($tables[$t])) { $tables_ok = false; break; }
+}
 $status_ok = $db_ok && $tables_ok;
 
 http_response_code($status_ok ? 200 : 503);

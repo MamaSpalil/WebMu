@@ -80,3 +80,96 @@ function vote_sites_by_id() {
     foreach (vote_sites() as $s) $out[$s["id"]] = $s;
     return $out;
 }
+
+/* =====================================================================
+ *  Market currencies — single source of truth.
+ *
+ *  WebMu's Web-Vault market lets sellers price an item in one of the
+ *  currencies declared here. Each entry describes:
+ *    id          — short token stored in WebMarketItems.currency
+ *    label       — displayable name for templates
+ *    kind        — "balance" | "jewel"
+ *      "balance" currencies have a numeric account balance the website
+ *        can debit/credit directly (wcoin, zen, usdt). For these we
+ *        offer a "Buy" button that performs the trade fully on-site.
+ *      "jewel" currencies are per-piece game items (Jewel of Soul,
+ *        etc.). The site only allows LISTING for jewel prices; the
+ *        actual trade requires a safe in-game escrow that is out of
+ *        scope for the MVP. Buyers see "Contact seller" instead.
+ *    table/column/acc — for "balance" currencies, the SQL location of
+ *        the balance value (mapped from $config[*] keys so admins can
+ *        remap to custom emulator schemas).
+ *    int_price   — true = enforce integer price (jewels & wcoin).
+ * ===================================================================== */
+function market_currencies()
+{
+    global $config;
+    $list = [
+        [
+            "id" => "wcoin", "label" => "WCoin", "kind" => "balance",
+            "table" => $config["wcoin_table"]  ?? "GameShopPoint",
+            "column"=> $config["wcoin_column"] ?? "WCoinP",
+            "acc"   => $config["wcoin_acc"]    ?? "AccountID",
+            "int_price" => true,
+        ],
+        [
+            "id" => "zen",   "label" => "Zen", "kind" => "balance",
+            // Zen lives on Character.Money — paid PER CHARACTER, so the
+            // buyer must pick a character to debit when paying in Zen.
+            "table" => $config["char_table"]    ?? "Character",
+            "column"=> "Money",
+            "acc"   => $config["char_name_col"] ?? "Name",
+            "is_character_balance" => true,
+            "int_price" => true,
+        ],
+        [
+            "id" => "usdt",  "label" => "USDT", "kind" => "balance",
+            "table" => $config["usdt_table"]  ?? "MEMB_INFO",
+            "column"=> $config["usdt_column"] ?? "usdt",
+            "acc"   => $config["usdt_acc"]    ?? "memb___id",
+            "int_price" => false,
+        ],
+    ];
+    // Jewels — ordered by familiar in-game frequency.
+    foreach ([
+        "bless"     => "Jewel of Bless",
+        "soul"      => "Jewel of Soul",
+        "chaos"     => "Jewel of Chaos",
+        "life"      => "Jewel of Life",
+        "creation"  => "Jewel of Creation",
+        "harmony"   => "Jewel of Harmony",
+        "level"     => "Jewel of Level",
+        "luck"      => "Jewel of Luck",
+        "excellent" => "Jewel of Excellent",
+    ] as $id => $label) {
+        $list[] = ["id" => $id, "label" => $label, "kind" => "jewel", "int_price" => true];
+    }
+    return $list;
+}
+
+/** Look up a market currency descriptor by id. Returns null if unknown. */
+function market_currency($id)
+{
+    $id = (string)$id;
+    foreach (market_currencies() as $c) {
+        if ($c["id"] === $id) return $c;
+    }
+    return null;
+}
+
+/**
+ * Returns true if the currency is supported on the current installation:
+ *   - balance currencies need their table+column to actually exist;
+ *   - jewel currencies are always allowed for listing.
+ */
+function market_currency_available($id)
+{
+    $c = market_currency($id);
+    if (!$c) return false;
+    if ($c["kind"] !== "balance") return true;
+    if (!function_exists("db_table_exists")) return false;
+    $tbl = (string)($c["table"] ?? "");
+    $col = (string)($c["column"] ?? "");
+    if ($tbl === "" || $col === "") return false;
+    return db_table_exists($tbl) && db_column_exists($tbl, $col);
+}
