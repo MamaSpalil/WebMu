@@ -56,15 +56,18 @@ return [
     "vote.thanks"      => "Thanks for voting! Reward has been credited.",
     "vote.cooldown"    => "You've already voted recently. Try later.",
     "vote.no_account"  => "Log in to receive the reward.",
+    "vote.rate_limit"  => "Daily vote limit reached. Try again later.",
 
     "donate.title"     => "Donate Shop",
     "donate.bought"    => "Purchase completed. Item delivered to vault.",
     "donate.no_funds"  => "Insufficient funds.",
     "donate.no_item"   => "Item not found.",
+    "donate.rate_limit"=> "Too many purchases in a row. Try again later.",
 
     "acc.title"        => "My Account",
     "acc.balances"     => "Balances",
     "acc.password"     => "Change password",
     "acc.password_ok"  => "Password updated.",
     "acc.password_bad" => "Current password is wrong.",
+    "acc.rate_limit"   => "Too many password change attempts. Try later.",
 ];

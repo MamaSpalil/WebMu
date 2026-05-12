@@ -25,10 +25,13 @@ $row = db_one(
      FROM MEMB_INFO WHERE memb___id = ?", [$login]
 );
 if (!$row || (int)($row["bloc_code"] ?? 0) !== 0 || !verify_password($pwd, $row)) {
+    audit_log("login_fail", ["account" => $login,
+        "reason" => !$row ? "no_user" : ((int)($row["bloc_code"] ?? 0) !== 0 ? "blocked" : "bad_pwd")]);
     flash_set("error", lang("login.bad"));
     redirect("index.php?m=login");
 }
 
 login_user($row);
+audit_log("login_ok");
 $next = $_GET["next"] ?? "index.php?m=account";
 redirect($next);

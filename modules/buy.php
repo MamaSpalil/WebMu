@@ -13,6 +13,16 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
     redirect("index.php?m=donate");
 }
 $me = current_user();
+
+// Rate-limit purchases: at most 20 / hour per IP and per account.
+// Stops a runaway client (browser-replay or compromised JS) from
+// hammering the debit endpoint while still allowing normal shopping.
+if (rate_limit_hit("buy:ip:" . client_ip(), 20, 3600)
+    || rate_limit_hit("buy:acc:" . $me["id"], 20, 3600)) {
+    flash_set("error", lang("donate.rate_limit"));
+    redirect("index.php?m=donate");
+}
+
 $item_id = (int)($_POST["item"] ?? 0);
 if ($item_id <= 0) {
     flash_set("error", lang("donate.no_item"));
@@ -86,4 +96,10 @@ if (db_table_exists($log_table)) {
 }
 
 flash_set("success", lang("donate.bought"));
+audit_log("buy", [
+    "item_id"      => $item_id,
+    "item_name"    => $it["name"],
+    "paid_credits" => (int)$it["credits"],
+    "paid_wcoin"   => (int)$it["wcoin"],
+]);
 redirect("index.php?m=donate");

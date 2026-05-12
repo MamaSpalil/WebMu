@@ -137,5 +137,9 @@ $row = db_one("SELECT memb___id, memb_name, mail_addr, memb__pwd FROM MEMB_INFO 
               [$login]);
 if ($row) login_user($row);
 
+audit_log("register", ["account" => $login,
+    "starter_credits" => $starter_credits, "starter_wcoin" => $starter_wcoin,
+    "referrer" => ($referrer !== "" ? $referrer : null)]);
+
 flash_set("success", lang("reg.success"));
 redirect("index.php?m=account");
