@@ -101,6 +101,30 @@ BEGIN
 END
 GO
 
+/* ---- webmu_log (per-account action log) ----------------------------- *
+ *  Used by the site to record security- and finance-relevant events:
+ *    login_ok / login_fail, register, change_password,
+ *    vote, buy, market_list / market_buy, etc.
+ *  Optional: every call site is gated by db_table_exists("webmu_log"),
+ *  so the site keeps working even if this table was never created.
+ * --------------------------------------------------------------------- */
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'webmu_log')
+BEGIN
+    CREATE TABLE webmu_log (
+        id          int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        ts          datetime      NOT NULL DEFAULT GETDATE(),
+        ip          varchar(45)   NULL,
+        account     varchar(10)   NULL,
+        action      varchar(32)   NOT NULL,
+        details     nvarchar(400) NULL
+    );
+    CREATE INDEX IX_webmu_log_account ON webmu_log(account);
+    CREATE INDEX IX_webmu_log_action  ON webmu_log(action);
+    CREATE INDEX IX_webmu_log_ts      ON webmu_log(ts);
+    PRINT 'Created webmu_log';
+END
+GO
+
 /* ---- WebVotePoints (fallback for vote rewards) ---------------------- */
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'WebVotePoints')
 BEGIN

@@ -96,4 +96,10 @@ if (db_table_exists($log_table)) {
 }
 
 flash_set("success", lang("donate.bought"));
+audit_log("buy", [
+    "item_id"      => $item_id,
+    "item_name"    => $it["name"],
+    "paid_credits" => (int)$it["credits"],
+    "paid_wcoin"   => (int)$it["wcoin"],
+]);
 redirect("index.php?m=donate");

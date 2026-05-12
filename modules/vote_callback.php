@@ -89,5 +89,6 @@ if (!$ok) {
 }
 
 @file_put_contents($f, (string)time(), LOCK_EX);
+audit_log("vote", ["site" => $site_id, "reward" => $reward]);
 flash_set("success", lang("vote.thanks"));
 redirect("index.php?m=vote");

@@ -35,5 +35,8 @@ if (!verify_password($cur, $row)) {
 
 $ok = db_exec("UPDATE MEMB_INFO SET memb__pwd = ? WHERE memb___id = ?",
               [pwd_for_db($new), $me["id"]]);
-if ($ok) flash_set("success", lang("acc.password_ok"));
+if ($ok) {
+    audit_log("change_password");
+    flash_set("success", lang("acc.password_ok"));
+}
 redirect("index.php?m=account");

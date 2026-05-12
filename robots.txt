@@ -8,8 +8,11 @@ Disallow: /index.php?m=change_password
 Disallow: /index.php?m=logout
 Disallow: /index.php?m=buy
 Disallow: /index.php?m=vote_callback
+Disallow: /index.php?m=health
 Disallow: /cache/
 Disallow: /logs/
 Disallow: /core/
 Disallow: /opt.php
 Disallow: /opt.example.php
+
+Sitemap: /sitemap.xml
