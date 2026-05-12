@@ -4,14 +4,20 @@
 // =====================================================================
 if (!defined("insite")) die("no access");
 if (!defined("MU_EQUIPPED_SLOTS")) define("MU_EQUIPPED_SLOTS", 12);
-if (!defined("MU_ITEM_BYTES")) define("MU_ITEM_BYTES", 12);
-if (!defined("MU_ITEM_TYPE_HIGH_BIT_OFFSET")) define("MU_ITEM_TYPE_HIGH_BIT_OFFSET", 8);
-if (!defined("MU_EXTENDED_ITEM_INDEX_OFFSET")) define("MU_EXTENDED_ITEM_INDEX_OFFSET", 32);
-if (!defined("MU_ITEM_TYPE_HIGH_BIT_FLAG")) define("MU_ITEM_TYPE_HIGH_BIT_FLAG", 0x80);
-if (!defined("MU_EXTENDED_ITEM_INDEX_FLAG")) define("MU_EXTENDED_ITEM_INDEX_FLAG", 0x40);
+// Per-slot record size for the Character.Inventory / warehouse.Items
+// blobs on this server: 16 bytes per slot (32 hex chars), matching the
+// reference parser in modules/webv.php — that is the canonical layout
+// for our game DB (item code in byte 0 as a full 8-bit value, item
+// group in byte 9's high nibble, 380 marker in byte 9's low nibble,
+// excellent options in byte 7, sockets in bytes 11..15).
+if (!defined("MU_ITEM_BYTES")) define("MU_ITEM_BYTES", 16);
 if (!defined("MU_ITEM_GLOW_LEVEL_THRESHOLD")) define("MU_ITEM_GLOW_LEVEL_THRESHOLD", 10);
 if (!defined("MU_HEX_FORMATTED_MIN_ITEM_CHARS")) define("MU_HEX_FORMATTED_MIN_ITEM_CHARS", MU_ITEM_BYTES * 2);
 if (!defined("MU_EXCELLENT_OPTION_MASK")) define("MU_EXCELLENT_OPTION_MASK", 0x3F); // bits 0..5 = six excellent options
+// Low nibble marker of byte 9 that the reference webv.php treats as the
+// "Item Level 380" flag — group is still the high nibble of byte 9 in
+// that case (because (b9 - 8) / 16 == b9 >> 4 when the low nibble is 8).
+if (!defined("MU_ITEM_380_MARKER")) define("MU_ITEM_380_MARKER", 0x08);
 
 /** ---- escaping ---- */
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, "UTF-8"); }
@@ -395,33 +401,39 @@ function mu_item_image($item_type, $item_index, $level = 0)
 }
 
 /**
- * Decode a single 12-byte equipped-slot record from Character.Inventory using
- * the canonical MuOnline Season 3 Episode 1 (1.02.19) layout used by stock
- * Webzen / MuServer S3 builds. The byte layout is:
+ * Decode a single equipped/warehouse slot record from the Inventory blob,
+ * matching the layout used by the reference parser in modules/webv.php
+ * (16 bytes / 32 hex chars per slot):
  *
- *   byte 0: bits 7..5 = ItemType low (0..7), bits 4..0 = ItemIndex low (0..31)
- *   byte 1: bit 7 = Skill, bits 6..3 = Level (0..15),
- *           bit 2 = Luck, bits 1..0 = Option (0..3, ×4 = +N)
- *   byte 2: Durability
+ *   byte 0:  ItemID — full 8-bit item code (0..255) within its group.
+ *   byte 1:  bit 7 = Skill, bits 6..3 = Level (0..15),
+ *            bit 2 = Luck, bits 1..0 = Option (0..3, ×4 = +N)
+ *   byte 2:  Durability
  *   byte 3..6: Serial / extra flags (per-build, opaque to the website)
- *   byte 7: Excellent options bitmask (bits 0..5; bits 6..7 reserved for set/ancient)
- *   byte 8: Set / 380 option (opaque)
- *   byte 9: bit 7 = ItemType extension (+8, giving group 0..15)
- *           bit 6 = ItemIndex extension (+32, giving code 0..63)
- *           bits 5..0 reserved
- *   byte 10..11: reserved
+ *   byte 7:  Excellent options bitmask (bits 0..5; bits 6..7 reserved
+ *            for set/ancient flags in some builds)
+ *   byte 8:  Set / ancient option (low nibble = ancient marker)
+ *   byte 9:  high nibble = ItemType / group (0..15);
+ *            low nibble = 380-item marker (0x08 for "Item Level 380")
+ *   byte 10: high nibble = harmony type, low nibble = harmony level
+ *   byte 11..15: socket bytes (5 sockets, FF or 0x00 = empty)
  *
- * Empty slots are encoded as 12 × 0xFF and must be filtered by the caller.
+ * Empty slots are encoded as 16 × 0xFF and must be filtered by the caller.
  *
- * @param string $bytes Raw 12-byte slot record.
+ * @param string $bytes Raw 16-byte slot record.
  * @return array{group:int,code:int}
  */
 function mu_decode_item_identity($bytes)
 {
+    // Match webv.php exactly: code is the full byte 0 (no high-bit
+    // extension — the +32 ItemIndex extension flag from S3 Ep.1 12-byte
+    // blobs does not apply to this server's 16-byte slot layout) and
+    // group is the high nibble of byte 9 (the low nibble carries the
+    // 380-item marker, which we deliberately ignore for identity).
     $b0 = ord($bytes[0]);
     $b9 = ord($bytes[9]);
-    $group = ($b0 >> 5) + (($b9 & MU_ITEM_TYPE_HIGH_BIT_FLAG) ? MU_ITEM_TYPE_HIGH_BIT_OFFSET : 0);
-    $code  = ($b0 & 0x1F) + (($b9 & MU_EXTENDED_ITEM_INDEX_FLAG) ? MU_EXTENDED_ITEM_INDEX_OFFSET : 0);
+    $group = ($b9 >> 4) & 0x0F;
+    $code  = $b0;
     return ["group" => $group, "code" => $code];
 }
 
@@ -487,8 +499,12 @@ function mu_slot_allows($slot, $group, $code)
         41, // Santa Girl Ring
         42, // GameMaster Ring
     ];
-    // Wings/Capes that exist in S2/S3 Ep.1; the rest of group 12 are
-    // orbs / scrolls / boxes that must never appear in the Wings slot.
+    // Wings/Capes/Mantles legal in the Wings slot. The reference parser
+    // (modules/webv.php) treats codes 0..6 as the classic 1st/2nd-class
+    // wings and 36..45 as the 3rd-class wings/capes (Storm, Space-Time,
+    // Illusion, Doom, Mantle of Monarch, Wings of Angel/Power/Butterfly/
+    // Dream, Mantle of Darkness). Anything else in group 12 is an
+    // orb / scroll / box that must never appear in the Wings slot.
     static $g12_wings = [
         0, // Wings of Elf
         1, // Wings of Heaven
@@ -497,6 +513,16 @@ function mu_slot_allows($slot, $group, $code)
         4, // Wings of Soul
         5, // Wings of Dragon
         6, // Wings of Darkness
+        36, // Wings of Storm
+        37, // Wings of Space-Time
+        38, // Wings of Illusion
+        39, // Wings of Doom
+        40, // Mantle of Monarch
+        41, // Wings of Angel
+        42, // Wings of Power
+        43, // Wings of Butterfly
+        44, // Wings of Dream
+        45, // Mantle of Darkness
     ];
 
     switch ($slot) {
@@ -544,7 +570,11 @@ function mu_item_supports($attr, $group, $code)
     $is_weapon  = ($g >= 0 && $g <= 5);
     $is_shield  = ($g === 6);
     $is_armor   = ($g >= 7 && $g <= 11);
-    $is_wing    = ($g === 12 && $c >= 0 && $c <= 6);
+    // Wings/Capes that can carry +N / Luck / Excellent badges: classic
+    // wings (codes 0..6) and the 3rd-class wings/capes (codes 36..45).
+    // Other group-12 codes are orbs/scrolls/boxes and must not show
+    // weapon-style badges (see modules/webv.php for the full list).
+    $is_wing    = ($g === 12 && (($c >= 0 && $c <= 6) || ($c >= 36 && $c <= 45)));
 
     switch ($attr) {
         case "level":
@@ -636,12 +666,13 @@ function mu_inventory_bytes($blob)
 
 /**
  * Decode the 12 equipped slots from a MuOnline Character.Inventory blob,
- * targeting the canonical MuOnline Season 3 Episode 1 (1.02.19) layout:
+ * targeting the 16-byte-per-slot layout used by this server (the same
+ * layout the reference parser modules/webv.php walks):
  *
- *   - The Inventory column is a packed varbinary of 12-byte slot records;
+ *   - The Inventory column is a packed varbinary of 16-byte slot records;
  *     slots 0–11 are equipped (right hand, left hand, helm, armor, pants,
  *     gloves, boots, wings, pet, pendant, ring 1, ring 2 in that storage
- *     order). An empty slot is filled with 12 × 0xFF.
+ *     order). An empty slot is filled with 16 × 0xFF.
  *   - The per-slot byte layout is documented on mu_decode_item_identity().
  *
  * We return an array of 12 entries with:
@@ -724,7 +755,7 @@ function mu_parse_equipped_inventory($blob)
 /**
  * Decode N slots from a packed MuOnline warehouse / inventory blob using
  * the same per-slot byte layout as mu_parse_equipped_inventory(): each
- * slot is MU_ITEM_BYTES (12) bytes, empty slot = 12 × 0xFF.
+ * slot is MU_ITEM_BYTES (16) bytes, empty slot = 16 × 0xFF.
  *
  * Used by the Web-Сундук page and the admin "view warehouse" tool.
  *
@@ -793,9 +824,9 @@ function mu_parse_warehouse_blob($blob, $slots = 120)
 
 /**
  * Pack a single decoded slot back into the warehouse blob, replacing the
- * 12 bytes at `slot` with `bytes` (or 12 × 0xFF when $bytes is "").
+ * 16 bytes at `slot` with `bytes` (or 16 × 0xFF when $bytes is "").
  * Returns the new full blob (same length as input or extended with 0xFF
- * up to ($slot+1)*12 bytes).
+ * up to ($slot+1)*16 bytes).
  */
 function mu_warehouse_set_slot($blob, $slot, $bytes, $total_slots = 120)
 {
@@ -818,7 +849,7 @@ function mu_warehouse_set_slot($blob, $slot, $bytes, $total_slots = 120)
 }
 
 /**
- * Find the index of the first empty (12 × 0xFF) slot in a warehouse blob.
+ * Find the index of the first empty (16 × 0xFF) slot in a warehouse blob.
  * Returns -1 if all $total_slots are occupied.
  */
 function mu_warehouse_first_empty_slot($blob, $total_slots = 120)
@@ -842,7 +873,7 @@ function mu_warehouse_first_empty_slot($blob, $total_slots = 120)
 }
 
 /**
- * Get the raw 12 bytes of a warehouse slot; returns "" if slot is empty
+ * Get the raw 16 bytes of a warehouse slot; returns "" if slot is empty
  * (all 0xFF) or out of range.
  */
 function mu_warehouse_get_slot($blob, $slot, $total_slots = 120)
