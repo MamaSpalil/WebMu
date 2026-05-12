@@ -163,10 +163,87 @@ $config["stat_connect_col"]   = "ConnectStat";
 // "Sundook Reitingi" feature. Leave empty to hide market listings.
 // Expected columns: Seller, ItemName, Price (required) plus optional
 // Currency, ItemImage, ItemLevel, Quantity, ListedAt, Source.
+//
+// NOTE: This is the legacy "external" market table. WebMu also ships its
+// own Web-Vault market (table `WebMarketItems` — see docs/schema_addons.sql)
+// which is used automatically when the table exists; it stores listings
+// created by the Web-Сундук "Put up for sale" form. The legacy table
+// (this one) is still read for backwards compatibility.
 $config["market_items_table"] = "";            // e.g. "WebMarketItems"
 $config["market_seller_col"]  = "Seller";
 $config["market_item_col"]    = "ItemName";
 $config["market_price_col"]   = "Price";
+// Web-Vault market — built-in. Listing fees / commission percentages are
+// applied when a buyer purchases a listing via ?m=market_buy. Set to 0 to
+// disable. Range: 0..50.
+$config["market_fee_pct"]     = 0;
+// Maximum number of active listings per seller. 0 = unlimited.
+$config["market_max_listings_per_seller"] = 50;
+// Hard caps on listing price (anti-typo / anti-overflow). decimal(20,4).
+$config["market_max_price"]   = 99999999;
+
+// ---- Web-Сундук (warehouse) ----
+// Stock MuOnline Season 3 stores per-account warehouse items in
+// `warehouse.Items` (varbinary, 120 slots × 12 bytes = 1440 bytes) keyed
+// by AccountID. Override these names for custom emulators.
+$config["wh_table"]       = "warehouse";
+$config["wh_items_col"]   = "Items";
+$config["wh_account_col"] = "AccountID";
+$config["wh_money_col"]   = "Money";          // optional — Zen stored in vault
+$config["wh_slots"]       = 120;              // 8×15 grid in stock
+$config["wh_cols"]        = 8;                // grid width in cells
+
+// ---- VIP (online-hours → in-game perks) ----
+// VipList table read by GameServer to apply VIP perks. Many Season 3
+// emulators use a table similar to this — adjust column names below if
+// your build differs. WebMu writes (AccountID, VipType, ExpireDate)
+// when a player exchanges accumulated online hours for a VIP package.
+$config["vip_table"]            = "VipList";
+$config["vip_account_col"]      = "AccountID";
+$config["vip_type_col"]         = "VipType";
+$config["vip_expire_col"]       = "ExpireDate";
+// VIP packages — the player chooses one and pays `hours` from their
+// online-hours balance. Perks are display-only; the GameServer must
+// implement the actual exp/drop/chaos/JoS bonuses keyed by VipType.
+$config["vip_packages"] = [
+    [
+        "id" => "vip1", "name" => "VIP Bronze",
+        "hours" => 24,  "vip_type" => 1, "duration_days" => 1,
+        "perks" => ["exp" => "+30%", "drop" => "+20%", "chaos" => "+5%",  "jos" => "+5%"],
+    ],
+    [
+        "id" => "vip2", "name" => "VIP Silver",
+        "hours" => 120, "vip_type" => 2, "duration_days" => 7,
+        "perks" => ["exp" => "+50%", "drop" => "+30%", "chaos" => "+10%", "jos" => "+10%"],
+    ],
+    [
+        "id" => "vip3", "name" => "VIP Gold",
+        "hours" => 400, "vip_type" => 3, "duration_days" => 30,
+        "perks" => ["exp" => "+80%", "drop" => "+50%", "chaos" => "+15%", "jos" => "+15%"],
+    ],
+];
+// Online-hours accumulator throttle. WebMu pulses MEMB_STAT.ConnectStat
+// once per `vip_hours_throttle_sec` seconds and adds the elapsed delta
+// (capped at `vip_hours_max_step_sec`) to WebOnlineHours.hours_total
+// for every account that is currently in-game. Set to 0 to disable the
+// in-PHP accumulator (use a SQL Agent job instead).
+$config["vip_hours_throttle_sec"] = 300;      // poll at most every 5 min
+$config["vip_hours_max_step_sec"] = 1800;     // cap a single tick at 30 min
+
+// ---- USDT — secondary internal balance for the market ----
+// Used as the `usdt` market currency. Stored in MEMB_INFO.usdt when the
+// column exists (added idempotently by docs/schema_addons.sql). Disable
+// by leaving the column missing — the currency simply hides from the
+// market UI when not configured.
+$config["usdt_table"]   = "MEMB_INFO";
+$config["usdt_column"]  = "usdt";
+$config["usdt_acc"]     = "memb___id";
+
+// ---- Admin panel ----
+// Whitelist of memb___id account names that may access ?m=admin and the
+// admin actions. Empty array disables the admin panel entirely (unless
+// MEMB_INFO.is_admin = 1 for the current user). Case-insensitive match.
+$config["admin_accounts"] = [];
 
 // ---- Optional WebMu tables ----
 $config["donate_items_table"] = "WebDonateItems";

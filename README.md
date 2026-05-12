@@ -61,3 +61,23 @@ donate shop and vote callback follow automatically.
 Download links, starter rewards, vote sites and optional WebMu donate
 tables are configured in `opt.php`.
 `mainmod` lists the home-page widgets to render in order.
+`admin_accounts` is a whitelist of memb___id account names that may
+access `?m=admin`. The optional `MEMB_INFO.is_admin` column (added by
+`docs/schema_addons.sql`) provides the same effect when set to 1.
+
+## User pages added by the User-Panel rework
+
+| Route                  | Module                          | Purpose                                                |
+|------------------------|---------------------------------|--------------------------------------------------------|
+| `?m=warehouse`         | `modules/warehouse.php`         | Read-only Web-Vault grid; "Put up for sale" button.    |
+| `?m=market`            | `modules/market.php`            | Browse listings (filter by currency).                  |
+| `?m=market_list` POST  | `modules/market_list.php`       | List one Web-Vault item on the market.                 |
+| `?m=market_cancel` POST| `modules/market_cancel.php`     | Cancel a listing, return item to seller's vault.       |
+| `?m=market_buy` POST   | `modules/market_buy.php`        | Buy a wcoin/zen/usdt listing (jewels are list-only).   |
+| `?m=vip`               | `modules/vip.php`               | Online-hours bank + VIP packages.                      |
+| `?m=vip_buy` POST      | `modules/vip_buy.php`           | Exchange accumulated hours for in-game VIP perks.      |
+| `?m=admin`             | `modules/admin.php`             | Admin panel (dashboard, users, vaults, market, VIP, log). |
+
+Run `docs/schema_addons.sql` after upgrading — it idempotently creates
+`WebMarketItems`, `WebMarketLog`, `WebOnlineHours`, `VipList` and adds
+`MEMB_INFO.usdt` / `MEMB_INFO.is_admin` columns when missing.

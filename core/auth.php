@@ -38,6 +38,46 @@ function require_login()
     }
 }
 
+/**
+ * Returns true if the currently logged-in user is an administrator.
+ * Admin status comes from $config["admin_accounts"] — a whitelist of
+ * memb___id values — to avoid touching the game DB schema. Admins can
+ * also be promoted via the optional `MEMB_INFO.is_admin` column when
+ * that column exists (idempotent add in docs/schema_addons.sql).
+ */
+function is_admin()
+{
+    global $config;
+    $u = current_user();
+    if (!$u || empty($u["id"])) return false;
+    $id = (string)$u["id"];
+
+    $whitelist = $config["admin_accounts"] ?? [];
+    if (is_array($whitelist)) {
+        foreach ($whitelist as $a) {
+            if (strcasecmp((string)$a, $id) === 0) return true;
+        }
+    }
+    if (function_exists("db_table_exists") && function_exists("db_column_exists")
+        && db_table_exists("MEMB_INFO") && db_column_exists("MEMB_INFO", "is_admin")) {
+        $row = db_one("SELECT is_admin AS x FROM MEMB_INFO WHERE memb___id = ?", [$id]);
+        if ($row && (int)($row["x"] ?? 0) === 1) return true;
+    }
+    return false;
+}
+
+/** Halt the request unless the current user is an administrator. */
+function require_admin()
+{
+    require_login();
+    if (!is_admin()) {
+        http_response_code(403);
+        flash_set("error", lang("admin.forbidden", "Admins only."));
+        header("Location: index.php?m=account");
+        exit;
+    }
+}
+
 function login_user(array $row)
 {
     // Regenerate session id to prevent fixation.

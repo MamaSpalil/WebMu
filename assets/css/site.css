@@ -1331,3 +1331,102 @@ body { perspective: 1400px; perspective-origin: 50% 0%; }
     0%   { transform: rotate3d(1, 0.4, 0.2,   0deg); }
     100% { transform: rotate3d(1, 0.4, 0.2, 360deg); }
 }
+
+/* =========================================================
+   Web-Vault grid + admin tabs + modal (User Panel rework)
+   ========================================================= */
+.wh-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--wh-cols, 8), minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 14px;
+}
+.wh-cell {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    background: rgba(34, 48, 65, 0.78);
+    border: 1px solid rgba(140, 160, 184, 0.28);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+}
+.wh-cell.empty { opacity: 0.35; }
+.wh-cell img {
+    max-width: 88%;
+    max-height: 88%;
+    object-fit: contain;
+    pointer-events: none;
+}
+.wh-cell .lvl {
+    position: absolute; top: -8px; right: -8px;
+    padding: 1px 5px; border-radius: 3px;
+    background: #ff4d55; color: #fff;
+    font-size: 11px; font-weight: 800; line-height: 1.2;
+    pointer-events: none;
+}
+.wh-cell .badge {
+    position: absolute; bottom: 2px; right: 2px;
+    padding: 0 4px; border-radius: 2px;
+    background: rgba(0, 0, 0, 0.6);
+    font-size: 9px; letter-spacing: 0.6px;
+    color: var(--gold-light);
+    pointer-events: none;
+}
+.wh-cell .badge.exc   { color: var(--grade-exc);   border: 1px solid var(--grade-exc); }
+.wh-cell .badge.luck  { color: #6cd3ff; bottom: auto; top: 2px; right: 2px; }
+.wh-cell .badge.skill { color: #ffae5a; bottom: auto; top: 2px; left: 2px;  right: auto; }
+
+.wh-cell .wh-list-btn {
+    position: absolute; bottom: -4px; left: -4px;
+    width: 22px; height: 22px;
+    border: 1px solid var(--gold);
+    background: rgba(20, 14, 4, 0.92);
+    color: var(--gold-light);
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 2;
+}
+.wh-cell .wh-list-btn:hover { background: var(--gold-deep); }
+
+/* Listing modal — minimal centered overlay */
+.wh-modal {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(2, 2, 2, 0.72);
+    z-index: 1000;
+    padding: 20px;
+}
+.wh-modal[hidden] { display: none; }
+.wh-modal-body {
+    max-width: 420px; width: 100%;
+    background: var(--bg-panel-2);
+}
+
+/* Admin panel — tab strip and shared layout */
+.admin-page .admin-tabs {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin: 0 0 18px 0;
+}
+.admin-page .admin-tabs .nav-btn {
+    font-size: 12.5px;
+    padding: 6px 12px;
+}
+.btn.small {
+    font-size: 12px;
+    padding: 6px 12px;
+    letter-spacing: 1px;
+}
+.btn.ghost {
+    background: transparent;
+    color: var(--gold);
+}
+.btn.small[disabled],
+.btn[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

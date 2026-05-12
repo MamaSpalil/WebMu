@@ -15,6 +15,8 @@ if ($m === "") $m = "home";
 $state_changing = [
     "register", "login", "logout",
     "change_password", "buy", "vote_callback",
+    "market_list", "market_cancel", "market_buy",
+    "vip_buy", "admin",
 ];
 if (in_array($m, $state_changing, true) && $_SERVER["REQUEST_METHOD"] === "POST") {
     if (honeypot_tripped() || !csrf_check()) {
@@ -25,6 +27,11 @@ if (in_array($m, $state_changing, true) && $_SERVER["REQUEST_METHOD"] === "POST"
             "change_password" => "account",
             "vote_callback"   => "vote",
             "buy"             => "donate",
+            "market_list"     => "warehouse",
+            "market_cancel"   => "warehouse",
+            "market_buy"      => "market",
+            "vip_buy"         => "vip",
+            "admin"           => "admin",
         ];
         redirect("index.php?m=" . ($back[$m] ?? $m));
     }
@@ -45,6 +52,13 @@ switch ($m) {
     case "ranking":         require __DIR__ . "/modules/ranking.php";         break;
     case "character":       require __DIR__ . "/modules/character.php";       break;
     case "market":          require __DIR__ . "/modules/market.php";          break;
+    case "market_list":     require __DIR__ . "/modules/market_list.php";     break;
+    case "market_cancel":   require __DIR__ . "/modules/market_cancel.php";   break;
+    case "market_buy":      require __DIR__ . "/modules/market_buy.php";      break;
+    case "warehouse":       require __DIR__ . "/modules/warehouse.php";       break;
+    case "vip":             require __DIR__ . "/modules/vip.php";             break;
+    case "vip_buy":         require __DIR__ . "/modules/vip_buy.php";         break;
+    case "admin":           require __DIR__ . "/modules/admin.php";           break;
     case "vote":            require __DIR__ . "/modules/vote.php";            break;
     case "vote_callback":   require __DIR__ . "/modules/vote_callback.php";   break;
     case "donate":          require __DIR__ . "/modules/donate.php";          break;
