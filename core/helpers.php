@@ -11,7 +11,7 @@ if (!defined("MU_ITEM_TYPE_HIGH_BIT_FLAG")) define("MU_ITEM_TYPE_HIGH_BIT_FLAG",
 if (!defined("MU_EXTENDED_ITEM_INDEX_FLAG")) define("MU_EXTENDED_ITEM_INDEX_FLAG", 0x40);
 if (!defined("MU_ITEM_GLOW_LEVEL_THRESHOLD")) define("MU_ITEM_GLOW_LEVEL_THRESHOLD", 10);
 if (!defined("MU_HEX_FORMATTED_MIN_ITEM_CHARS")) define("MU_HEX_FORMATTED_MIN_ITEM_CHARS", MU_ITEM_BYTES * 2);
-if (!defined("MU_EXCELLENT_OPTION_MASK")) define("MU_EXCELLENT_OPTION_MASK", 0x3F);
+if (!defined("MU_EXCELLENT_OPTION_MASK")) define("MU_EXCELLENT_OPTION_MASK", 0x3F); // bits 0..5 = six excellent options
 
 /** ---- escaping ---- */
 function h($s) { return htmlspecialchars((string)$s, ENT_QUOTES, "UTF-8"); }
@@ -404,7 +404,7 @@ function mu_item_image($item_type, $item_index, $level = 0)
  *           bit 2 = Luck, bits 1..0 = Option (0..3, ×4 = +N)
  *   byte 2: Durability
  *   byte 3..6: Serial / extra flags (per-build, opaque to the website)
- *   byte 7: Excellent options bitmask (bits 0..5; bit 6/7 reserved for set/ancient)
+ *   byte 7: Excellent options bitmask (bits 0..5; bits 6..7 reserved for set/ancient)
  *   byte 8: Set / 380 option (opaque)
  *   byte 9: bit 7 = ItemType extension (+8, giving group 0..15)
  *           bit 6 = ItemIndex extension (+32, giving code 0..63)
