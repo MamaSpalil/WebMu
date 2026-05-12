@@ -184,7 +184,7 @@ $config["market_max_price"]   = 99999999;
 
 // ---- Web-Сундук (warehouse) ----
 // Stock MuOnline Season 3 stores per-account warehouse items in
-// `warehouse.Items` (varbinary, 120 slots × 12 bytes = 1440 bytes) keyed
+// `warehouse.Items` (varbinary, 120 slots × 16 bytes = 1920 bytes) keyed
 // by AccountID. Override these names for custom emulators.
 $config["wh_table"]       = "warehouse";
 $config["wh_items_col"]   = "Items";

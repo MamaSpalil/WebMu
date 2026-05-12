@@ -272,7 +272,7 @@ try {
 }
 
 cache_del("warehouse." . strtolower($account));
-cache_del("market.listings");
+market_invalidate_listings_cache();
 
 flash_set($ok ? "success" : "error", lang($ok ? "market.bought" : $err_key));
 redirect("index.php?m=" . ($ok ? "warehouse" : "market"));

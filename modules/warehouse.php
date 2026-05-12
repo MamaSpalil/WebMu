@@ -3,7 +3,7 @@
 //  Web-Сундук — read-only view of the player's in-game warehouse.
 //
 //  Stock MuOnline Season 3 keeps the warehouse in `warehouse.Items`
-//  (varbinary, 120 slots × 12 bytes) keyed by AccountID. Table/column
+//  (varbinary, 120 slots × 16 bytes) keyed by AccountID. Table/column
 //  names come from $config["wh_*"] so custom emulators can remap them.
 //
 //  This module is read-only; the actual "put up for sale" action is
