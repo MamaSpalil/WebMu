@@ -217,7 +217,10 @@ body.mu-theme .block-login {
   padding-left: 18px;
   padding-top: 20px;
 }
-body.mu-theme .block-login a {
+/* The "Register" link beside the login form is the only anchor that
+   should be floated; the account menu's own anchors must keep their
+   stacked layout (otherwise all 8 menu links collide in the corner). */
+body.mu-theme .block-login > form > a {
   font: 11px PSType;
   color: #d38574;
   display: block;
@@ -380,4 +383,138 @@ body.mu-theme .main-content textarea {
 body.mu-theme .main-content table {
   width: 100%;
   border-collapse: collapse;
+}
+
+/* ---------------------------------------------------------------- */
+/* Right-sidebar account menu (logged-in user). The legacy           */
+/* .account_menu rules in engine.css size each link to a fixed        */
+/* 130 px block; make sure those links keep their stacked layout      */
+/* inside the 260 px right sidebar and don't inherit the floated      */
+/* "Register" link styling that the logged-out form relies on.        */
+/* ---------------------------------------------------------------- */
+body.mu-theme .block-login .account_menu {
+  padding-top: 8px;
+  padding-left: 16px;
+}
+body.mu-theme .block-login .account_menu a {
+  float: none;
+  margin: 0 0 4px 0;
+  width: 200px;
+  height: auto;
+  min-height: 22px;
+  padding: 4px 6px 4px 18px;
+  font: 12px PSTypeBold, "Trebuchet MS", sans-serif;
+  color: #dbb795;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+body.mu-theme .block-login .account_menu a b { font-weight: normal; }
+body.mu-theme .block-login .account_menu a:hover { color: #ffefe0; }
+body.mu-theme .block-login .account_menu form {
+  display: block;
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------- */
+/* Character page — the page is rendered inside the ~470 px main     */
+/* column, but its grid was authored for a much wider canvas. Stack  */
+/* it to a single column and shrink equip cells/badges so item       */
+/* labels don't break mid-word and the +level pill doesn't overlap   */
+/* the next column.                                                  */
+/* ---------------------------------------------------------------- */
+body.mu-theme .main-content .char-grid {
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+body.mu-theme .main-content .stat-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+body.mu-theme .main-content .stat-grid .kv {
+  padding: 7px 10px;
+  gap: 6px;
+}
+body.mu-theme .main-content .stat-grid .kv .k {
+  font-size: 10.5px;
+  letter-spacing: 1px;
+}
+body.mu-theme .main-content .stat-grid .kv .v {
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+body.mu-theme .main-content .equip-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px 10px;
+}
+body.mu-theme .main-content .equip-cell {
+  min-height: 0;
+  gap: 5px;
+}
+body.mu-theme .main-content .equip-cell .slot-box {
+  width: 64px;
+  height: 64px;
+}
+body.mu-theme .main-content .equip-cell .slot-box img {
+  max-width: 56px;
+  max-height: 56px;
+}
+body.mu-theme .main-content .equip-cell .slot-box .lvl {
+  /* Slight negative offset is intentional here: equip cells have a
+     14 px row-gap and no border/background, so the +level pill is
+     allowed to peek above the slot box (matches the original design
+     intent). This is different from .wh-cell where cells abut and
+     the pill must stay inside. */
+  top: -7px;
+  right: -7px;
+  padding: 1px 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  border-radius: 3px;
+}
+body.mu-theme .main-content .equip-cell .item {
+  font-size: 11.5px;
+  line-height: 1.25;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+body.mu-theme .main-content .equip-cell .badges {
+  gap: 3px;
+}
+body.mu-theme .main-content .equip-cell .badges span {
+  font-size: 8.5px;
+  letter-spacing: 0.8px;
+  padding: 0 4px;
+}
+
+/* Account page — same idea: its 1fr 1fr grid is too tight here.
+   `!important` is required because account.tpl.php sets the grid
+   columns via an inline style="..." attribute, which can only be
+   overridden with !important. */
+body.mu-theme .main-content .reg-grid {
+  grid-template-columns: 1fr !important;
+  gap: 18px !important;
+}
+
+/* Warehouse — the +level pill and corner badges spill outside the   */
+/* tiny cells when the grid is squeezed into the 470 px column. Pull  */
+/* them inside the cell instead of overhanging.                      */
+body.mu-theme .main-content .wh-cell .lvl {
+  top: 0;
+  right: 0;
+  padding: 0 3px;
+  font-size: 9.5px;
+  border-radius: 0 3px 0 3px;
+}
+body.mu-theme .main-content .wh-cell .badge {
+  font-size: 8px;
+  padding: 0 3px;
+}
+body.mu-theme .main-content .wh-cell .wh-list-btn {
+  width: 18px;
+  height: 18px;
+  font-size: 13px;
+  bottom: 0;
+  left: 0;
 }
