@@ -1338,12 +1338,17 @@ body { perspective: 1400px; perspective-origin: 50% 0%; }
 .wh-grid {
     display: grid;
     grid-template-columns: repeat(var(--wh-cols, 8), minmax(0, 1fr));
+    /* Lock the grid's aspect-ratio to (cols × rows) so a fixed number of
+       1fr row tracks renders each underlying cell square. Items that span
+       (w × h) cells (see mu_item_size) then naturally cover the right
+       footprint because grid-template-rows divides the height evenly. */
+    grid-template-rows: repeat(var(--wh-rows, 15), minmax(0, 1fr));
+    aspect-ratio: var(--wh-cols, 8) / var(--wh-rows, 15);
     gap: 6px;
     margin-top: 14px;
 }
 .wh-cell {
     position: relative;
-    aspect-ratio: 1 / 1;
     background: rgba(34, 48, 65, 0.78);
     border: 1px solid rgba(140, 160, 184, 0.28);
     border-radius: 4px;
@@ -1351,6 +1356,8 @@ body { perspective: 1400px; perspective-origin: 50% 0%; }
     align-items: center;
     justify-content: center;
     overflow: visible;
+    min-width: 0;
+    min-height: 0;
 }
 .wh-cell.empty { opacity: 0.35; }
 .wh-cell img {
