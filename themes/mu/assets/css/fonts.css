@@ -1,0 +1,8 @@
+@font-face{
+    font-family: PSTypeBold;
+    src: url(../fonts/PermianSansTypeface-Bold.otf);
+}
+@font-face{
+    font-family: PSType;
+    src: url(../fonts/PermianSansTypeface.otf);
+}

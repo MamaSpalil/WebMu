@@ -54,7 +54,7 @@ $config["server_timeout"] = 2;                  // TCP probe timeout in seconds
 
 // ---- Localization & theme ----
 $config["def_lang"]     = "rus";              // rus | eng
-$config["theme"]        = "ex";               // themes/<theme>/
+$config["theme"]        = "mu";               // themes/<theme>/  (mu = new design from templates.zip; ex = legacy)
 
 // ---- Runtime ----
 $config["debug"]        = 0;                  // 1 = print SQL/PHP errors

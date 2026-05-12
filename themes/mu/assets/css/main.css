@@ -1,0 +1,383 @@
+/* Scope the new design's reset to the theme chrome so it does not
+   override the styling used by inner page templates that ship their
+   own (assets/css/site.css) reset. */
+body.mu-theme,
+body.mu-theme header,
+body.mu-theme .bg-content,
+body.mu-theme .bg-content aside,
+body.mu-theme .bg-content main,
+body.mu-theme .bg-content aside *,
+body.mu-theme .bg-content > .wrapper > main > .btn-start-game,
+body.mu-theme .bg-content > .wrapper > main > .news-block-chrome,
+body.mu-theme .bg-content > .wrapper > main > .news-block-chrome * {
+  box-sizing: border-box;
+}
+body.mu-theme {
+  margin: 0;
+  padding: 0;
+  background: #1a0b0b;
+  color: #d8c8b8;
+  font-family: PSType, "Trebuchet MS", sans-serif;
+}
+body.mu-theme aside ul,
+body.mu-theme aside li {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+body.mu-theme aside a,
+body.mu-theme header a {
+  text-decoration: none;
+}
+body.mu-theme .wrapper {
+  width: 1020px;
+  margin: 0 auto;
+}
+body.mu-theme header {
+  background: url("../img/header.jpg") no-repeat top center;
+  height: 432px;
+  text-align: center;
+  padding-top: 207px;
+}
+body.mu-theme .bg-content {
+  background: url("../img/content.jpg") no-repeat top center;
+  background-color: #1a0b0b;
+  min-height: 1331px;
+  padding-bottom: 30px;
+}
+body.mu-theme .clear {
+  clear: both;
+}
+body.mu-theme .left-sitebar {
+  width: 260px;
+  float: left;
+}
+body.mu-theme .left-sitebar .nav-block {
+  text-align: center;
+  padding-top: 141px;
+}
+body.mu-theme .left-sitebar .nav-block li {
+  margin-bottom: 20px;
+  padding-right: 20px;
+}
+body.mu-theme .left-sitebar .nav-block li a {
+  color: #915756;
+  font: 12px PSTypeBold;
+  text-transform: uppercase;
+}
+body.mu-theme .left-sitebar .nav-block li a:hover {
+  color: #fff;
+}
+body.mu-theme .left-sitebar .block-top {
+  margin-top: 335px;
+}
+body.mu-theme .left-sitebar .block-top p {
+  padding-left: 20px;
+  width: 180px;
+  padding-top: 13px;
+  padding-bottom: 13px;
+  position: relative;
+  color: #fff;
+  font: bold 12px PSTypeBold;
+}
+body.mu-theme .left-sitebar .block-top a {
+    color: #fff;
+    font: bold 12px PSTypeBold;
+  }
+body.mu-theme .left-sitebar .block-top p .nomber-top {
+  color: #795e5d;
+}
+body.mu-theme .left-sitebar .block-top p .lvl-top {
+  float: right;
+  color: #d38574;
+  text-align: right;
+}
+body.mu-theme .left-sitebar .block-top p:before {
+  content: '';
+  position: absolute;
+  width: 160px;
+  bottom: 0;
+  height: 1px;
+  background: #ffffff;
+  background: -moz-linear-gradient(left, #ffffff 0%, #685367 44%, #342432 100%);
+  background: -webkit-linear-gradient(left, #ffffff 0%, #685367 44%, #342432 100%);
+  background: linear-gradient(to right, #ffffff 0%, #685367 44%, #342432 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#342432', GradientType=1);
+}
+body.mu-theme .right-sitebar {
+  width: 260px;
+  float: left;
+}
+body.mu-theme .main-content {
+  width: 500px;
+  float: left;
+}
+body.mu-theme .main-content .btn-start-game {
+  background: url("../img/elements/bgn-1.png") no-repeat top center;
+  width: 255px;
+  height: 137px;
+  margin: 0 auto;
+  margin-top: -30px;
+  display: block;
+}
+body.mu-theme .main-content .news-block {
+  padding-top: 90px;
+  padding-right: 30px;
+}
+body.mu-theme .main-content .news-block .news-1 {
+  width: 100%;
+  position: relative;
+  margin-bottom: 70px;
+}
+body.mu-theme .main-content .news-block .news-1 h3 {
+  color: #fff;
+  font: bold 15px PSTypeBold;
+  position: relative;
+}
+body.mu-theme .main-content .news-block .news-1 h3 .date-news {
+  float: right;
+  color: #d38574;
+}
+body.mu-theme .main-content .news-block .news-1 h3:before {
+  content: url("../img/elements/news-1.png");
+  position: absolute;
+  left: -25px;
+  top: 0;
+}
+body.mu-theme .main-content .news-block .news-1 p {
+  font: bold 12px PSTypeBold;
+  color: #69555e;
+  margin-top: 25px;
+  margin-bottom: 15px;
+}
+body.mu-theme .main-content .news-block .news-1 .read-next {
+  color: #d38574;
+  display: block;
+  width: 100%;
+  text-align: right;
+  font: bold 11px PSTypeBold;
+  position: relative;
+}
+body.mu-theme .main-content .news-block .news-1 .read-next:before {
+  content: url("../img/elements/line-href.png");
+  position: absolute;
+  left: 0;
+  top: 2px;
+}
+body.mu-theme .main-content .news-block .news-1:before {
+  content: url("../img/elements/ell_1.png");
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  margin-left: -17px;
+}
+body.mu-theme .block-online {
+  width: 100%;
+  padding-top: 80px;
+  padding-left: 13px;
+}
+body.mu-theme .block-online .segment-server {
+  background: url("../img/elements/ser-bg.png") no-repeat top center;
+  width: 216px;
+  height: 47px;
+  position: relative;
+  margin-bottom: 20px;
+}
+body.mu-theme .block-online .segment-server p {
+  padding-left: 60px;
+  font: 13px PSTypeBold;
+  color: #bcbbb8;
+  line-height: 47px;
+}
+body.mu-theme .block-online .segment-server .coll-players {
+  float: right;
+  color: #e7b267;
+  margin-right: 28px;
+}
+body.mu-theme .block-online .segment-server .online {
+  display: block;
+  position: absolute;
+  top: -7px;
+  left: -15px;
+  background: url("../img/elements/online.png") no-repeat top center;
+  width: 60px;
+  height: 57px;
+}
+body.mu-theme .block-online .segment-server .off {
+  display: block;
+  position: absolute;
+  top: -7px;
+  left: -15px;
+  background: url("../img/elements/off.png") no-repeat top center;
+  width: 60px;
+  height: 57px;
+}
+body.mu-theme .block-login {
+  width: 100%;
+  padding-left: 18px;
+  padding-top: 20px;
+}
+body.mu-theme .block-login a {
+  font: 11px PSType;
+  color: #d38574;
+  display: block;
+  float: right;
+  margin-right: 55px;
+  margin-top: 10px;
+}
+body.mu-theme .block-login .btn-vhod {
+  background: url("../img/elements/btn-vhod.png") no-repeat top center;
+  border: 0;
+  outline: 0;
+  width: 87px;
+  height: 32px;
+  cursor: pointer;
+}
+body.mu-theme .block-login .inp-login {
+  background: rgba(121, 99, 116, 0.08) url("../img/elements/login.png") no-repeat top center;
+  width: 202px;
+  height: 37px;
+  border: 0;
+  outline: 0;
+  padding-left: 55px;
+  font: 11px PSType;
+  color: #5a484f;
+  margin-bottom: 18px;
+}
+body.mu-theme .block-login .inp-pass {
+  background: rgba(121, 99, 116, 0.08) url("../img/elements/pass.png") no-repeat top center;
+  width: 202px;
+  height: 37px;
+  border: 0;
+  outline: 0;
+  padding-left: 55px;
+  font: 11px PSType;
+  color: #5a484f;
+  margin-bottom: 18px;
+}
+body.mu-theme .block-login input::-moz-placeholder {
+  color: #5a484f;
+}
+body.mu-theme .block-login input::-webkit-input-placeholder {
+  color: #5a484f;
+}
+body.mu-theme .block-login input:-ms-input-placeholder {
+  color: #5a484f;
+}
+body.mu-theme .block-topic-forum {
+  width: 100%;
+  padding-top: 205px;
+  padding-left: 35px;
+}
+body.mu-theme .block-topic-forum .topic-forum {
+  width: 100%;
+  padding: 20px 0;
+  position: relative;
+}
+body.mu-theme .block-topic-forum .topic-forum .img-forum {
+  width: 30px;
+  height: 30px;
+  margin-right: 5px;
+  float: left;
+  padding-top: 7px;
+}
+body.mu-theme .block-topic-forum .topic-forum a {
+  float: left;
+  font: 12px PSTypeBold;
+  color: #fff;
+}
+body.mu-theme .block-topic-forum .topic-forum p {
+  float: left;
+  font: 11px PSTypeBold;
+  color: #705656;
+}
+body.mu-theme .block-topic-forum .topic-forum p .autor-top {
+  color: #d38574;
+}
+body.mu-theme .block-topic-forum .topic-forum:before {
+  content: url("../img/elements/line-top.png");
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+body.mu-theme .block-topic-forum .topic-forum:last-child:before {
+  content: '';
+}
+
+/* ---------------------------------------------------------------- */
+/* Adapter rules: make the existing page templates (themes/ex/pages) */
+/* readable when rendered inside the new mu-theme chrome.            */
+/* The inner pages still load assets/css/site.css for their own      */
+/* component styling; these rules just position them inside the      */
+/* main-content slot and force-fit them to its 470 px column.        */
+/* ---------------------------------------------------------------- */
+body.mu-theme .main-content > main.page,
+body.mu-theme .main-content > section,
+body.mu-theme .main-content > .news-block-chrome > main.page,
+body.mu-theme .main-content > .news-block-chrome > section {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  color: #d8c8b8;
+}
+body.mu-theme .main-content main.page,
+body.mu-theme .main-content .panel,
+body.mu-theme .main-content .card {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+body.mu-theme .main-content {
+  color: #d8c8b8;
+  font-family: PSType, "Trebuchet MS", sans-serif;
+}
+body.mu-theme .main-content h1,
+body.mu-theme .main-content h2,
+body.mu-theme .main-content h3,
+body.mu-theme .main-content .page-title,
+body.mu-theme .main-content .panel-title {
+  color: #ffd9a8;
+  font-family: PSTypeBold, "Trebuchet MS", sans-serif;
+}
+body.mu-theme .main-content a {
+  color: #d38574;
+}
+body.mu-theme .main-content a:hover {
+  color: #fff;
+}
+/* Hide the inner-page header bars (logo + nav) the ex theme prints,  */
+/* because the mu chrome already provides a header and a nav.         */
+body.mu-theme .site-header,
+body.mu-theme .site-footer,
+body.mu-theme .flash-stack {
+  display: none !important;
+}
+/* Re-show flashes inside the main column as a thin notice strip. */
+body.mu-theme .main-content .mu-flash {
+  display: block;
+  background: rgba(60, 20, 20, 0.55);
+  border: 1px solid #6a3535;
+  color: #ffd9a8;
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  font: 12px PSType, "Trebuchet MS", sans-serif;
+}
+body.mu-theme .main-content .mu-flash.warn {
+  background: rgba(80, 30, 30, 0.7);
+  border-color: #a04040;
+}
+/* Tame inputs/buttons inside main content so they fit the 470 px col. */
+body.mu-theme .main-content input[type="text"],
+body.mu-theme .main-content input[type="password"],
+body.mu-theme .main-content input[type="email"],
+body.mu-theme .main-content input[type="number"],
+body.mu-theme .main-content select,
+body.mu-theme .main-content textarea {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+body.mu-theme .main-content table {
+  width: 100%;
+  border-collapse: collapse;
+}
