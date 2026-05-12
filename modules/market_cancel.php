@@ -78,7 +78,7 @@ try {
     if ($free < 0) {
         throw new RuntimeException("no_room");
     }
-    $bytes = (string)$row["item_blob"]; // varbinary(12) — driver returns binary
+    $bytes = (string)$row["item_blob"]; // varbinary(MU_ITEM_BYTES) — driver returns binary
     if (strlen($bytes) !== MU_ITEM_BYTES) {
         // Some ODBC drivers return hex-string for varbinary.
         if (strlen($bytes) === MU_ITEM_BYTES * 2 && ctype_xdigit($bytes)) {
@@ -124,7 +124,7 @@ try {
 }
 
 cache_del("warehouse." . strtolower($seller));
-cache_del("market.listings");
+market_invalidate_listings_cache();
 
 if ($ok) flash_set("success", lang("wh.cancel_ok"));
 redirect("index.php?m=" . ($is_admin ? "admin&sub=market" : "warehouse"));

@@ -147,6 +147,24 @@ function market_currencies()
     return $list;
 }
 
+/**
+ * Invalidate every cached market listing view (the unfiltered key plus
+ * one per known currency filter — see modules/market.php which builds
+ * the cache key as "market.listings." . $filter_cur).
+ *
+ * Call this from any state-changing market endpoint (list / buy /
+ * cancel) so per-currency tabs refresh immediately instead of waiting
+ * out the 30-second TTL.
+ */
+function market_invalidate_listings_cache()
+{
+    if (!function_exists("cache_del")) return;
+    cache_del("market.listings.");          // unfiltered view
+    foreach (market_currencies() as $c) {
+        cache_del("market.listings." . (string)$c["id"]);
+    }
+}
+
 /** Look up a market currency descriptor by id. Returns null if unknown. */
 function market_currency($id)
 {

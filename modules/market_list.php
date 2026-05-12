@@ -8,8 +8,8 @@
 //    1. Validate inputs and currency.
 //    2. Refuse if the account is currently in-game (race with GameServer).
 //    3. Read warehouse blob WITH (UPDLOCK,ROWLOCK,HOLDLOCK).
-//    4. Extract the 12 bytes for the slot — refuse if empty.
-//    5. INSERT into WebMarketItems (item_blob = those 12 bytes + decoded
+//    4. Extract the 16 bytes for the slot — refuse if empty.
+//    5. INSERT into WebMarketItems (item_blob = those 16 bytes + decoded
 //       name/level/exc/luck/skill/opt for display).
 //    6. UPDATE the warehouse blob with that slot zeroed (12 × 0xFF).
 //    7. COMMIT — or ROLLBACK on any failure.
@@ -149,7 +149,7 @@ try {
             (seller_account, seller_char, wh_slot, item_blob, item_name, item_image,
              item_level, item_exc, item_luck, item_skill, item_opt, qty,
              currency, price, state, listed_at)
-         VALUES (?, NULL, ?, CONVERT(varbinary(12), ?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'listed', GETDATE())",
+         VALUES (?, NULL, ?, CONVERT(varbinary(" . MU_ITEM_BYTES . "), ?), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'listed', GETDATE())",
         [
             $account, $slot, "0x" . bin2hex($bytes), $name, $img,
             $level, $exc, $luck ? 1 : 0, $skill ? 1 : 0, $opt, $qty,
@@ -187,7 +187,7 @@ try {
 }
 
 cache_del("warehouse." . strtolower($account));
-cache_del("market.listings");
+market_invalidate_listings_cache();
 
 flash_set($ok ? "success" : "error", lang($ok ? "wh.list_ok" : "wh.list_fail"));
 redirect("index.php?m=warehouse");

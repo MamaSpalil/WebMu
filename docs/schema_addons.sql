@@ -180,7 +180,7 @@ BEGIN
         seller_account  varchar(10)    NOT NULL,
         seller_char     nvarchar(10)   NULL,
         wh_slot         int            NULL,
-        item_blob       varbinary(12)  NOT NULL,
+        item_blob       varbinary(16)  NOT NULL,
         item_name       nvarchar(80)   NOT NULL,
         item_image      varchar(40)    NOT NULL DEFAULT '',
         item_level      int            NOT NULL DEFAULT 0,
@@ -200,6 +200,23 @@ BEGIN
     CREATE INDEX IX_WebMarketItems_seller   ON WebMarketItems(seller_account);
     CREATE INDEX IX_WebMarketItems_currency ON WebMarketItems(currency);
     PRINT 'Created WebMarketItems';
+END
+ELSE
+BEGIN
+    /* Upgrade legacy 12-byte slot blobs to the current 16-byte slot
+     * layout used by Character.Inventory / warehouse.Items on this
+     * server. Safe no-op when item_blob is already varbinary(16)+. */
+    IF EXISTS (
+        SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+         WHERE TABLE_NAME = 'WebMarketItems'
+           AND COLUMN_NAME = 'item_blob'
+           AND DATA_TYPE = 'varbinary'
+           AND CHARACTER_OCTET_LENGTH < 16
+    )
+    BEGIN
+        ALTER TABLE WebMarketItems ALTER COLUMN item_blob varbinary(16) NOT NULL;
+        PRINT 'Upgraded WebMarketItems.item_blob to varbinary(16)';
+    END
 END
 GO
 
