@@ -461,6 +461,11 @@ body.mu-theme .main-content .equip-cell .slot-box img {
   max-height: 56px;
 }
 body.mu-theme .main-content .equip-cell .slot-box .lvl {
+  /* Slight negative offset is intentional here: equip cells have a
+     14 px row-gap and no border/background, so the +level pill is
+     allowed to peek above the slot box (matches the original design
+     intent). This is different from .wh-cell where cells abut and
+     the pill must stay inside. */
   top: -7px;
   right: -7px;
   padding: 1px 4px;
@@ -483,7 +488,10 @@ body.mu-theme .main-content .equip-cell .badges span {
   padding: 0 4px;
 }
 
-/* Account page — same idea: its 1fr 1fr grid is too tight here.    */
+/* Account page — same idea: its 1fr 1fr grid is too tight here.
+   `!important` is required because account.tpl.php sets the grid
+   columns via an inline style="..." attribute, which can only be
+   overridden with !important. */
 body.mu-theme .main-content .reg-grid {
   grid-template-columns: 1fr !important;
   gap: 18px !important;
