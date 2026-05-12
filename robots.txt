@@ -1,0 +1,15 @@
+User-agent: *
+# Allow public pages, disallow user-flow / state-changing endpoints.
+Disallow: /index.php?m=login
+Disallow: /index.php?m=register
+Disallow: /index.php?m=registration
+Disallow: /index.php?m=account
+Disallow: /index.php?m=change_password
+Disallow: /index.php?m=logout
+Disallow: /index.php?m=buy
+Disallow: /index.php?m=vote_callback
+Disallow: /cache/
+Disallow: /logs/
+Disallow: /core/
+Disallow: /opt.php
+Disallow: /opt.example.php

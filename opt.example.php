@@ -165,6 +165,12 @@ $config["donate_log_table"]   = "WebDonateLog";
 // present on MEMB_INFO (stock Season 3 backups). Auto-created on demand.
 $config["web_vote_table"]     = "WebVotePoints";
 
+// Antifraud caps on the vote_callback endpoint (per 24h sliding window).
+// Per-(account,site) cooldown is the primary anti-replay; these protect
+// against multi-site farming from a single IP / account.
+$config["vote_max_per_ip_day"]  = 30;
+$config["vote_max_per_acc_day"] = 20;
+
 // ---- Vote sites (replace URLs/ids with real top-list links) ----
 $config["vote_sites"] = [
     ["id"=>"topmu", "name"=>"TopMu Online", "desc"=>"MU top-list", "reward"=>50, "cooldown"=>12*3600, "url"=>"https://topmu.example/in?id=YOUR_ID"],

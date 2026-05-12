@@ -11,6 +11,18 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 $me = current_user();
 $site_id = preg_replace('~[^a-z0-9]~', '', strtolower((string)($_POST["site"] ?? "")));
 
+// Per-IP and per-account daily antifraud caps (§2.4.3 of the improvement prompt).
+// The per-(account,site) cooldown below is the primary anti-replay; these caps
+// just make sure a single IP / account can't farm rewards across many sites at
+// once. Tunable via opt.php (`vote_max_per_ip_day`, `vote_max_per_acc_day`).
+$max_ip  = (int)($config["vote_max_per_ip_day"]  ?? 30);
+$max_acc = (int)($config["vote_max_per_acc_day"] ?? 20);
+if (rate_limit_hit("vote:ip:"  . client_ip(), $max_ip,  86400)
+    || rate_limit_hit("vote:acc:" . $me["id"], $max_acc, 86400)) {
+    flash_set("error", lang("vote.rate_limit"));
+    redirect("index.php?m=vote");
+}
+
 // Look up the configured site (single source of truth in core/catalog.php).
 $sites = vote_sites_by_id();
 if (!isset($sites[$site_id])) {
