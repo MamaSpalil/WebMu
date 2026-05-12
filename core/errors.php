@@ -228,6 +228,7 @@ function err_exception_handler($e)
         "file" => $e->getFile(),
         "line" => $e->getLine(),
     ]);
+    err_render_fatal_page();
 }
 
 /** Capture fatal errors that bypass set_error_handler(). */
@@ -241,4 +242,62 @@ function err_fatal_handler()
         "file" => $e["file"] ?? "",
         "line" => (int)($e["line"] ?? 0),
     ]);
+    err_render_fatal_page();
+}
+
+/**
+ * Render a neutral, self-contained "internal error" page after an
+ * uncaught exception or fatal so the user never sees a blank screen
+ * or a half-rendered template (§3.1.1).
+ *
+ * Intentionally inline HTML — the regular template renderer cannot be
+ * trusted at this point (the failure may have happened mid-render, or
+ * inside the template engine itself). Stays silent if:
+ *   * we're running on the CLI,
+ *   * headers have already been sent (response is already on the wire),
+ *   * the active route is one of the JSON endpoints (health/metrics) —
+ *     those handle their own error formatting.
+ */
+function err_render_fatal_page()
+{
+    if (PHP_SAPI === "cli") return;
+    if (headers_sent()) return;
+
+    $route = isset($_GET["m"]) ? preg_replace('~[^a-z_]~', '', strtolower((string)$_GET["m"])) : "";
+    if ($route === "health" || $route === "metrics") return;
+
+    // Drop any partially-buffered output so we render a clean page.
+    while (ob_get_level() > 0) { @ob_end_clean(); }
+
+    http_response_code(500);
+    header("Content-Type: text/html; charset=utf-8");
+    header("Cache-Control: no-store, no-cache, must-revalidate");
+
+    $title = function_exists("lang") ? lang("errors.unhandled", "Internal server error") : "Internal server error";
+    $body  = function_exists("lang") ? lang("errors.unhandled_text",
+        "Something went wrong while handling your request. The incident has been logged. Please try again in a moment.")
+        : "Something went wrong while handling your request. The incident has been logged. Please try again in a moment.";
+    $home  = function_exists("lang") ? lang("errors.return_home", "Return home") : "Return home";
+
+    $h = function_exists("h")
+        ? "h"
+        : function ($s) { return htmlspecialchars((string)$s, ENT_QUOTES, "UTF-8"); };
+
+    echo "<!doctype html>\n<html lang=\"en\"><head><meta charset=\"utf-8\">"
+       . "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
+       . "<title>500 — " . $h($title) . "</title>"
+       . "<style>"
+       . "body{margin:0;padding:0;background:#0e0e12;color:#e6e2d5;"
+       . "font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;}"
+       . "main{max-width:560px;margin:8vh auto;padding:32px 28px;"
+       . "background:#15151c;border:1px solid #2a2a36;border-radius:8px;}"
+       . "h1{margin:0 0 12px;font-size:22px;color:#f3d27a;}"
+       . "p{margin:0 0 16px;color:#bdb7a3;}"
+       . "a{color:#f3d27a;text-decoration:none;border-bottom:1px solid #5a4d20;}"
+       . "a:hover{border-bottom-color:#f3d27a;}"
+       . "</style></head><body><main>"
+       . "<h1>500 — " . $h($title) . "</h1>"
+       . "<p>" . $h($body) . "</p>"
+       . "<p><a href=\"index.php\">" . $h($home) . "</a></p>"
+       . "</main></body></html>";
 }

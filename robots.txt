@@ -9,6 +9,7 @@ Disallow: /index.php?m=logout
 Disallow: /index.php?m=buy
 Disallow: /index.php?m=vote_callback
 Disallow: /index.php?m=health
+Disallow: /index.php?m=metrics
 Disallow: /cache/
 Disallow: /logs/
 Disallow: /core/

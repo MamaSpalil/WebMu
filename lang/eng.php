@@ -28,6 +28,9 @@ return [
     "errors.db_failed" => "Some data could not be loaded from the database. See logs/errors.log for details.",
     "errors.module_failed" => "Module finished with an error.",
     "errors.details" => "Show details",
+    "errors.unhandled" => "Internal server error",
+    "errors.unhandled_text" => "Something went wrong while handling your request. The incident has been logged. Please try again in a moment.",
+    "errors.return_home" => "Return home",
 
     "reg.title"        => "Create Account",
     "reg.success"      => "Account created! Welcome to the continent.",

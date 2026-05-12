@@ -3,7 +3,7 @@
 //  WebMu front controller. The single entry point for every request.
 //  Routes:  ?m=home|registration|register|login|logout|account|
 //           change_password|ranking|character|market|vote|vote_callback|
-//           donate|buy|download|about|health|maintenance
+//           donate|buy|download|about|health|metrics|maintenance
 // =====================================================================
 define("insite", 1);
 require __DIR__ . "/core/init.php";
@@ -52,6 +52,7 @@ switch ($m) {
     case "download":        require __DIR__ . "/modules/download.php";        break;
     case "about":           require __DIR__ . "/modules/about.php";           break;
     case "health":          require __DIR__ . "/modules/health.php";          break;
+    case "metrics":         require __DIR__ . "/modules/metrics.php";         break;
     case "maintenance":     render_page("maintenance");                       break;
     default:
         http_response_code(404);
