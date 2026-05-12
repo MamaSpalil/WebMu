@@ -63,6 +63,16 @@ $config["onlineplus"]   = 0;                  // optional offset for "online" co
 $config["md5use"]       = "off";              // off = plain (MuOnline default), on = md5
 $config["under_rec"]    = 0;                  // 1 = maintenance mode (site closed)
 
+// ---- Operational metrics endpoint (?m=metrics) ----
+// Exposes operational counters (online, registrations/hour, votes/hour,
+// errors/hour, ...) for dashboards. MUST NOT be public.
+// Access is granted when the remote IP is in metrics_allow_ips OR when
+// the request carries a matching token via the X-Metrics-Token header
+// or ?token=... query parameter. Set metrics_token to a long random
+// string when scraping from a non-loopback host (e.g. Prometheus).
+$config["metrics_allow_ips"] = ["127.0.0.1", "::1"];
+$config["metrics_token"]     = "";            // optional shared secret; empty = IP allowlist only
+
 // ---- SEO / branding ----
 $config["description"]  = "WebMu MuOnline Season 3 Episode 1 server";
 $config["keywords"]     = "MuOnline Season 3 episode 1";

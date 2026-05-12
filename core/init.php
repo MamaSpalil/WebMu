@@ -66,11 +66,13 @@ require $config["__core"] . "/catalog.php";
 lang_load($config["def_lang"] ?? "rus");
 
 // maintenance gate (skipped for the explicit "maintenance" route handler
-// and for the "health" probe so external monitors keep working during
-// scheduled maintenance windows).
+// and for the "health" / "metrics" probes so external monitors keep
+// working during scheduled maintenance windows).
 if (!empty($config["under_rec"])) {
     $current_route = $_GET["m"] ?? "";
-    if ($current_route !== "maintenance" && $current_route !== "health") {
+    if ($current_route !== "maintenance"
+        && $current_route !== "health"
+        && $current_route !== "metrics") {
         render_page("maintenance", [
             "title" => lang("maintenance.title", "Server is under maintenance"),
         ]);
