@@ -425,6 +425,100 @@ function mu_decode_item_identity($bytes)
     return ["group" => $group, "code" => $code];
 }
 
+/**
+ * Strict slot-type whitelist for the 12 equipped slots of a MuOnline
+ * Season 2 / Season 3 Episode 1 (1.02.19) Character.Inventory blob.
+ *
+ * Returns true only if the (group, code) decoded from a slot is a legal
+ * item for that slot under stock S2/S3 Ep.1 rules:
+ *
+ *   slot 0  Right Hand → weapons only           (groups 0..5)
+ *   slot 1  Left Hand  → weapons or shield      (groups 0..5 or 6)
+ *   slot 2  Helm       → group 7
+ *   slot 3  Armor      → group 8
+ *   slot 4  Pants      → group 9
+ *   slot 5  Gloves     → group 10
+ *   slot 6  Boots      → group 11
+ *   slot 7  Wings      → group 12, wing/cape codes only
+ *   slot 8  Pet        → group 13, pet codes only
+ *   slot 9  Pendant    → group 13, pendant codes only
+ *   slot 10 Ring 1     → group 13, ring codes only
+ *   slot 11 Ring 2     → group 13, ring codes only
+ *
+ * Group 13 mixes pets, pendants and rings, so the slot has to be matched
+ * by item code as well — otherwise (e.g.) a Pendant of Fire would be
+ * accepted in the Pet slot.
+ */
+function mu_slot_allows($slot, $group, $code)
+{
+    $slot  = (int)$slot;
+    $group = (int)$group;
+    $code  = (int)$code;
+
+    // Group 13 sub-categories per stock S2/S3 Ep.1 item lists.
+    static $g13_pets = [
+        0,  // Guardian Angel
+        1,  // Imp
+        2,  // Horn of Uniria
+        3,  // Horn of Dinorant
+        4,  // Dark Horse
+        5,  // Dark Raven
+    ];
+    static $g13_pendants = [
+        12, // Pendant of Lightning
+        13, // Pendant of Fire
+        25, // Pendant of Ice
+        26, // Pendant of Wind
+        27, // Pendant of Water
+        28, // Pendant of Ability
+    ];
+    static $g13_rings = [
+        8,  // Ring of Ice
+        9,  // Ring of Poison
+        10, // Transformation Ring
+        20, // Wizards Ring
+        21, // Ring of Fire
+        22, // Ring of Earth
+        23, // Ring of Wind
+        24, // Ring of Magic
+        38, // Moonstone Ring
+        39, // Skeleton Warrior Ring
+        40, // Jack O'Lantern Ring
+        41, // Santa Girl Ring
+        42, // GameMaster Ring
+    ];
+    // Wings/Capes that exist in S2/S3 Ep.1; the rest of group 12 are
+    // orbs / scrolls / boxes that must never appear in the Wings slot.
+    static $g12_wings = [
+        0, // Wings of Elf
+        1, // Wings of Heaven
+        2, // Wings of Satan
+        3, // Wings of Spirits
+        4, // Wings of Soul
+        5, // Wings of Dragon
+        6, // Wings of Darkness
+    ];
+
+    switch ($slot) {
+        case 0: // Right Hand: weapons only
+            return $group >= 0 && $group <= 5;
+        case 1: // Left Hand: weapons or shield
+            return ($group >= 0 && $group <= 5) || $group === 6;
+        case 2: return $group === 7;   // Helm
+        case 3: return $group === 8;   // Armor
+        case 4: return $group === 9;   // Pants
+        case 5: return $group === 10;  // Gloves
+        case 6: return $group === 11;  // Boots
+        case 7: return $group === 12 && in_array($code, $g12_wings, true);
+        case 8: return $group === 13 && in_array($code, $g13_pets, true);
+        case 9: return $group === 13 && in_array($code, $g13_pendants, true);
+        case 10:
+        case 11:
+            return $group === 13 && in_array($code, $g13_rings, true);
+    }
+    return false;
+}
+
 function mu_is_hex_inventory($value, $min_chars)
 {
     return $value !== "" && (strlen($value) % 2) === 0
@@ -531,6 +625,14 @@ function mu_parse_equipped_inventory($blob)
         $luck  = (bool)($b1 & 0x04);
         $opt   = $b1 & 0x03;              // ×4 = visible +N option
         $identity = mu_choose_item_identity($bytes, $i, $level);
+
+        // Strict S2/S3 Ep.1 slot-type validation: a Helm slot must hold a
+        // Helm, a Pet slot must hold a pet, etc. Anything else is bogus
+        // data (corrupt blob, wrong-season build, manual DB edit) and is
+        // surfaced as an empty slot rather than as a mis-rendered item.
+        if (!mu_slot_allows($i, $identity["group"], $identity["code"])) {
+            continue;
+        }
 
         $slots[$i] = [
             "empty" => false,
