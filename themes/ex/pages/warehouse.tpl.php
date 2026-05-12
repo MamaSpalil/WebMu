@@ -39,14 +39,51 @@
         foreach ($slots as $s) if (empty($s["empty"])) $non_empty++;
         if ($non_empty === 0): ?>
             <p class="text-mute"><?= h(lang("wh.empty")) ?></p>
-        <?php else: ?>
-            <div class="wh-grid" style="--wh-cols:<?= (int)$wh_cols ?>">
+        <?php else:
+            // Pre-compute (col, row, w, h) for every visible cell. Items
+            // spanning (w × h) cells are clamped against the grid bounds,
+            // and cells covered by another item's footprint are dropped
+            // so the placeholder doesn't show through.
+            $wh_rows = (int)ceil($wh_slots / max(1, $wh_cols));
+            $cells = [];
+            $covered = [];
+            foreach ($slots as $idx => $s) {
+                $col0 = $idx % $wh_cols;
+                $row0 = intdiv($idx, $wh_cols);
+                $empty = !empty($s["empty"]);
+                if ($empty) {
+                    $w = 1; $h = 1;
+                } else {
+                    $w = max(1, (int)($s["w"] ?? 1));
+                    $h = max(1, (int)($s["h"] ?? 1));
+                    if ($col0 + $w > $wh_cols) $w = max(1, $wh_cols - $col0);
+                    if ($row0 + $h > $wh_rows) $h = max(1, $wh_rows - $row0);
+                }
+                $cells[$idx] = ["col" => $col0, "row" => $row0, "w" => $w, "h" => $h, "empty" => $empty];
+                if (!$empty && ($w > 1 || $h > 1)) {
+                    for ($dy = 0; $dy < $h; $dy++) {
+                        for ($dx = 0; $dx < $w; $dx++) {
+                            if ($dx === 0 && $dy === 0) continue;
+                            $covered[($row0 + $dy) * $wh_cols + ($col0 + $dx)] = true;
+                        }
+                    }
+                }
+            }
+        ?>
+            <div class="wh-grid" style="--wh-cols:<?= (int)$wh_cols ?>;--wh-rows:<?= (int)$wh_rows ?>">
                 <?php foreach ($slots as $idx => $s):
-                    $empty = !empty($s["empty"]);
+                    if (!empty($covered[$idx])) continue;
+                    $c = $cells[$idx];
+                    $empty = $c["empty"];
                     $image = (string)($s["image"] ?? "");
                     if (!preg_match('~^[A-Za-z0-9_.-]+\.gif$~', $image)) $image = "";
+                    $cell_style = "grid-column: " . ($c["col"] + 1) . " / span " . $c["w"]
+                                . "; grid-row: " . ($c["row"] + 1) . " / span " . $c["h"] . ";";
+                    $cell_class = "wh-cell" . ($empty ? " empty" : "")
+                                . ($c["w"] > 1 ? " w" . $c["w"] : "")
+                                . ($c["h"] > 1 ? " h" . $c["h"] : "");
                 ?>
-                <div class="wh-cell<?= $empty ? " empty" : "" ?>"
+                <div class="<?= h($cell_class) ?>" style="<?= h($cell_style) ?>"
                      title="<?= h(lang("wh.slot")) ?> #<?= (int)$idx ?><?= $empty ? "" : " · " . h($s["name"] ?? "") ?>">
                     <?php if (!$empty): ?>
                         <?php if ($image !== ""): ?>

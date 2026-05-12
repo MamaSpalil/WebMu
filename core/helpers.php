@@ -600,6 +600,166 @@ function mu_item_exists($group, $code)
 }
 
 /**
+ * Return the inventory dimensions [width, height] of an item in cells,
+ * matching the Item.bmd table the MuOnline Season 3 Ep.1 client uses
+ * to lay items out in the warehouse / inventory grid.
+ *
+ * The data is sourced from the legacy `imgs/items.php` reference
+ * (`$itembd[group][code][1]` was a 2-char "WH" string) plus the public
+ * Item.bmd shipped with the S3 Ep.1 client. Items that don't appear in
+ * the per-item override map fall back to a per-group default; truly
+ * unknown items default to 1×1.
+ *
+ * @param int $group ItemType (0..15)
+ * @param int $code  ItemIndex
+ * @return array{0:int,1:int} [width, height]
+ */
+function mu_item_size($group, $code)
+{
+    static $table = null;
+    if ($table === null) {
+        // Per-group defaults (used when the (group, code) pair is not in
+        // the override map below).
+        $defaults = [
+            0  => [1, 3], // Swords
+            1  => [2, 3], // Axes
+            2  => [1, 3], // Maces / Scepters
+            3  => [1, 3], // Spears
+            4  => [1, 4], // Bows / Crossbows
+            5  => [1, 3], // Staves
+            6  => [2, 2], // Shields
+            7  => [2, 2], // Helms
+            8  => [2, 3], // Armor
+            9  => [2, 2], // Pants
+            10 => [2, 2], // Gloves
+            11 => [2, 2], // Boots
+            12 => [2, 3], // Wings (defaults to wing size; orbs/scrolls overridden)
+            13 => [1, 1], // Pets / pendants / rings / misc (overridden case-by-case)
+            14 => [1, 1], // Potions / jewels
+            15 => [1, 2], // Magic scrolls
+        ];
+        // Per-item overrides (only entries that differ from the default).
+        $overrides = [
+            // ----- Group 0: Swords ---------------------------------------
+            0 => [
+                0 => [1, 2],   // Kris
+                1 => [1, 2],   // Short Sword
+                2 => [1, 2],   // Rapier
+                15 => [1, 4],  // Giant Sword
+                16 => [1, 4],  // Sword of Destruction
+                17 => [1, 4],  // Dark Breaker
+                18 => [1, 4],  // Thunder Blade
+                19 => [1, 4],  // Divine Sword of Archangel
+                21 => [1, 4],  // Dark Reign Blade
+                22 => [1, 4],  // Bone Blade
+                23 => [1, 4],  // Explosion Blade
+                24 => [1, 4],  // Daybreak
+                26 => [1, 4],  // Archon Guardian Blade
+            ],
+            // ----- Group 1: Axes ----------------------------------------
+            1 => [
+                0 => [1, 2],   // Small Axe
+                1 => [1, 2],   // Hand Axe
+                8 => [2, 4],   // Crescent Axe
+            ],
+            // ----- Group 2: Maces / Scepters ----------------------------
+            2 => [
+                6 => [2, 3],   // Chaos Dragon Axe
+                13 => [1, 4],  // Divine Scepter of Archangel
+                15 => [1, 4],  // Shining Scepter
+            ],
+            // ----- Group 3: Spears --------------------------------------
+            3 => [
+                2 => [1, 4],   // Dragon Lance
+                5 => [1, 4],   // Double Poleaxe
+                6 => [1, 4],   // Halberd
+                7 => [1, 4],   // Berdysh
+                8 => [1, 4],   // Great Scythe
+                9 => [1, 4],   // Bill of Balrog
+                10 => [1, 4],  // Dragon Spear
+            ],
+            // ----- Group 4: Bows / Crossbows ----------------------------
+            4 => [
+                0 => [1, 3],   // Short Bow
+                1 => [1, 3],   // Bow
+                7 => [1, 2],   // Bolts
+                8 => [1, 3],   // Crossbow
+                9 => [1, 3],   // Golden Crossbow
+                15 => [1, 2],  // Arrows
+            ],
+            // ----- Group 5: Staves --------------------------------------
+            5 => [
+                7 => [1, 4],   // Chaos Lightning Staff
+                8 => [1, 4],   // Staff of Destruction
+                10 => [1, 4],  // Divine Staff of Archangel
+                12 => [1, 4],  // Grand Viper Staff
+                13 => [1, 4],  // Platina Wing Staff
+            ],
+            // ----- Group 6: Shields -------------------------------------
+            6 => [
+                5 => [2, 3],   // Dragon Slayer Shield
+                8 => [2, 3],   // Tower Shield
+            ],
+            // ----- Group 12: Wings / Orbs / Scrolls ---------------------
+            12 => [
+                7  => [1, 1],  // Orb of Twisting Slash
+                8  => [1, 1],  // Healing Orb
+                9  => [1, 1],  // Orb of Greater Defense
+                10 => [1, 1],  // Orb of Greater Damage
+                11 => [1, 1],  // Orb of Summoning
+                12 => [1, 1],  // Orb of Rageful Blow
+                13 => [1, 1],  // Orb of Impale
+                14 => [1, 1],  // Orb of Greater Fortitude
+                15 => [1, 1],  // Jewel of Chaos
+                16 => [1, 1],  // Orb of Fire Slash
+                17 => [1, 1],  // Orb of Penetration
+                18 => [1, 1],  // Orb of Ice Arrow
+                19 => [1, 1],  // Orb of Death Stab
+                21 => [1, 2],  // Scroll of FireBurst
+                22 => [1, 2],  // Scroll of Summon
+                23 => [1, 2],  // Scroll of Critical Damage
+                24 => [1, 2],  // Scroll of Electric Spark
+                26 => [1, 1],  // Gem of Secret
+                30 => [1, 1],  // Bundled Jewel of Bless
+                31 => [1, 1],  // Bundled Jewel of Soul
+                32 => [1, 1],  // Chaos Castle Box
+                33 => [1, 1],  // Illusion Temple Box
+                34 => [1, 1],  // Blood Castle Box
+                35 => [1, 2],  // Scroll of Fire Scream
+            ],
+            // ----- Group 13: Pets / Pendants / Rings / Misc -------------
+            13 => [
+                0  => [1, 2],  // Guardian Angel
+                1  => [1, 1],  // Imp
+                2  => [1, 2],  // Horn of Uniria
+                3  => [1, 2],  // Horn of Dinorant
+                4  => [2, 2],  // Dark Horse
+                5  => [1, 2],  // Dark Raven
+                12 => [1, 2],  // Pendant of Lightning
+                13 => [1, 2],  // Pendant of Fire
+                25 => [1, 2],  // Pendant of Ice
+                26 => [1, 2],  // Pendant of Wind
+                27 => [1, 2],  // Pendant of Water
+                28 => [1, 2],  // Pendant of Ability
+                30 => [2, 3],  // Cape of Lord
+                37 => [2, 2],  // Horn of Fenrir
+            ],
+        ];
+        $table = ["__defaults" => $defaults, "__overrides" => $overrides];
+    }
+
+    $g = (int)$group;
+    $c = (int)$code;
+    if (isset($table["__overrides"][$g][$c])) {
+        return $table["__overrides"][$g][$c];
+    }
+    if (isset($table["__defaults"][$g])) {
+        return $table["__defaults"][$g];
+    }
+    return [1, 1];
+}
+
+/**
  * Clamp a decoded slot's optional badges (`level`, `skill`, `luck`, `exc`)
  * to what the S2/S3 Ep.1 item class can legally carry. Mutates the slot
  * array in place. Used by both the equipped and warehouse decoders to
@@ -770,6 +930,7 @@ function mu_parse_warehouse_blob($blob, $slots = 120)
         "empty" => true, "group" => 0, "code" => 0, "level" => 0,
         "skill" => false, "luck" => false, "opt" => 0, "exc" => 0,
         "raw" => "", "name" => "Empty", "image" => "",
+        "w" => 1, "h" => 1,
     ]);
     $blob = mu_inventory_bytes($blob);
     if ($blob === "") return $out;
@@ -814,6 +975,10 @@ function mu_parse_warehouse_blob($blob, $slots = 120)
             "exc"   => $excellent_mask,
             "raw"   => strtoupper(bin2hex($bytes)),
         ];
+        // Per-item inventory dimensions in cells (Item.bmd / S3 Ep.1).
+        $size = mu_item_size($identity["group"], $identity["code"]);
+        $out[$i]["w"] = (int)$size[0];
+        $out[$i]["h"] = (int)$size[1];
         // Clamp +N / Skill / Luck / Exc badges to what this item class
         // can legally carry under S2/S3 Ep.1 — jewels / potions /
         // scrolls / pets / pendants / rings cannot carry any of them.
