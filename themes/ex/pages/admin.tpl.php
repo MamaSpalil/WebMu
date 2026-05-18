@@ -257,7 +257,7 @@ $wh_cols = $wh_cols ?? 8;
             <?php else: ?>
                 <div class="table-wrap">
                 <table class="rank">
-                    <thead><tr><th>#</th><th><?= h(lang("admin.news.title")) ?></th><th><?= h(lang("news.author")) ?></th><th><?= h(lang("news.posted_by")) ?></th><th></th></tr></thead>
+                    <thead><tr><th>#</th><th><?= h(lang("admin.news.title")) ?></th><th><?= h(lang("news.author")) ?></th><th><?= h(lang("admin.news.posted_at", "Posted at")) ?></th><th></th></tr></thead>
                     <tbody>
                     <?php foreach ($news as $n): ?>
                         <tr>

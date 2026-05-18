@@ -171,6 +171,7 @@ return [
     "admin.news.edit"      => "Edit",
     "admin.news.cancel"    => "Cancel",
     "admin.news.no_table"  => "Table webmu_news is missing. Run docs/schema_addons.sql.",
+    "admin.news.posted_at" => "Posted at",
     "admin.search"         => "Search (login or e-mail)",
     "admin.adjust"         => "Adjust",
     "admin.adjust_ok"      => "Balance updated.",

@@ -181,6 +181,7 @@ return [
     "admin.news.edit"      => "Редактировать",
     "admin.news.cancel"    => "Отмена",
     "admin.news.no_table"  => "Таблица webmu_news не найдена. Выполните docs/schema_addons.sql.",
+    "admin.news.posted_at" => "Опубликовано",
     "admin.search"         => "Поиск (логин или e-mail)",
     "admin.adjust"         => "Изменить",
     "admin.adjust_ok"      => "Баланс обновлён.",
