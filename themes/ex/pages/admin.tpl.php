@@ -2,6 +2,7 @@
 // Admin panel — single template, branches on $sub.
 $tabs = [
     "dashboard" => "admin.tab.dashboard",
+    "news"      => "admin.tab.news",
     "users"     => "admin.tab.users",
     "warehouse" => "admin.tab.warehouse",
     "market"    => "admin.tab.market",
@@ -208,6 +209,80 @@ $wh_cols = $wh_cols ?? 8;
                 </div>
             <?php endif; ?>
         </section>
+
+    <?php elseif ($sub === "news"): ?>
+        <?php
+        $edit = $edit_post ?? null;
+        $edit_id    = (int)($edit["id"] ?? 0);
+        $edit_title = (string)($edit["title"] ?? "");
+        $edit_body  = (string)($edit["body"]  ?? "");
+        ?>
+        <section class="panel panel-corner">
+            <h2 class="panel-title left">
+                <?= $edit_id > 0 ? h(lang("admin.news.edit")) : h(lang("admin.news.create")) ?>
+            </h2>
+            <?php if (!empty($no_table)): ?>
+                <p class="note warn"><?= h(lang("admin.news.no_table")) ?></p>
+            <?php else: ?>
+                <form method="post" action="index.php?m=admin" class="form-grid" style="display:block">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="news_save">
+                    <input type="hidden" name="id" value="<?= (int)$edit_id ?>">
+                    <div class="field">
+                        <label for="n_title"><?= h(lang("admin.news.title")) ?></label>
+                        <input id="n_title" name="title" type="text" maxlength="160"
+                               value="<?= h($edit_title) ?>" required>
+                    </div>
+                    <div class="field">
+                        <label for="n_body"><?= h(lang("admin.news.body")) ?></label>
+                        <textarea id="n_body" name="body" rows="6" maxlength="8000" required><?= h($edit_body) ?></textarea>
+                    </div>
+                    <div class="field" style="display:flex;gap:8px">
+                        <button class="btn small" type="submit">
+                            <?= $edit_id > 0 ? h(lang("admin.news.update")) : h(lang("admin.news.create")) ?>
+                        </button>
+                        <?php if ($edit_id > 0): ?>
+                            <a class="btn small" href="index.php?m=admin&amp;sub=news"><?= h(lang("admin.news.cancel")) ?></a>
+                        <?php endif; ?>
+                    </div>
+                </form>
+            <?php endif; ?>
+        </section>
+
+        <?php if (empty($no_table)): ?>
+        <section class="panel panel-corner">
+            <h2 class="panel-title left"><?= h(lang("admin.news.list")) ?></h2>
+            <?php if (!$news): ?>
+                <p class="text-mute"><?= h(lang("admin.news.empty")) ?></p>
+            <?php else: ?>
+                <div class="table-wrap">
+                <table class="rank">
+                    <thead><tr><th>#</th><th><?= h(lang("admin.news.title")) ?></th><th><?= h(lang("news.author")) ?></th><th><?= h(lang("admin.news.posted_at", "Posted at")) ?></th><th></th></tr></thead>
+                    <tbody>
+                    <?php foreach ($news as $n): ?>
+                        <tr>
+                            <td><?= (int)$n["id"] ?></td>
+                            <td><?= h((string)$n["title"]) ?></td>
+                            <td><?= h((string)($n["author"] ?? "")) ?></td>
+                            <td><?= h((string)($n["posted_at"] ?? "")) ?></td>
+                            <td style="white-space:nowrap">
+                                <a class="btn small" href="index.php?m=admin&amp;sub=news&amp;edit=<?= (int)$n["id"] ?>"><?= h(lang("admin.news.edit")) ?></a>
+                                <form method="post" action="index.php?m=admin" style="display:inline;margin:0"
+                                      onsubmit="return confirm('<?= h(lang("admin.news.confirm_delete")) ?>');">
+                                    <?= csrf_field() ?>
+                                    <input type="hidden" name="action" value="news_delete">
+                                    <input type="hidden" name="id" value="<?= (int)$n["id"] ?>">
+                                    <button class="btn small" type="submit"><?= h(lang("admin.news.delete")) ?></button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+                </div>
+            <?php endif; ?>
+        </section>
+        <?php endif; ?>
 
     <?php elseif ($sub === "log"): ?>
         <section class="panel panel-corner">

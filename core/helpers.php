@@ -1130,3 +1130,66 @@ function flash_pop()
     unset($_SESSION["flash"]);
     return $msgs;
 }
+
+/**
+ * Render a numeric pager: "First [1][2]..[N] Last".
+ *
+ *   $current      — 1-based current page
+ *   $total_pages  — total number of pages (>=1)
+ *   $url_template — printf-style URL with one %d for the page number
+ *                   (e.g. "index.php?m=news&page=%d")
+ *   $window       — how many numbered neighbours to render around current
+ *
+ * Returns HTML; empty string when there is only one page.
+ */
+function pager_html($current, $total_pages, $url_template, $window = 2)
+{
+    $current     = max(1, (int)$current);
+    $total_pages = max(1, (int)$total_pages);
+    if ($total_pages <= 1) return "";
+    if ($current > $total_pages) $current = $total_pages;
+
+    $u = function ($p) use ($url_template) {
+        return htmlspecialchars(sprintf($url_template, (int)$p), ENT_QUOTES, "UTF-8");
+    };
+
+    $lbl_first = htmlspecialchars(function_exists("lang") ? lang("news.pager.first", "First") : "First", ENT_QUOTES, "UTF-8");
+    $lbl_last  = htmlspecialchars(function_exists("lang") ? lang("news.pager.last",  "Last")  : "Last",  ENT_QUOTES, "UTF-8");
+
+    // Build the visible-number window: always include 1 and last, plus
+    // a [current-window .. current+window] band, with "…" placeholders
+    // around gaps. This produces things like 1 … 4 5 6 … 12.
+    $nums = [1];
+    for ($i = $current - $window; $i <= $current + $window; $i++) {
+        if ($i > 1 && $i < $total_pages) $nums[] = $i;
+    }
+    if ($total_pages > 1) $nums[] = $total_pages;
+    $nums = array_values(array_unique($nums));
+    sort($nums);
+
+    $out = '<nav class="pager" aria-label="pagination">';
+    if ($current > 1) {
+        $out .= '<a class="pager-edge" href="' . $u(1) . '">' . $lbl_first . '</a>';
+    } else {
+        $out .= '<span class="pager-edge disabled">' . $lbl_first . '</span>';
+    }
+    $prev = 0;
+    foreach ($nums as $n) {
+        if ($prev && $n > $prev + 1) {
+            $out .= '<span class="pager-gap">…</span>';
+        }
+        if ($n === $current) {
+            $out .= '<span class="pager-num current">' . (int)$n . '</span>';
+        } else {
+            $out .= '<a class="pager-num" href="' . $u($n) . '">' . (int)$n . '</a>';
+        }
+        $prev = $n;
+    }
+    if ($current < $total_pages) {
+        $out .= '<a class="pager-edge" href="' . $u($total_pages) . '">' . $lbl_last . '</a>';
+    } else {
+        $out .= '<span class="pager-edge disabled">' . $lbl_last . '</span>';
+    }
+    $out .= '</nav>';
+    return $out;
+}

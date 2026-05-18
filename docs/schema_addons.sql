@@ -284,6 +284,26 @@ BEGIN
 END
 GO
 
+/* ---- webmu_news (site news / announcements) ------------------------ *
+ *  Posts shown on the home page and the dedicated ?m=news page. Only
+ *  administrators (admin_accounts whitelist or MEMB_INFO.is_admin = 1)
+ *  may create / edit / delete posts via the admin panel.
+ * --------------------------------------------------------------------- */
+IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'webmu_news')
+BEGIN
+    CREATE TABLE webmu_news (
+        id          int IDENTITY(1,1) NOT NULL PRIMARY KEY,
+        title       nvarchar(160) NOT NULL,
+        body        nvarchar(MAX) NOT NULL,
+        author      varchar(32)   NOT NULL,
+        posted_at   datetime      NOT NULL DEFAULT GETDATE(),
+        updated_at  datetime      NULL
+    );
+    CREATE INDEX IX_webmu_news_posted_at ON webmu_news(posted_at DESC);
+    PRINT 'Created webmu_news';
+END
+GO
+
 IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'VipList')
 BEGIN
     CREATE TABLE VipList (
