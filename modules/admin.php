@@ -99,6 +99,48 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         redirect("index.php?m=admin&sub=vip");
     }
 
+    if ($action === "news_save") {
+        $id    = (int)($_POST["id"] ?? 0);
+        $title = trim((string)($_POST["title"] ?? ""));
+        $body  = trim((string)($_POST["body"]  ?? ""));
+        // Hard caps mirror the column widths in docs/schema_addons.sql.
+        if (function_exists("mb_substr")) {
+            $title = mb_substr($title, 0, 160, "UTF-8");
+            $body  = mb_substr($body,  0, 8000, "UTF-8");
+        } else {
+            $title = substr($title, 0, 160);
+            $body  = substr($body,  0, 8000);
+        }
+        if ($title !== "" && $body !== "" && db_table_exists("webmu_news")) {
+            $author = (string)($me["id"] ?? "admin");
+            if ($id > 0) {
+                db_exec(
+                    "UPDATE webmu_news SET title = ?, body = ?, updated_at = GETDATE() WHERE id = ?",
+                    [$title, $body, $id]
+                );
+                audit_log("admin_news_update", ["id" => $id, "title" => $title]);
+            } else {
+                db_exec(
+                    "INSERT INTO webmu_news (title, body, author, posted_at) VALUES (?, ?, ?, GETDATE())",
+                    [$title, $body, $author]
+                );
+                audit_log("admin_news_create", ["title" => $title]);
+            }
+            flash_set("success", lang("admin.news.saved"));
+        }
+        redirect("index.php?m=admin&sub=news");
+    }
+
+    if ($action === "news_delete") {
+        $id = (int)($_POST["id"] ?? 0);
+        if ($id > 0 && db_table_exists("webmu_news")) {
+            db_exec("DELETE FROM webmu_news WHERE id = ?", [$id]);
+            audit_log("admin_news_delete", ["id" => $id]);
+            flash_set("success", lang("admin.news.deleted"));
+        }
+        redirect("index.php?m=admin&sub=news");
+    }
+
     redirect("index.php?m=admin&sub=" . $sub);
 }
 
@@ -234,6 +276,26 @@ if ($sub === "log") {
         if ($where) $sql .= " WHERE " . implode(" AND ", $where);
         $sql .= " ORDER BY ts DESC";
         $data["entries"] = db_all($sql, $args);
+    }
+}
+
+if ($sub === "news") {
+    $data["news"]      = [];
+    $data["edit_post"] = null;
+    $data["no_table"]  = !db_table_exists("webmu_news");
+    if (!$data["no_table"]) {
+        $data["news"] = db_all(
+            "SELECT TOP 200 id, title, body, author, posted_at, updated_at
+               FROM webmu_news
+              ORDER BY posted_at DESC, id DESC"
+        );
+        $edit_id = (int)($_GET["edit"] ?? 0);
+        if ($edit_id > 0) {
+            $data["edit_post"] = db_one(
+                "SELECT id, title, body FROM webmu_news WHERE id = ?",
+                [$edit_id]
+            );
+        }
     }
 }
 

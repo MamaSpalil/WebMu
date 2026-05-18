@@ -65,6 +65,7 @@ switch ($m) {
     case "buy":             require __DIR__ . "/modules/buy.php";             break;
     case "download":        require __DIR__ . "/modules/download.php";        break;
     case "about":           require __DIR__ . "/modules/about.php";           break;
+    case "news":            require __DIR__ . "/modules/news.php";            break;
     case "health":          require __DIR__ . "/modules/health.php";          break;
     case "metrics":         require __DIR__ . "/modules/metrics.php";         break;
     case "maintenance":     render_page("maintenance");                       break;

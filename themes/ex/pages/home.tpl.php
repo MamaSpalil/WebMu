@@ -8,6 +8,9 @@ $top5g   = $widget_data["top5guild"] ?? [];
 $qtop    = $widget_data["questtop"]  ?? [];
 $top5i   = $widget_data["top5items"] ?? [];
 $baners  = $widget_data["baners"]    ?? [];
+$home_news       = $home_news       ?? [];
+$home_news_total = $home_news_total ?? 0;
+$home_news_pages = $home_news_pages ?? 1;
 ?>
 <style>
     .hero { position: relative; z-index: 5; max-width: 1280px; margin: 0 auto; padding: 60px 30px 40px; text-align: center; }
@@ -125,6 +128,45 @@ $baners  = $widget_data["baners"]    ?? [];
     </div>
 </section>
 <?php endif; ?>
+
+<section class="news-on-home" aria-label="Latest news">
+    <div class="news-on-home-inner">
+        <header class="news-on-home-head">
+            <h2 class="news-on-home-title"><?= h(lang("news.title", "News")) ?></h2>
+            <p class="news-on-home-sub"><?= h(lang("news.subtitle", "Announcements")) ?></p>
+        </header>
+        <?php if (!$home_news): ?>
+            <p class="text-mute" style="text-align:center"><?= h(lang("news.empty", "No news posts yet.")) ?></p>
+        <?php else: ?>
+            <div class="news-on-home-list">
+                <?php foreach ($home_news as $n):
+                    $title  = trim((string)($n["title"]  ?? ""));
+                    $body   = trim((string)($n["body"]   ?? ""));
+                    $author = trim((string)($n["author"] ?? ""));
+                    $ts     = (string)($n["posted_at"] ?? "");
+                    $ts_iso = $ts !== "" ? date("Y-m-d\TH:i", strtotime($ts) ?: time()) : "";
+                    $ts_h   = $ts !== "" ? date("d.m.Y H:i", strtotime($ts) ?: time()) : "";
+                ?>
+                    <article class="news-post panel panel-corner">
+                        <header class="news-post-head">
+                            <h3 class="news-post-title"><?= h($title) ?></h3>
+                            <div class="news-post-meta">
+                                <span class="news-post-author"><?= h(lang("news.posted_by", "Posted by")) ?>
+                                    <strong><?= h($author !== "" ? $author : lang("news.author", "Administrator")) ?></strong></span>
+                                <time class="news-post-date" datetime="<?= h($ts_iso) ?>"><?= h($ts_h) ?></time>
+                            </div>
+                        </header>
+                        <div class="news-post-body"><?= nl2br(h($body)) ?></div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($home_news_pages > 1): ?>
+            <?= pager_html(1, $home_news_pages, "index.php?m=news&page=%d") ?>
+        <?php endif; ?>
+    </div>
+</section>
 
 <section class="featured">
     <div class="grid-3">
