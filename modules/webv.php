@@ -934,11 +934,11 @@ $ch_name[6][3] = "Unknown class";
 $display="";
 for ($i=0;$i<strlen(trim($array));$i++)
 {
-	if ($array{$i}!=0)
+	if ($array[$i]!=0)
 	{
 		if ($display!="") $display .="/";
 			
-		$display .= $ch_name[$i][$array{$i}];
+		$display .= $ch_name[$i][$array[$i]];
 	}
 }
 return $display;
